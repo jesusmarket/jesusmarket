@@ -10,6 +10,8 @@ if [ "$LOCAL" = "$REMOTE" ]; then
     echo "Up-to-date"
 elif [ "$LOCAL" = "$BASE" ]; then
     echo "Need to pull"
+    git pull origin master && /var/www/html/scripts/refresh-permissions.sh
+    
 elif [ "$REMOTE" = "$BASE" ]; then
     echo "Need to push"
 else
