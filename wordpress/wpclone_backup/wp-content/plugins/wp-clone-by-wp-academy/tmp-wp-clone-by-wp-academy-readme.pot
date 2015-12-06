@@ -1,0 +1,268 @@
+msgid ""
+msgstr "MIME-Version: 1.0\n"
+
+#. Name.
+msgid "WP Clone by WP Academy"
+msgstr ""
+
+#. Short description.
+msgid "Move or copy a WordPress site to another server or to another domain name, move to/from local server hosting, and backup sites."
+msgstr ""
+
+#. Found in description header.
+msgid "Update September 2015"
+msgstr ""
+
+#. Found in description header.
+msgid "Update April 2015"
+msgstr ""
+
+#. Found in description header.
+msgid "Help Video"
+msgstr ""
+
+#. Found in description header.
+msgid "New features (July 2013): Exclude directories and Database-only backup"
+msgstr ""
+
+#. Found in description header.
+msgid "Support and Disclaimer"
+msgstr ""
+
+#. Found in description header.
+msgid "Please donate to support plugin development &amp; ongoing support"
+msgstr ""
+
+#. Found in description header.
+msgid "Additional documentation"
+msgstr ""
+
+#. Found in description header.
+msgid "Other contributors"
+msgstr ""
+
+#. Found in description list item.
+msgid "Does not require FTP access to either the source or destination site &ndash; just install a new WordPress on the destination site, upload and activate WP Clone plugin, and follow the prompts"
+msgstr ""
+
+#. Found in description list item.
+msgid "It does not backup or restore the WordPress system files (just the user content and database) &ndash; reducing upload time and improving security of your site"
+msgstr ""
+
+#. Found in description list item.
+msgid "It fetches the site backup via your host&apos;s direct http connection, which saves you from needing to upload large files through your internet connection"
+msgstr ""
+
+#. Found in description list item.
+msgid "It uses the WordPress internal zip archive function, which makes it compatible with virtually 100% of hosts that support WordPress (no special PHP libraries are required)"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "WP Clone is the easiest, fastest and most secure way to move or copy a WordPress site to another domain or hosting server.  You can also use it to move your site to/from local server hosting, to create copies of your site for development or testing purposes, to backup your site, and to install pre-configured versions of WordPress."
+msgstr ""
+
+#. Found in description paragraph.
+msgid "WP Clone is a superior solution to even commercial WordPress cloning plugins for the following reasons:"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "[youtube http://www.youtube.com/watch?v=xN5Ffhyn4Ao]"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "We have implemented exclude-directories on the backup, and also database-only backup!  By transferring the contents of 'wp-content' directory with FTP from your old site to new site, you should now be able to migrate sites of any size."
+msgstr ""
+
+#. Found in description paragraph.
+msgid ""
+"No WordPress backup plugin will work reliably on all hosts.  If you have any problems, try doing a \"Database Only\" backup (use \"Advanced Options\"), transfer the wp-content directory over with FTP, and then restore new site.  You should also deactivate and delete any page caching plugins (i.e. W3 Total Cache) before backup.\n"
+"If you still have an issue, please post to the WordPress.org support forum where we support this plugin for free, and we'll respond on a  \"best-effort\" basis.  You can also try the Duplicator plugin http://wordpress.org/plugins/duplicator/ or All-in-One WP Migration https://wordpress.org/plugins/all-in-one-wp-migration/, both of which work pretty good, but are not as fast as WP Clone to migrate sites; or use the manual method described here http://members.wpacademy.com/ww3.htm?moving-wordpress.htm"
+msgstr ""
+
+#. Found in description paragraph.
+msgid ""
+"WP Clone is provided free of charge to the community and supported through the plugin forums on WordPress.org. Please help defray our development expenses and help with support costs through the <a href=\"http://wpacademy.com/software\" title=\"Donations page\">Donations Page</a>\n"
+"Donation page."
+msgstr ""
+
+#. Found in description paragraph.
+msgid "Additional documentation, including supported hosts, at the <a href=\"http://members.wpacademy.com/wpclone-faq\" title=\"WP Clone FAQ\">WP Clone FAQ Page</a>"
+msgstr ""
+
+#. Found in description paragraph.
+msgid ""
+"WP Clone uses functions from the \"Safe Search and Replace on Database with Serialized Data\" script first written by David Coveney of Interconnect IT Ltd (UK) http://www.davidcoveney.com or http://www.interconnectit.com and\n"
+"released under the WTFPL http://sam.zoy.org/wtfpl/. Partial script with full changelog is placed inside 'lib/files' directory."
+msgstr ""
+
+#. Found in installation list item.
+msgid "Navigate to Plugins &gt; Add New"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Search for \"WP Clone\""
+msgstr ""
+
+#. Found in installation list item.
+msgid "Install and activate the plugin"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Follow remaining instructions in the help video"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: Missing backups that some users encountered after upgrading to 2.1.9"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: An option to refresh the backup list."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: An option to remove the database entry and delete all the backup files."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: A section that shows the uncompressed database size and the uncompressed size and the number of files that will be archived during a full backup."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: Notes in the advanced settings section regarding the Maximum memory limit and the Script execution time fields."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: The report returned from the search and replace process into the restore successful page."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Moved the backup list location from the custom table to the wp_options table. (previous backups will be imported and the custom table will be removed on existing installations)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Moved the system information block from the advanced settings section into the \"normal\" dashboard page."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Only the tables with the wordpress table prefix will be altered during a restore."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Only the tables with the wordpress table prefix will be saved during a backup."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Backup deletion is now handled using AJAX."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Disabled heartbeat on wpclone's admin page."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "DB_CHARSET in wp-config.php is used during direct database transactions."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Updated: Readme description."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Admin page links."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: An option to exclude specific directories during backup."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: An option to only backup the database."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: An admin notice for multisite users."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: File operations during backup are now handled directly instead of using the WP filesystem abstraction class."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: UI Twitter feed from rss to the official twitter widget."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: UI Sidebar link attributes."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: When javascript is disabled,submit button shows \"Create Backup\" but the plugin attempts to do a restore."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: The temporary directory location during the restore process from '/wp-content/' to '/wp-content/wpclone-temp/'."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: The 'copy' link in the 'backup successful' screen which stopped working after the 2.1.2 update."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: An option to backup the database using WordPress' WPDB class."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed: The need to keep the original backup names intact."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed: 'lib/DirectoryTree.php' and 'lib/class.php'."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: The backup name structure."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed: Backup file downloads are now handled using WP core functions."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: An XSS vulnerability caused by an older version of the ZeroClipboard library."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: a missing nonce action which was causing a wp_nonce_ays loop on some hosts."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: a couple of UI issues."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: WP Academy sidebar."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: WP Filesystem integration"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added: Alternate zip method for better compatibility with hosts that haven't enabled PHP's zip extension"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: A secondary search and replace that was corrupting serialized entries"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed: ignoring trailing slashes in the site URLs"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Initial release"
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "Review FAQ's and Help Video at the <a href=\"http://members.wpacademy.com/wpclone-faq\" title=\"WP Clone FAQ\">WP Clone FAQ Page</a>"
+msgstr ""

@@ -1,0 +1,290 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ipray-plugin-1.0\n"
+"POT-Creation-Date: 2015-09-22 17:09+0530\n"
+"PO-Revision-Date: 2015-09-22 17:09+0530\n"
+"Last-Translator: \n"
+"Language-Team: ipray\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: C:\\wamp\\www\\native224\\wp-content\\plugins\\ipray\n"
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_admin_init.php:45
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_shortcode.php:54
+msgid "Prayer add successfully."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_admin_init.php:48
+msgid "Prayer instruction here."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_function.php:121
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:21
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:14
+msgid "Add new prayer"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_function.php:128
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_function.php:146
+msgid "Click here"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_function.php:139
+msgid "Someone prayer for you."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:18
+msgid "Prayers"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:19
+msgid "Prayer"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:20
+msgid "Add New"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:22
+msgid "Edit Prayer"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:23
+msgid "New Prayer"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:24
+msgid "View Prayer"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:25
+msgid "Search Prayer"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:26
+msgid "No prayers have been added yet"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:27
+msgid "Nothing found in Trash"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:50
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:57
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:37
+msgid "Share this"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:51
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:40
+msgid "Share this anonymously"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:52
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:58
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:44
+msgid "Do not share this"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:65
+msgid "Prayer Extra Fields"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:70
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:22
+msgid "Your Name:"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:72
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:79
+msgid "Enter your name."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:77
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:26
+msgid "Your Email:"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:84
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:30
+msgid "Your Phone:"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:86
+msgid "Enter your phone"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:91
+msgid "Please..."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:93
+msgid "Desired share option"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:98
+msgid "Email When Someone Prays for Me"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:100
+msgid "Please check for notifiaction"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_global.php:115
+msgid "Settings"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:6
+msgid "iPray Settings"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:10
+msgid "Show subscribe form button"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:17
+msgid "Allow anonymous prayer sumissions"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:24
+msgid "Show pagination"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:28
+msgid "Top"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:30
+msgid "Bottom"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:32
+msgid "Both"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:36
+msgid "Requires modification"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:43
+msgid "Success submission message"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:49
+msgid "Number of prayers to show"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:55
+msgid "Include Bootstrap Css"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:59
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:69
+msgid "Yes"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:61
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:71
+msgid "No"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:65
+msgid "Include Bootstrap Js"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_page.php:75
+msgid "Prayer instruction"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_shortcode.php:55
+msgid "Oops something went wrong!"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_shortcode.php:56
+msgid "Prayer not found."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_shortcode.php:57
+msgid "loading..."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_shortcode.php:58
+msgid "Sending..."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:74
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:135
+msgid "Anonymous"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:149
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:280
+#, php-format
+msgid "Prayed for %d %s"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:168
+msgid "This email already exists."
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:181
+msgid "Subscription add successfully"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:323
+msgid "I prayed for this"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/libraries/ipray_utility.php:324
+msgid "Posted:"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:2
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_list.php:2
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_newsletter.php:2
+msgid "Don't load directly"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:6
+msgid "Close Prayer Request Form"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:6
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:7
+msgid "Share Your Request or Praise"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:9
+msgid "Close alerts Form"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:9
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:10
+msgid "Get alerts when new prayers post"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:34
+msgid "Share it"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:50
+msgid "Your prayer request:"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_alertform.php:60
+msgid "Email me when someone prays for me"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_newsletter.php:5
+msgid "Get new prayers updates"
+msgstr ""
+
+#: C:\wamp\www\native224\wp-content\plugins\ipray/public/templates/ipray_newsletter.php:8
+msgid "Email:"
+msgstr ""
