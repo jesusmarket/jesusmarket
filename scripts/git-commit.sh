@@ -11,6 +11,8 @@ git pull origin master && /var/www/html/scripts/refresh-permissions.sh
 git add *
 echo "adding new files to git"
 
+git status
+
 #Commit change with message added
 git commit -m "$1"
 echo "commiting new changes with message: $1"
