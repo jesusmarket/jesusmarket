@@ -30,6 +30,7 @@
         </title>
         <!--// SITE META //-->
         <meta charset="<?php bloginfo('charset'); ?>" />
+<meta name="google-site-verification" content="yRsJpK4CTzs_xfWyKau2a76pzuEpAAl0O8yaHMDmJ-E" />
         <!-- Mobile Specific Metas
         ================================================== -->
 <?php if ($options['switch-responsive'] == 1) { ?>
