@@ -11,6 +11,7 @@ class SanityTests:
                  "http://jesusmarket.org/?sermons-category=programe-speciale",
                  "http://jesusmarket.org/events-timeline/",
                  "http://jesusmarket.org/despre/",
+		 "http://jesusmarket.org/blog/",
                  "http://jesusmarket.org/despre/nicu-butoi/",
                  "http://jesusmarket.org/despre/misiune/",
                  "http://jesusmarket.org/gradina-rugaciunii/",
