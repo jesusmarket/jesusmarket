@@ -13,4 +13,7 @@ find wordpress wp-admin wpclone_backup wp-includes scripts wp-content -type d -n
 echo "scripts"
 chmod 740 scripts/*sh
 chmod 740 scripts/*py
+echo "cleanup .DS_Store files"
+find / -depth -name ".DS_Store" -exec rm {} \;
+find / -depth -name ".DS_Store?" -exec rm {} \;
 echo "done"
