@@ -1481,6 +1481,7 @@ function getGoogleEvent($month_last='') {
     else{
       $futureevents ='false';
     }
+		$google_event_address = '';
 $currentEventTime = (isset($_POST['date'])?date(DATE_ATOM, strtotime($_POST['date'])):date(DateTime::ATOM));
 require_once('google_api/google_api.php');
 $calender_id = $imic_options['google_feed_id'];
@@ -2039,7 +2040,7 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 		 case '0':
 		    if(!empty($time[0]) && $time[0] != strtotime(date('23:59')))
 			{
-		      $time_opt = date($time_format, $time[0]);
+		      $time_opt = date_i18n($time_format, $time[0]);
 			}
 			else
 			{
@@ -2066,7 +2067,7 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 		 if((!empty($time[0]) && !empty($time[1])) &&
            ($time[0] != strtotime(date('23:59')) || $time[1] != strtotime(date('23:59'))))
 			{
-				 $time_opt_0 = date($time_format, $time[0]);
+				 $time_opt_0 = date_i18n($time_format, $time[0]);
 				 $time_opt_1 = date_i18n($time_format, $time[1]);
 				 if($time[0] != $time[1])
 				 {
@@ -2088,7 +2089,7 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 		 default : 
 		  if(!empty($time[0]))
 		  {
-		    $time_opt = date($time_format, $time[0]);
+		    $time_opt = date_i18n($time_format, $time[0]);
 		  }
 		 break;
 	}
@@ -2100,12 +2101,12 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 			 $diff_date = imic_dateDiff($date[0], $date[1]);
 			 if($diff_date>0)
 			 {
-		       $date_opt = date($date_format, $date[0]);
+		       $date_opt = date_i18n($date_format, $date[0]);
 		       $date_opt = '<strong>' . date_i18n('l', $date[0]) . '</strong> | ' . $date_opt;
 			 }
 			 else
 			 {
-				 $date_opt = date($date_format, $key);
+				 $date_opt = date_i18n($date_format, $key);
 		         $date_opt = '<strong>' . date_i18n('l', $key) . '</strong> | ' . $date_opt;
 			 }
 		  }
@@ -2129,7 +2130,7 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 		 case '2':
 		  if(!empty($date[0]) && !empty($date[1]))
 		  {
-			  $date_opt_0 = date($date_format, $date[0]);
+			  $date_opt_0 = date_i18n($date_format, $date[0]);
 			  $date_opt_0 = '<strong>' . date_i18n('l', $date[0]) . '</strong> | ' . $date_opt_0;
 			  if($date[0] !== $date[1])
 			  {
@@ -2139,7 +2140,7 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 			  }
 			  else
 			  {
-				  $date_opt = date($date_format, $key);
+				  $date_opt = date_i18n($date_format, $key);
 			  }
 		  }
 		 break;
@@ -2149,12 +2150,12 @@ $event_dt_opt = ($single==true)?'2':$event_dt_opt;
 			 $diff_date = imic_dateDiff($date[0], $date[1]);
 			 if($diff_date>0)
 			 {
-		       $date_opt = date($date_format, $date[0]);
+		       $date_opt = date_i18n($date_format, $date[0]);
 		       $date_opt = '<strong>' . date_i18n('l', $date[0]) . '</strong> | ' . $date_opt;
 			 }
 			 else
 			 {
-				 $date_opt = date($date_format, $key);
+				 $date_opt = date_i18n($date_format, $key);
 		         $date_opt = '<strong>' . date_i18n('l', $key) . '</strong> | ' . $date_opt;
 			 }
 		  }
@@ -2629,4 +2630,70 @@ if(!function_exists('imic_save_event'))
 }
 /* add action on init*/
 add_action('init','imic_save_event');
+//Add Sermons Filter Shortcode
+if(!function_exists('imic_sermons_filter_shortcode'))
+{
+	function imic_sermons_filter_shortcode($atts, $content = null) 
+	{
+    extract(shortcode_atts(array(
+		'categories' => '',
+		'tags' => '',
+		'speakers' => ''
+    	), $atts));
+		$output = '';
+		$output .= '<form class="sermon-filter-search searchandfilter" method="get" action="'.esc_url(home_url()).'">
+		<div>
+		<ul>';
+		$get_sermon_categories = get_terms('sermons-category');
+		if(!empty($get_sermon_categories))
+		{
+			$output .= '<li>
+			<select id="sermons-category" class="postform" name="sermons-category">
+			<option selected value="">'.__('Sermons Categories', 'framework').'</option>';
+			foreach($get_sermon_categories as $category)
+			{
+				$selected = ($categories==$category->slug)?'selected':'';
+				$output .= '<option '.$selected.' value="'.$category->slug.'">'.$category->name.' ('.$category->count.')</option>';
+			}
+			$output .= '</select>
+			</li>';
+		}
+		$get_sermon_tags = get_terms('sermons-tag');
+		if(!empty($get_sermon_tags))
+		{
+			$output .= '<li>
+			<select id="sermons-tag" class="postform" name="sermons-tag">
+			<option selected value="">'.__('Sermons Tag', 'framework').'</option>';
+			foreach($get_sermon_tags as $tag)
+			{
+				$selected = ($tags==$tag->slug)?'selected':'';
+				$output .= '<option '.$selected.' value="'.$tag->slug.'">'.$tag->name.' ('.$tag->count.')</option>';
+			}
+			$output .= '</select>
+			</li>';
+		}
+		$get_sermon_speakers = get_terms('sermons-speakers');
+		if(!empty($get_sermon_speakers))
+		{
+			$output .= '<li>
+			<select id="sermons-speakers" class="postform" name="sermons-speakers">
+			<option selected value="">'.__('Sermons Speakers', 'framework').'</option>';
+			foreach($get_sermon_speakers as $speaker)
+			{
+				$selected = ($speakers==$speaker->slug)?'selected':'';
+				$output .= '<option '.$selected.' value="'.$speaker->slug.'">'.$speaker->name.' ('.$speaker->count.')</option>';
+			}
+			$output .= '</select>
+			</li>';
+		}
+		$output .= '<li>
+		<input class="btn btn-default" type="submit" value="Filter">
+		</li>
+		</ul>
+		</div>
+		</form>';
+		return $output;
+	}
+	add_shortcode( 'imic-searchandfilter', 'imic_sermons_filter_shortcode' );
+}
 ?>

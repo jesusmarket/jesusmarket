@@ -61,8 +61,8 @@ echo'<a id="back-to-top"><i class="fa fa-angle-double-up"></i></a>';
 				});
 				jQuery('.sort-source a').click(function(){
 					var sortval = jQuery(this).parent().attr('data-option-value');
-					$(".sort-destination li a").removeAttr('data-rel');
-    				$(".sort-destination li a").attr('data-rel', "prettyPhoto["+sortval+"]");
+					jQuery(".sort-destination li a").removeAttr('data-rel');
+    				jQuery(".sort-destination li a").attr('data-rel', "prettyPhoto["+sortval+"]");
 				});
             });
 		</script>
@@ -182,5 +182,4 @@ if(is_user_logged_in()||$event_guest_switch==1) {
     </div>
 </div>
 <?php } } ?>
-
 </html>

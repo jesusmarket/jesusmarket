@@ -31,6 +31,14 @@ See the [screenshots tab](http://wordpress.org/extend/plugins/regenerate-thumbna
 
 == ChangeLog ==
 
+= Version 2.2.6 =
+
+* PHP 7 compatibility.
+
+= Version 2.2.5 =
+
+* Updates relating to plugin language pack support.
+
 = Version 2.2.4 =
 
 * Better AJAX response error handling in the JavaScript. This should fix a long-standing bug in this plugin. Props Hew Sutton.

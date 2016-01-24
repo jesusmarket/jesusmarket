@@ -479,6 +479,14 @@ $upcoming_events_category= $events_categories->slug; }
             $posts_per_page = get_post_meta($home_id, 'imic_posts_to_show_on', true);
             $imic_recent_post_area = get_post_meta($home_id, 'imic_imic_recent_posts', true);
             $post_category = get_post_meta($home_id,'imic_recent_post_taxonomy',true);
+						$post_new_category = explode(',', $post_category);
+						if(!empty($post_new_category)){
+							foreach($post_new_category as $category)
+							{
+								$post_categories = get_category($category);
+								$post_category_make[] = $post_categories->slug; 
+							}
+						}
             if(!empty($post_category)){
             $post_categories= get_category($post_category);
             if(!empty($post_categories)){
@@ -494,7 +502,11 @@ $upcoming_events_category= $events_categories->slug; }
                 query_posts(array(
                     'post_type' => 'post',
                     'posts_per_page' => $posts_per_page,
-                    'category_name' => $post_category,
+                    'tax_query' => array(array(
+												'taxonomy' => 'category',
+												'field' => 'slug',
+												'terms' => $post_category_make,
+												'operator' => 'IN')),
                 ));
                 if (have_posts()):
                     ?>

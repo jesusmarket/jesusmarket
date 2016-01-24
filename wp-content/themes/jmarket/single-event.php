@@ -110,10 +110,11 @@ $pageOptions = imic_page_design(); //page design options ?>
 			{
 				$events_all = imic_recur_events("future");
 				ksort($events_all);
+				$value_event = '';
 				foreach($events_all as $key=>$value)
 				{
 					if($value==get_the_ID())
-					{
+					{ 
 						$st_dt = get_post_meta($value, 'imic_event_start_dt', true);
 						$en_dt = get_post_meta($value, 'imic_event_end_dt', true);
 						$st_dt_unix = strtotime($st_dt);
@@ -140,11 +141,17 @@ $pageOptions = imic_page_design(); //page design options ?>
 							$date_opt = '<strong>' . date_i18n('l', $key) . '</strong> | ' . $st_dt_unix;
 							$event_dt_outs = '';
 						}
+						$value_event = 1;
 						break;
 					}
 					else
 					{
-						$st_dt = get_post_meta(get_the_ID(), 'imic_event_start_dt', true);
+						
+					}
+				}
+				if($value_event=='')
+				{
+					$st_dt = get_post_meta(get_the_ID(), 'imic_event_start_dt', true);
 						$en_dt = get_post_meta(get_the_ID(), 'imic_event_end_dt', true);
 						$st_dt_unix = strtotime($st_dt);
 						if($en_dt!='')
@@ -170,9 +177,8 @@ $pageOptions = imic_page_design(); //page design options ?>
 							$date_opt = '<strong>' . date_i18n('l', $st_dt_unix) . '</strong> | ' . $st_dt_unix;
 							$event_dt_outs = '';
 						}
-					}
 				}
-				$eventDetailsData = array($event_dt_out[0],$date_opt, get_post_meta(get_the_ID(), 'imic_event_address', true),
+				$eventDetailsData = array($date_opt, $event_dt_out[0], get_post_meta(get_the_ID(), 'imic_event_address', true),
 			 get_post_meta(get_the_ID(), 'imic_event_contact', true));
 			}
 /*			 $eventDetailsData = array($date, $stime . $etime, get_post_meta(get_the_ID(), 'imic_event_address', true),

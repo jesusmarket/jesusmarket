@@ -18,7 +18,7 @@ $options = get_option('imic_options');
                 if (have_posts()): ?>
                 <?php if ($options['switch_sermon_filters'] == 1) { ?>
                 <div class="search-filters">
-                    <?php echo do_shortcode( '[searchandfilter taxonomies="sermons-category,sermons-tag,sermons-speakers" show_count="1,1,1" empty_search_url="'.$SermonPageURL.'"]' ); ?>
+                    <?php echo do_shortcode( '[imic-searchandfilter categories="'.get_query_var('sermons-category').'" tags="'.get_query_var('sermons-tag').'" speakers="'.get_query_var('sermons-speakers').'"]' ); ?>
                 </div>
                 <?php } ?>
                 <?php while (have_posts()):the_post();

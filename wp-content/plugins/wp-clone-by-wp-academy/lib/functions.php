@@ -23,7 +23,18 @@ function wpa_db_backup_wpdb($destination)
     $return = '';
 
     // Get all of the tables
-    $tables = $wpdb->get_col('SHOW TABLES LIKE "' . $wpdb->prefix . '%"');
+    if( isset( $_POST['ignore_prefix'] ) && 'true' === $_POST['ignore_prefix'] ) {
+        wpa_wpc_log( 'ignore prefix enabled, backing up all the tables' );
+        $tables = $wpdb->get_col('SHOW TABLES');
+
+    } else {
+        wpa_wpc_log( sprintf( 'backing up tables with "%s" prefix', $wpdb->prefix ) );
+        $tables = $wpdb->get_col('SHOW TABLES LIKE "' . $wpdb->prefix . '%"');
+
+    }
+
+    wpa_wpc_log( sprintf( 'number of tables to backup - %d', count( $tables ) ) );
+    
     // Cycle through each provided table
     foreach ($tables as $table) {
 
@@ -69,46 +80,50 @@ function wpa_db_backup_wpdb($destination)
 /**
  * @link http://davidwalsh.name/backup-mysql-database-php
  */
-function wpa_db_backup_direct($destination,$tables = '*')
+function wpa_db_backup_direct($destination)
 {
 
     global $wpdb;
-    $link = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
+    $prefix = $wpdb->prefix;
+    $link = wpa_wpc_mysql_connect();
     if ( false === $link ) {
         wpa_backup_error('db', mysql_error() );
     }
-    mysql_select_db( DB_NAME, $link );
-    mysql_set_charset(DB_CHARSET, $link);
-    //get all of the tables
-    if($tables == '*')
-    {
-            $tables = array();
-            $result = mysql_query('SHOW TABLES LIKE "' . $wpdb->prefix . '%"');
-            if ( false === $result ) {
-                wpa_backup_error('db', mysql_error() );
-            }
-            while($row = mysql_fetch_row($result))
-            {
-                    $tables[] = $row[0];
-            }
+
+    $tables = array();
+
+    if( isset( $_POST['ignore_prefix'] ) && 'true' === $_POST['ignore_prefix'] ) {
+        wpa_wpc_log( 'ignore prefix enabled, backing up all the tables' );
+        $result = mysql_query('SHOW TABLES');
+
+    } else {
+        wpa_wpc_log( sprintf( 'backing up tables with "%s" prefix', $prefix ) );
+        $result = mysql_query('SHOW TABLES LIKE "' . $prefix . '%"');
+
     }
-    else
-    {
-            $tables = is_array($tables) ? $tables : explode(',',$tables);
+
+    if ( false === $result ) {
+        wpa_backup_error('db', mysql_error() );
     }
+
+    while( $row = mysql_fetch_row( $result ) ) {
+        $tables[] = $row[0];
+    }
+
+    wpa_wpc_log( sprintf( 'number of tables to backup - %d', count( $tables ) ) );
     $return = '';
-    //cycle through
+
     foreach($tables as $table)
     {
 
-            $result = mysql_query('SELECT * FROM '.$table);
+            $result = mysql_query( 'SELECT * FROM ' . $table, $link );
             if ( false === $result ) {
                 wpa_backup_error('db', mysql_error() );
             }
             $num_fields = mysql_num_fields($result);
 
             $return.= 'DROP TABLE IF EXISTS '.$table.';';
-            $row2 = mysql_fetch_row(mysql_query('SHOW CREATE TABLE '.$table));
+            $row2 = mysql_fetch_row( mysql_query( 'SHOW CREATE TABLE ' . $table, $link ) );
             $return.= "\n\n".$row2[1].";\n\n";
 
             for ($i = 0; $i < $num_fields; $i++)
@@ -141,9 +156,10 @@ function wpa_insert_data($name, $size)
     global $current_user;
     $backup = array(
         $time => array(
-            'name' => $name,
-            'creator' => $current_user->user_login,
-            'size' => $size
+            'name'     => $name . '.zip',
+            'log'      => $name . '.log',
+            'creator'  => $current_user->user_login,
+            'size'     => $size
         )
     );
 
@@ -162,30 +178,65 @@ function wpa_insert_data($name, $size)
 function CreateWPFullBackupZip($backupName, $zipmode, $use_wpdb = false )
 {
     $folderToBeZipped = WPCLONE_DIR_BACKUP . 'wpclone_backup';
-    $destinationPath = $folderToBeZipped . '/' . basename(WPCLONE_WP_CONTENT);
-    $zipFileName = WPCLONE_DIR_BACKUP . $backupName . '.zip';
-    $exclude = wpa_excluded_dirs();
-    $dbonly = isset( $_POST['dbonly'] ) && 'true' == $_POST['dbonly'] ? true : false;
+    $htaccess         = "<Files>\r\n\tOrder allow,deny\r\n\tDeny from all\r\n\tSatisfy all\r\n</Files>";
+    $zipFileName      = WPCLONE_DIR_BACKUP . $backupName . '.zip';
+    $exclude          = wpa_excluded_dirs();
+    $dbonly           = isset( $_POST['dbonly'] ) && 'true' == $_POST['dbonly'] ? true : false;
+    $skip             = 25 * 1024 * 1024;
 
-    if( false === mkdir( $folderToBeZipped ) )
+    if( isset( $_POST['skipfiles'] ) && '' !== $_POST['skipfiles'] ) {
+
+        if( 0 === $_POST['skipfiles'] ) {
+            $skip = false;
+
+        } else {
+            $skip = $_POST['skipfiles'] * 1024 * 1024;
+
+        }
+
+    }
+
+    if( false === mkdir( $folderToBeZipped ) ) {
         wpa_backup_error ( 'file', sprintf( __( 'Unable to create the temporary backup directory,please make sure that PHP has permission to write into the <code>%s</code> directory.' ), WPCLONE_DIR_BACKUP ) );
+    }
+    
+    file_put_contents( $folderToBeZipped . '/.htaccess', $htaccess );
 
-    if( false === $dbonly )
-        wpa_copy_dir( untrailingslashit( WPCLONE_WP_CONTENT ), $destinationPath, $exclude);
+    if( $dbonly ) {
+        wpa_wpc_log ( 'database only backup, no files will be copied' );
+    }
+
+    if( false === $dbonly ) {        
+        if( $skip ) {
+            wpa_wpc_log( sprintf( 'files larger than %s will be excluded from the backup', bytesToSize( $skip ) ) );
+        }
+        wpa_wpc_log( 'generating file list' );
+        file_put_contents( $folderToBeZipped . '/file.list', serialize( wpa_wpc_get_filelist( WPCLONE_WP_CONTENT, $exclude, $skip ) ) );
+        wpa_wpc_log( 'finished generating file list' );
+    }
 
     wpa_save_prefix($folderToBeZipped);
     /*  error handler is called from within the db backup functions */
     if ( $use_wpdb ) {
+        wpa_wpc_log ( 'database backup started [wpdb]' );
         wpa_db_backup_wpdb( $folderToBeZipped );
     } else {
+        wpa_wpc_log ( 'database backup started' );
         wpa_db_backup_direct( $folderToBeZipped );
     }
+    wpa_wpc_log ( 'database backup finished' );
 
     /* error haldler is called from within the wpa_zip function */
+
     wpa_zip($zipFileName, $folderToBeZipped, $zipmode);
-    $zipSize = filesize($zipFileName);
+    
     wpa_delete_dir( $folderToBeZipped );
-    return array($backupName . '.zip', $zipSize);
+    
+    if( ! file_exists( $zipFileName ) ) {
+        wpa_backup_error( 'backup', 'possibly out of free disk space' );
+    }
+    $zipSize = filesize($zipFileName);
+    return array($backupName, $zipSize);
 }
 
 function DeleteWPBackupZip($nm)
@@ -195,7 +246,12 @@ function DeleteWPBackupZip($nm)
     if( empty( $backups ) || ! isset( $backups[$nm] ) ) {
         return array(
             'status' => 'failed',
-            'msg' => 'Something is not quite right here, please try again later.' );
+            'msg' => 'Something is not quite right here, refresh the backup list and try again later.' );
+    }
+
+    if( isset( $backups[$nm]['log'] ) && file_exists( WPCLONE_DIR_BACKUP . $backups[$nm]['log'] ) ) {
+        @unlink( WPCLONE_DIR_BACKUP . $backups[$nm]['log'] );
+
     }
 
     if ( file_exists( WPCLONE_DIR_BACKUP . $backups[$nm]['name'] ) ) {
@@ -243,48 +299,31 @@ function bytesToSize($bytes, $precision = 2)
     }
 }
 
-function replaceSiteUrlFromDatabaseFile($databaseFile)
-{
-    global $wp_filesystem;
-    $fileContent = $wp_filesystem->get_contents($databaseFile);
-    $pos = strpos($fileContent, 'siteurl') + 8;
-    $urlStartPos = strpos($fileContent, '"', $pos) + 1;
-    $urlEndPos = strpos($fileContent, '"', $urlStartPos);
-    $backupSiteUrl = substr($fileContent, $urlStartPos, $urlEndPos - $urlStartPos);
+function wpa_wpc_get_url( $db ) {
+
+    $pos = strpos( $db, 'siteurl' ) + 8;
+    $urlStartPos = strpos( $db, '"', $pos ) + 1;
+    $urlEndPos = strpos( $db, '"', $urlStartPos );
+    $backupSiteUrl = substr( $db, $urlStartPos, $urlEndPos - $urlStartPos );
     return $backupSiteUrl;
+
 }
 
-function processConfigAndDatabaseFile($databaseFileInZip)
-{
-    global $wp_filesystem;
-    $dbFileContent = $wp_filesystem->get_contents($databaseFileInZip);
-    /* we don't want to nuke the curret database if if something went wrong with the above operation */
-    if ( false === $dbFileContent ) {
-        wpa_backup_error( 'dbrest', sprintf ( __( 'Cannot read <code>%s</code>' ), $databaseFileInZip ) , true );
+function wpa_wpc_mysql_connect() {
+
+    $link = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
+
+    if ( false === $link ) {
+        mysql_close( $link );
+        sleep(2);
+        $link = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD, true );
     }
 
+    mysql_select_db( DB_NAME, $link );
+    mysql_set_charset( DB_CHARSET, $link );
 
-    $conn = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
-    /* and we cannot nuke the db if the connection failed now can we */
-    if ( false === $conn ) {
-        wpa_backup_error('dbrest', __( 'database connection failed' ), true );
-    }
+    return $link;
 
-    mysql_select_db( DB_NAME, $conn);
-    mysql_set_charset(DB_CHARSET, $conn);
-
-    $res = explode(";\n", $dbFileContent);
-    foreach ($res AS $query) {
-        mysql_query($query, $conn);
-    }
-    mysql_close($conn);
-    $backupSiteUrl =  replaceSiteUrlFromDatabaseFile($databaseFileInZip); /* don't let the name fool you,it just returns the old site's url */
-    $currentSiteUrl = site_url();
-    $backupSiteUrl = untrailingslashit($backupSiteUrl);
-    $currentSiteUrl = untrailingslashit($currentSiteUrl);
-    $report = wpa_safe_replace_wrapper ( $backupSiteUrl, $currentSiteUrl );
-
-    return array( 'url' => $currentSiteUrl, 'report' => $report );
 }
 
 /**
@@ -292,29 +331,66 @@ function processConfigAndDatabaseFile($databaseFileInZip)
  * @param type $replace URL of the current site.
  * @return type total time it took for the operation.
  */
-function wpa_safe_replace_wrapper ( $search, $replace ) {
+function wpa_safe_replace_wrapper ( $search, $replace, $prefix ) {
     if ( !function_exists( 'icit_srdb_replacer' ) && !function_exists( 'recursive_unserialize_replace' ) ) {
         require_once 'icit_srdb_replacer.php';
     }
-    global $wpdb;
-    $connection = @mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
-    $all_tables = array();
-    @mysql_select_db( DB_NAME, $connection );
-    mysql_set_charset( DB_CHARSET, $connection );
-    $all_tables_mysql = @mysql_query( 'SHOW TABLES LIKE "' . $wpdb->prefix . '%"', $connection );
 
-    if ( ! $all_tables_mysql ) {
-        wpa_backup_error( 'dbrest', mysql_error(), true );
-    } else {
-        while ( $table = mysql_fetch_array( $all_tables_mysql ) ) {
-            $all_tables[] = $table[ 0 ];
-        }
+    wpa_wpc_log( 'search and replace started' );
+
+    $connection = wpa_wpc_mysql_connect();
+
+
+    if ( false === $connection ) {
+
+        wpa_wpc_log( 'mysql connection failure @ safe replace wrapper - error : "' . mysql_error( $connection ) . '" retrying..'  );
+
+        mysql_close( $connection );
+        sleep(1);
+        $connection = wpa_wpc_mysql_connect();
+
     }
 
+    $all_tables = array();
+
+    if( isset( $_POST['ignore_prefix'] ) && 'true' === $_POST['ignore_prefix'] ) {
+        wpa_wpc_log( 'ignore table prefix enabled, search and replace will scan all the tables in the database' );
+        $all_tables_mysql = @mysql_query( 'SHOW TABLES', $connection );
+
+    } else {
+        $all_tables_mysql = @mysql_query( 'SHOW TABLES LIKE "' . $prefix . '%"', $connection );
+
+    }
+
+    while ( $table = mysql_fetch_array( $all_tables_mysql ) ) {
+        $all_tables[] = $table[ 0 ];
+    }
+
+    wpa_wpc_log( sprintf( 'there are %d tables to scan', count( $all_tables ) ) );
+
     $report = icit_srdb_replacer( $connection, $search, $replace, $all_tables );
+    mysql_close( $connection );
+    wpa_wpc_log( 'search and replace finished' );
     return $report;
 }
 
+function wpa_wpc_temp_dir() {
+
+    global $wp_filesystem;
+    $temp_dir = trailingslashit( WPCLONE_WP_CONTENT ) . 'wpclone-temp';
+    $err      = $wp_filesystem->mkdir( $temp_dir );
+
+    if ( is_wp_error( $err ) ) {
+        wpa_backup_error('dirrest', $err->get_error_message(), true );
+    }
+
+    $content = "<Files>\r\n\tOrder allow,deny\r\n\tDeny from all\r\n\tSatisfy all\r\n</Files>";
+    $file = trailingslashit( $temp_dir ) . '.htaccess';
+    $wp_filesystem->put_contents( $file, $content, 0644 );
+
+    return $temp_dir;
+
+}
 
 function processRestoringBackup($url, $zipmode) {
     wpa_cleanup( true );
@@ -323,83 +399,74 @@ function processRestoringBackup($url, $zipmode) {
     }
 
     global $wp_filesystem;
-    $temp_dir = trailingslashit( WPCLONE_WP_CONTENT ) . 'wpclone-temp';
-    $temp_dir_err = $wp_filesystem->mkdir( $temp_dir );
-    if ( is_wp_error($temp_dir_err) ) {
-        wpa_backup_error('dirrest', $temp_dir_err->get_error_message(), true );
+    $GLOBALS['wpclone']['logfile'] = 'wpclone_restore_' . current_time( 'dS_M_Y_h-iA', false ) . '_' . wp_generate_password( 10, false ) . '.log';
+
+    wpa_wpc_log_start( 'restore' );
+
+    if( $zipmode ) {
+        define( 'PCLZIP_TEMPORARY_DIR', WPCLONE_DIR_BACKUP );
+        
     }
-    $pathParts = pathinfo($url);
-    $zipFilename = wpa_fetch_file($url);
-
-    $result = wpa_unzip($zipFilename, $temp_dir, $zipmode);
-    if ($result) {
-        $unzippedFolderPath = wpCloneSafePathMode( trailingslashit( $temp_dir ) . 'wpclone_backup' );
-        if ( ! $wp_filesystem->is_dir( $unzippedFolderPath ) ) {
-            $unzippedFolderPath = wpCloneSafePathMode( trailingslashit( $temp_dir ) . $pathParts['filename'] );
-        }
-
-        /* if we're here then the file extraction worked,but let's make doubly sure */
-        if( ! $wp_filesystem->is_dir( $unzippedFolderPath ) ) {
-            wpa_backup_error( 'restore', sprintf( __( 'Cannot find <code>%s<code>' ), $unzippedFolderPath ), true );
-        }
-        /* check the table prefixes */
-        $old_db_prefix = $unzippedFolderPath . '/prefix.txt';
-        $prefix = wpa_check_prefix($old_db_prefix);
-        if ($prefix) {
-            wpa_replace_prefix( $prefix );
-        }
-        $wp_filesystem->delete( $old_db_prefix );
-        /* import db */
-        $databaseFile = $unzippedFolderPath . '/database.sql';
-        $currentSiteUrl = processConfigAndDatabaseFile($databaseFile);
-        /*  */
-        $wp_filesystem->delete( $databaseFile );
-
-        wpa_copy( $unzippedFolderPath . '/wp-content', WPCLONE_WP_CONTENT );
+    
+    $temp_dir        = wpa_wpc_temp_dir();
+    $site_url        = site_url();
+    $permalink_url   = admin_url( 'options-permalink.php' );
+    $zipfile         = wpa_fetch_file($url);
+    $report          = wpa_wpc_process_db( $zipfile, $zipmode );    
+    $unzipped_folder = wpCloneSafePathMode( trailingslashit( $temp_dir ) . 'wpclone_backup' );
 
 
-        $wp_filesystem->delete( $temp_dir, true );
-        /* remove the zip file only if it was downloaded from an external location. */
-        $wptmp = explode('.', $zipFilename);
-        if ( in_array( 'tmp', $wptmp ) ) {
-            $wp_filesystem->delete( $zipFilename );
-        }
+    wpa_unzip( $zipfile, $temp_dir, $zipmode );
+    wpa_wpc_log( 'copying files..' );
+    wpa_copy( $unzipped_folder . '/wp-content', WPCLONE_WP_CONTENT );
 
-        echo "<div><h1>Restore Successful!</h1>";
-
-        echo "Visit your restored site [ <a href='{$currentSiteUrl['url']}' target=blank>here</a> ]<br><br>";
-
-        echo "<strong>You may need to re-save your permalink structure <a href='{$currentSiteUrl['url']}/wp-admin/options-permalink.php' target=blank>Here</a></strong>";
-
-        $report = $currentSiteUrl['report'];
-        /* copy pasta (more or less) from serialized search and replace script by interconnectit */
-        $time = array_sum( explode( ' ', $report[ 'end' ] ) ) - array_sum( explode( ' ', $report[ 'start' ] ) );
-        printf( '<div class="info"><p>Search and replace scanned <strong>%d</strong> tables with a total of <strong>%d</strong> rows, ' , $report['tables'], $report['rows'] );
-        printf( '<strong>%d</strong> cells were changed and <strong>%d</strong> db updates were performed. it took <strong>%f</strong> seconds.</p></div>', $report['change'], $report['updates'], $time );
-
-
-        if ( ! empty( $report['errors'] ) && is_array( $report['errors'] ) ) {
-            echo '<div class="error">';
-            echo '<h3>The following errors were encountered during the search and replace process.</h3>';
-            foreach( $report['errors'] as $error )
-                echo '<p>' . $error . '</p>';
-            echo '</div>';
-        }
-
-        echo '</div>';
-
-    } else {
-
-        echo "<h1>Restore unsuccessful!!!</h1>";
-
-        echo "Please try again.";
+    wpa_wpc_log( 'deleting temp directory..' );
+    $wp_filesystem->delete( $temp_dir, true );
+    /* remove the zip file only if it was downloaded from an external location. */
+    $wptmp = explode( '.', $zipfile );
+    if ( in_array( 'tmp', $wptmp ) ) {
+        wpa_wpc_log( 'deleting downloaded zip file..' );
+        $wp_filesystem->delete( $zipfile );
     }
+
+    wpa_wpc_log( 'restore finished' );
+
+    echo '<div class="width-60"><h1>Restore Successful!</h1>';
+    printf( 'Visit your restored site [ <a href="%s" target=blank>here</a> ]<br><br>', $site_url );
+    printf( '<strong>You may need to re-save your permalink structure <a href="%s" target=blank>Here</a></strong>', $permalink_url );
+    printf( '</br><a href="%s">log</a>',  convertPathIntoUrl( WPCLONE_DIR_BACKUP . $GLOBALS['wpclone']['logfile'] ) );
+    unset( $GLOBALS['wpclone'] );
+    echo wpa_wpc_search_n_replace_report( $report );
+
+
+}
+
+function wpa_wpc_search_n_replace_report( $report ) {
+    
+    if( is_string( $report ) ) {
+        return sprintf( '<div class="info"><p>%s</p></div>', $report );
+    }
+
+    $time = array_sum( explode( ' ', $report[ 'end' ] ) ) - array_sum( explode( ' ', $report[ 'start' ] ) );
+    $return = sprintf( '<div class="info"><p>Search and replace scanned <strong>%d</strong> tables with a total of <strong>%d</strong> rows. ' , $report['tables'], $report['rows'] );
+    $return .= sprintf( '<strong>%d</strong> cells were changed and <strong>%d</strong> db updates were performed in <strong>%f</strong> seconds.</p></div>', $report['change'], $report['updates'], $time );
+
+    if ( ! empty( $report['errors'] ) && is_array( $report['errors'] ) ) {
+        $return .= '<div>';
+        $return .= '<h4>search and replace returned the following errors.</h4>';
+        foreach( $report['errors'] as $error ) {
+            $return .= '<p class="error">' . $error . '</p>';
+        }
+        $return .= '</div>';
+    }
+
+    return $return;
 
 }
 
 function wpa_save_prefix($path) {
     global $wpdb;
-    $prefix = $wpdb->prefix;
+    $prefix = $wpdb->prefix;    
     $file = $path . '/prefix.txt';
     if ( is_dir($path) && is_writable($path) ) {
         file_put_contents($file, $prefix);
@@ -434,32 +501,36 @@ function wpa_check_prefix($file) {
  * @return as false in the event of failure.
  */
 function wpa_unzip($zipfile, $path, $zipmode = false){
-    if ( $zipmode ) {
+
+    if ( $zipmode || ( ! in_array('ZipArchive', get_declared_classes() ) || ! class_exists( 'ZipArchive' ) ) ) {
+
+        wpa_wpc_log( 'extracting archive using pclzip' );
 
         if ( ini_get('mbstring.func_overload') && function_exists('mb_internal_encoding') ) {
             $previous_encoding = mb_internal_encoding();
             mb_internal_encoding('ISO-8859-1');
         }
 
-        define('PCLZIP_TEMPORARY_DIR', WPCLONE_DIR_BACKUP);
         require_once ( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
         $z = new PclZip($zipfile);
-            $files = $z->extract(PCLZIP_OPT_PATH, $path);
+        
+        $files = $z->extract( PCLZIP_OPT_PATH, $path );
 
-            if ( isset($previous_encoding) ) mb_internal_encoding($previous_encoding);
+        if ( isset( $previous_encoding ) ) {
+            mb_internal_encoding( $previous_encoding );
+            
+        }
 
-        if ( $files == 0 ) {
+        if ( $files === 0 ) {
             wpa_backup_error( 'pclunzip', $z->errorInfo(true), true );
         }
-        return true;
+
+    } else {
+        wpa_wpc_log( 'extracting archive using ziparchive' );
+        wpa_wpc_unzip( $zipfile, $path );
+
     }
-    else {
-        $z= unzip_file($zipfile, $path);
-        if (is_wp_error($z)) {
-            wpa_backup_error( 'unzip', $z->get_error_message(), true );
-        }
-        return true;
-    }
+
 }
 /**
  * @since 2.0.6
@@ -469,21 +540,38 @@ function wpa_unzip($zipfile, $path, $zipmode = false){
  */
 function wpa_zip($zip_name, $folder, $zipmode = false){
     if ( $zipmode || (!in_array('ZipArchive', get_declared_classes()) || !class_exists('ZipArchive')) ) {
+        wpa_wpc_log( 'archiving files using pclzip' );
+        $zipmode = true;
         define('PCLZIP_TEMPORARY_DIR', WPCLONE_DIR_BACKUP);
         require_once ( ABSPATH . 'wp-admin/includes/class-pclzip.php');
         $z = new PclZip($zip_name);
-        $v_list = $z->create($folder, PCLZIP_OPT_REMOVE_PATH, WPCLONE_DIR_BACKUP);
+        $v_list = $z->create($folder, PCLZIP_OPT_REMOVE_PATH, WPCLONE_DIR_BACKUP );
         if ($v_list == 0) {
             wpa_backup_error( 'pclzip', $z->errorInfo(true) );
         }
+        $file_list = wpa_wpc_zip( $z, $zipmode );
+
+        if( $file_list ) {
+            $z->add( $file_list, PCLZIP_OPT_REMOVE_PATH, WPCLONE_ROOT, PCLZIP_OPT_ADD_PATH, 'wpclone_backup' );
+        }
+
+        $z->delete( PCLZIP_OPT_BY_NAME, 'wpclone_backup/file.list' );
+
     } else {
+        wpa_wpc_log( 'archiving files using ziparchive' );
         $z = new ZipArchive();
         if ( true !== $z->open( $zip_name, ZIPARCHIVE::CREATE ) ) {
-            wpa_backup_error( 'zip', $z );
+            wpa_backup_error( 'zip', $z->getStatusString() );
         }
         wpa_ziparc($z, $folder, WPCLONE_DIR_BACKUP);
+
+        wpa_wpc_zip( $z, $zipmode );
+        $z->deleteName( 'wpclone_backup/file.list' );
         $z->close();
+
     }
+
+
 }
 
 function wpa_ziparc($zip, $dir, $base) {
@@ -503,11 +591,16 @@ function wpa_ziparc($zip, $dir, $base) {
  * @since 2.0.6
  */
 function wpa_bump_limits(){
-    $time = isset( $_POST['maxexec'] ) && '' != $_POST['maxexec'] ? $_POST['maxexec'] : 300; /*300 seconds = 5 minutes*/
-    $mem =  isset ( $_POST['maxmem'] ) && '' != $_POST['maxmem']  ? $_POST['maxmem'] . 'M' : '512M';
-    @ini_set('memory_limit', $mem);
-    @ini_set('max_execution_time', $time);
+    $GLOBALS['wpclone'] = array();
+    $GLOBALS['wpclone']['time'] = isset( $_POST['maxexec'] ) && '' != $_POST['maxexec'] ? $_POST['maxexec'] : 600; /* 10 minutes */
+    $GLOBALS['wpclone']['mem']  =  isset ( $_POST['maxmem'] ) && '' != $_POST['maxmem']  ? $_POST['maxmem'] . 'M' : '1024M';
+
+    @ini_set('memory_limit', $GLOBALS['wpclone']['mem']);
+    @ini_set('max_execution_time', $GLOBALS['wpclone']['time']);
+    @ini_set('mysql.connect_timeout', $GLOBALS['wpclone']['time']);
+    @ini_set('default_socket_timeout', $GLOBALS['wpclone']['time']);
 }
+
 /**
  * @since 2.0.6
  */
@@ -527,7 +620,7 @@ function wpa_wpfs_init(){
     }
 
     $form_post = wp_nonce_url('admin.php?page=wp-clone', 'wpclone-submit');
-    $extra_fields = array( 'restore_from_url', 'maxmem', 'maxexec', 'zipmode', 'restoreBackup', 'createBackup' );
+    $extra_fields = array( 'restore_from_url', 'maxmem', 'maxexec', 'zipmode', 'ignore_prefix', 'wipedb', 'mysql_check', 'restoreBackup', 'createBackup' );
     $type = '';
     if ( false === ($creds = request_filesystem_credentials($form_post, $type, false, false, $extra_fields)) ){
         return true;
@@ -574,25 +667,36 @@ function wpa_copy($source, $target) {
 /**
  * @since 2.0.6
  */
-function wpa_replace_prefix($newPrefix){
+function wpa_replace_prefix( $current, $new ){
+
     $wpconfig = wpa_wpconfig_path();
     global $wp_filesystem;
 
     if ( ! $wp_filesystem->is_writable($wpconfig) ) {
         if( false === $wp_filesystem->chmod( $wpconfig ) )
             wpa_backup_error('wpconfig', sprintf( __( "<code>%s</code> is not writable and wpclone was unable to change the file permissions." ), $wpconfig ), true );
+
     }
 
-    $fileContent = $wp_filesystem->get_contents($wpconfig);
-    $pos = strpos($fileContent, '$table_prefix');
-    $str = substr($fileContent, $pos, strpos($fileContent, PHP_EOL, $pos) - $pos);
-    $fileContent = str_replace($str, '$table_prefix = "' . $newPrefix . '";', $fileContent);
-    $wp_filesystem->put_contents($wpconfig, $fileContent, 0600);
+    $content = file( $wpconfig );
+
+    foreach( $content as $key => $value ) {
+
+        if( false !== strpos( $value, '$table_prefix' ) ) {
+            $content[$key] = str_replace( $current, $new, $value );
+        }
+
+    }
+
+    $content = implode( $content );
+    $wp_filesystem->put_contents( $wpconfig, $content, 0600 );
+
 }
 /**
  * @since 2.0.6
  */
 function wpa_create_backup (){
+
     if( true === is_multisite() )
         die( 'wpclone does not work on multisite installs.' );
     if ( !file_exists(WPCLONE_DIR_BACKUP) ) {
@@ -601,13 +705,18 @@ function wpa_create_backup (){
     wpa_cleanup();
     $use_wpdb = isset( $_POST['use_wpdb'] ) && 'true' == $_POST['use_wpdb'] ? true : false;
     $backupName = wpa_backup_name();
+    $GLOBALS['wpclone']['logfile'] = $backupName . '.log';
+
+    wpa_wpc_log_start( 'backup' );
 
     $zipmode = isset($_POST['zipmode']) ? true : false;
     list($zipFileName, $zipSize) = CreateWPFullBackupZip($backupName, $zipmode, $use_wpdb);
 
     wpa_insert_data($zipFileName, $zipSize);
-    $backZipPath = convertPathIntoUrl(WPCLONE_DIR_BACKUP . $zipFileName);
+    $backZipPath = convertPathIntoUrl(WPCLONE_DIR_BACKUP . $zipFileName . '.zip');
     $zipSize = bytesToSize($zipSize);
+    wpa_wpc_log( 'backup finished');
+
     echo <<<EOF
 
 <h1>Backup Successful!</h1>
@@ -622,6 +731,8 @@ Here is your backup file : <br />
 
     (Copy that link and paste it into the "Restore URL" of your new WordPress installation to clone this site)
 EOF;
+    printf( '</br><a href="%s">log</a>',  convertPathIntoUrl( WPCLONE_DIR_BACKUP . $GLOBALS['wpclone']['logfile'] ) );
+    unset( $GLOBALS['wpclone'] );
 }
 /**
  * @since 2.0.6
@@ -639,23 +750,23 @@ function wpa_remove_backup(){
  */
 function wpa_wpconfig_path () {
 
-	if ( file_exists( ABSPATH . 'wp-config.php') ) {
+    if ( file_exists( ABSPATH . 'wp-config.php') ) {
 
-		/** The config file resides in ABSPATH */
-		return ABSPATH . 'wp-config.php';
+        /** The config file resides in ABSPATH */
+        return ABSPATH . 'wp-config.php';
 
-	}
-	elseif ( file_exists( dirname(ABSPATH) . '/wp-config.php' ) && ! file_exists( dirname(ABSPATH) . '/wp-settings.php' ) ) {
+    }
+    elseif ( file_exists( dirname(ABSPATH) . '/wp-config.php' ) && ! file_exists( dirname(ABSPATH) . '/wp-settings.php' ) ) {
 
-		/** The config file resides one level above ABSPATH but is not part of another install */
-		return dirname(ABSPATH) . '/wp-config.php';
+        /** The config file resides one level above ABSPATH but is not part of another install */
+        return dirname(ABSPATH) . '/wp-config.php';
 
-	}
-	else {
+    }
+    else {
 
-		return false;
+        return false;
 
-	}
+    }
 
 }
 
@@ -663,17 +774,22 @@ function wpa_fetch_file($path){
     $z = pathinfo($path);
     global $wp_filesystem;
     if ( $wp_filesystem->is_file(WPCLONE_DIR_BACKUP . $z['basename']) ) {
+        wpa_wpc_log( 'file exists in the backup folder, filesize - ' . bytesToSize( filesize( WPCLONE_DIR_BACKUP . $z['basename'] ) ) );
         return WPCLONE_DIR_BACKUP . $z['basename'];
     }
     else {
+        wpa_wpc_log( 'file download started' );
         $url = download_url($path, 750);
-        if ( is_wp_error($url) ) wpa_backup_error( 'url', $url->get_error_message(), true );
+        if ( is_wp_error($url) ) {
+            wpa_backup_error( 'url', $url->get_error_message(), true );
+        }
+        wpa_wpc_log( 'download finished, filesize - ' . bytesToSize( filesize( $url ) ) );
         return $url;
     }
 }
 
 function wpa_backup_name() {
-    $backup_name = 'wpclone_backup_' . date( 'dS_M_Y_h-iA' ) . '_'  . get_option( 'blogname' );
+    $backup_name = 'wpclone_backup_' . current_time( 'dS_M_Y_h-iA', false ) . '_'  . get_option( 'blogname' );
     $backup_name = substr( str_replace( ' ', '', $backup_name ), 0, 40 );
     $rand_str = substr( str_shuffle( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ), 0, 10 );
     $backup_name = sanitize_file_name( $backup_name ) . '_' . $rand_str;
@@ -683,11 +799,12 @@ function wpa_backup_name() {
 function wpa_backup_error($error, $data, $restore = false) {
 
     $temp_dir = $restore ? trailingslashit( WPCLONE_WP_CONTENT ) . 'wpclone-temp' : trailingslashit( WPCLONE_DIR_BACKUP ) . 'wpclone_backup';
+    $disp_dir = str_replace( WPCLONE_ROOT, '**SITE-ROOT**/', wpCloneSafePathMode( $temp_dir ) );
 
     if( !file_exists( $temp_dir ) ) {
         unset($temp_dir);
     }
-
+    
     switch ( $error ) :
         /* during backup */
         case 'file' :
@@ -713,7 +830,7 @@ function wpa_backup_error($error, $data, $restore = false) {
             $error = __( 'while cloning the database' );
             break;
         case 'unzip' :
-            $error = __( 'while extracting the zip file using WP\'s zip file extractor' );
+            $error = __( 'while extracting the zip file using php ziparchive' );
             break;
         case 'pclunzip' :
             $error = __( 'while extracting the zip file using the PclZip library' );
@@ -733,7 +850,7 @@ function wpa_backup_error($error, $data, $restore = false) {
     printf( __( 'The plugin encountered an error %s,the following error message was returned:</br>' ), $error );
     echo '<div class="error">' . __( 'Error Message : ' ) . $data . '</div></br>';
     if( isset( $temp_dir ) ) {
-        printf( __( 'Temporary files created in <code>%s</code> will be deleted.' ), $temp_dir );
+        printf( __( 'Temporary files created in <code>%s</code> will be deleted.' ), $disp_dir );
         echo '</div>';
         if( $restore ) {
             global $wp_filesystem;
@@ -813,7 +930,8 @@ function wpa_excluded_dirs() {
             $ex = trim( $ex );
             if( '' !== $ex ) {
                 $ex = trim( $ex, "/\\" );
-                $exclude[] = trailingslashit( WPCLONE_WP_CONTENT ) . str_replace( '\\', '/', $ex ) ;
+                wpa_wpc_log( sprintf( 'files inside "**SITE_ROOT**/wp-content/%s/" will not be included in the backup', $ex ) );
+                $exclude[] = wpCloneSafePathMode( trailingslashit( WPCLONE_WP_CONTENT ) . $ex ) ;
             }
         }
     }
@@ -828,7 +946,7 @@ function wpa_wpc_dir_size( $path ) {
 
     foreach( $i as $file => $info ) {
 
-        if( ! strpos( $file, 'wp-clone' ) ) {
+        if( false === strpos( wpCloneSafePathMode( $file ), WPCLONE_DIR_BACKUP ) ) {
             $size += $info->getSize();
             $files++;
 
@@ -836,7 +954,16 @@ function wpa_wpc_dir_size( $path ) {
 
     }
 
-    return array( 'size' => size_format( $size ), 'files' => $files );
+    $ret = array(
+        'dbsize' => wpa_wpc_db_size(),
+        'size'   => bytesToSize( $size ),
+        'files'  => $files,
+        'time'   => time()
+    );
+
+    update_option( 'wpclone_directory_scan', $ret );
+    unset( $ret['time'] );
+    return $ret;
 
 }
 
@@ -845,7 +972,7 @@ function wpa_wpc_db_size() {
     global $wpdb;
     $sql = 'SELECT sum(data_length + index_length) FROM information_schema.TABLES WHERE table_schema = "' . DB_NAME . '"';
     $size = $wpdb->get_var( $sql );
-    return size_format( $size );
+    return bytesToSize( $size );
 
 }
 
@@ -906,9 +1033,283 @@ function wpa_wpc_scan_dir() {
 function wpa_wpc_filter_list( $a, $b ) {
 
     $return = array();
-    foreach( $a as $v ) $return[$v] = '';
-    foreach( $b as $v ) unset( $return[$v] );
+    foreach( $a as $v ) {
+        $return[$v] = '';
+    }
+    foreach( $b as $v ) {
+        unset( $return[$v] );
+    }
     return array_keys( $return );
+
+}
+
+function wpa_wpc_log( $msg ) {
+
+    if( ! isset( $GLOBALS['wpclone']['logfile'] ) ) {
+        return;
+    }
+    $file = WPCLONE_DIR_BACKUP . $GLOBALS['wpclone']['logfile'];
+    $time = date( 'l, d-M-Y H:i:s', time() + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
+    $msg  = $time . ' - ' . $msg . "\r\n";
+    file_put_contents( $file, $msg, FILE_APPEND );
+
+}
+
+function wpa_wpc_log_start( $action ) {
+
+    global $wp_version;
+    global $wpdb;
+
+    wpa_wpc_log( sprintf( '%s started', $action ) );
+    wpa_wpc_log( 'wp version     : ' . $wp_version );
+    wpa_wpc_log( 'php version    : ' . phpversion() );
+    wpa_wpc_log( 'mysql version  : ' . $wpdb->db_version() );
+    wpa_wpc_log( 'memory limit   : ' . ini_get( 'memory_limit' ) );
+    wpa_wpc_log( 'execution time : ' . ini_get( 'max_execution_time' ) );
+    wpa_wpc_log( 'mysql timeout  : ' . ini_get( 'mysql.connect_timeout' ) );
+    wpa_wpc_log( 'socket timeout : ' . ini_get( 'default_socket_timeout' ) );
+
+}
+
+function wpa_wpc_strpos_array( $array, $haystack ) {
+
+    foreach( $array as $needle ) {
+        if( false !== strpos( $haystack, $needle ) ) {
+            return true;
+
+        }
+
+    }
+
+}
+
+function wpa_wpc_get_filelist( $path, $exclude, $skip = false ) {
+
+    $i = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $path, FilesystemIterator::CURRENT_AS_SELF | FilesystemIterator::UNIX_PATHS | FilesystemIterator::SKIP_DOTS ) );
+    $skipped  = 0;
+    $size     = 0;
+    $files    = 0;
+    $list     = array();
+
+    foreach( $i as $file => $info ) {
+
+        $file = wpCloneSafePathMode( $file );
+
+        if( false !== strpos( $file, WPCLONE_DIR_BACKUP ) ) {
+            continue;
+        }
+
+        if( false !== strpos( $file, WPCLONE_DIR_PLUGIN ) ) {
+            continue;
+        }
+
+        if( ! empty( $exclude ) && wpa_wpc_strpos_array( $exclude, $file ) ) {
+            $skipped++;
+            wpa_wpc_log( sprintf( 'file is inside an excluded directory, and it will not be included in the backup - "%s"',
+                                    str_replace( WPCLONE_ROOT, '**SITE-ROOT**/', $file ) ) );
+            continue;
+
+        }
+
+        if( $skip && $info->getSize() > $skip ) {
+            $skipped++;
+            wpa_wpc_log( sprintf( 'file skipped, file is larger than %s - "%s"  %s',
+                                    bytesToSize( $skip ), str_replace( WPCLONE_ROOT, '**SITE-ROOT**/', $file ), bytesToSize( $info->getSize() ) ) );
+            continue;
+
+        }
+
+        if( $info->isFile() ) {
+            $list[] = $file;
+            $files++;
+            $size += $info->getSize();
+
+        }
+
+    }
+
+    if( $skipped > 0 ) {
+        wpa_wpc_log( sprintf( '%d files were excluded from the backup', $skipped ) );
+    }
+
+    wpa_wpc_log( sprintf( 'number of files to include in the archive is %d, and their uncompressed size is %s',
+                            $files, bytesToSize( $size ) ) );
+
+    return $list;
+
+}
+
+
+function wpa_wpc_zip( $zh, $zipmode ) {
+
+    $file = WPCLONE_DIR_BACKUP . 'wpclone_backup/file.list';
+
+    if( is_readable( $file ) ) {
+        $filelist = unserialize( file_get_contents( $file ) );
+
+    } else {
+        return false;
+
+    }
+
+    if( $zipmode ) {
+        return $filelist;
+
+    }
+
+    foreach( $filelist as $file ) {
+        $zh->addFile( $file, str_replace( WPCLONE_ROOT, 'wpclone_backup/', $file ) );
+
+    }
+
+    $zh->deleteName( 'wpclone_backup/file.list' );
+
+}
+
+function wpa_wpc_unzip( $zipfile, $temp_dir ) {
+
+    $z = new ZipArchive();
+
+    if( true === $z->open( $zipfile ) ) {
+        $z->extractTo( $temp_dir );
+
+    } else {
+        wpa_wpc_log( sprintf( 'failed to open the zip file : %s', $z->getStatusString() ) );
+        wpa_backup_error( 'unzip', $z->getStatusString(), true );
+
+    }
+
+}
+
+function wpa_wpc_get_db( $zipfile, $zipmode ) {
+
+    $ret = array();
+    if( $zipmode || ( ! in_array( 'ZipArchive', get_declared_classes() ) || ! class_exists( 'ZipArchive' ) ) ) {
+
+        wpa_wpc_log( 'extracting database using pclzip' );
+
+        if ( ini_get('mbstring.func_overload') && function_exists('mb_internal_encoding') ) {
+            $previous_encoding = mb_internal_encoding();
+            mb_internal_encoding('ISO-8859-1');
+        }
+
+        require_once ( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
+        $z = new PclZip($zipfile);
+        $database = $z->extract( PCLZIP_OPT_BY_NAME, 'wpclone_backup/database.sql', PCLZIP_OPT_EXTRACT_AS_STRING );
+        $prefix   = $z->extract( PCLZIP_OPT_BY_NAME, 'wpclone_backup/prefix.txt', PCLZIP_OPT_EXTRACT_AS_STRING );
+
+        if ( isset( $previous_encoding ) ) {
+            mb_internal_encoding($previous_encoding);
+
+        }
+
+        if( 'ok' === $database[0]['status'] && 'ok' === $prefix[0]['status'] ) {
+            $ret['database'] = $database[0]['content'];
+            $ret['prefix']   = $prefix[0]['content'];
+
+        } else {
+            wpa_backup_error( 'pclunzip', $z->errorInfo(true), true );
+
+        }
+
+        return $ret;
+
+    } else {
+
+        $z = new ZipArchive();
+
+        if( true === $z->open( $zipfile ) ) {
+
+            wpa_wpc_log( 'extracting database using ziparchive' );
+            $ret['database'] = $z->getFromName( 'wpclone_backup/database.sql' );
+            $ret['prefix']   = $z->getFromName( 'wpclone_backup/prefix.txt' );
+            if( false === $ret['database'] || false === $ret['prefix'] ) {
+                wpa_backup_error( 'unzip', $z->getStatusString(), true );
+
+            }
+
+            $z->close();
+            return $ret;
+
+        } else {
+            wpa_backup_error( 'unzip', $z->getStatusString(), true );
+
+        }
+
+    }
+
+}
+
+function wpa_wpc_process_db( $zipfile, $zipmode = false ) {
+
+    $files   = wpa_wpc_get_db( $zipfile, $zipmode );
+
+    $prefix  = wpa_wpc_get_prefix( $files['prefix'] );
+    $old_url = untrailingslashit( wpa_wpc_get_url( $files['database'] ) );
+    $cur_url = untrailingslashit( site_url() );
+    $found   = false;
+    $db      = explode( ";\n", $files['database'] );
+    $link    = wpa_wpc_mysql_connect();
+    
+    wpa_wpc_log( 'database import started' );
+    foreach( $db as $query ) {
+
+        if( ! $found && false !== strpos( $query, '"siteurl",' ) ) {            
+            $query = str_replace( $old_url, $cur_url, $query, $count );
+            wpa_wpc_log( sprintf( 'updating mysql query with current site\'s url - new query : "%s"', ltrim( $query ) ) );
+            if( $count > 0 ) {
+                $found = true;
+                
+            }
+
+        }
+
+        if( isset( $_POST['mysql_check'] ) && 'true' === $_POST['mysql_check'] ) {
+            if( ! mysql_ping( $link ) ) {
+                mysql_close( $link );
+                $link = wpa_wpc_mysql_connect();
+
+            }
+
+        }
+
+        $status = mysql_query( $query, $link );
+
+        if( false === $status ) {
+            wpa_wpc_log( sprintf( 'mysql query failed. error : %d %s - query : "%s"', mysql_errno(), mysql_error(), ltrim( $query ) ) );
+
+        }
+
+    }
+    wpa_wpc_log( 'database import finished' );
+
+    if( $cur_url === $old_url ) {
+        wpa_wpc_log( 'URLs are similar, skipping search and replace' );
+        $report = 'Search and replace did not run because the URLs are similar';
+        
+    } else {
+        $report = wpa_safe_replace_wrapper( $old_url, $cur_url, $prefix );
+        
+    }
+    
+    return $report;
+
+
+}
+
+function wpa_wpc_get_prefix( $prev_prefix ) {
+
+    global $wpdb;
+    $cur_prefix  = $wpdb->prefix;
+
+    if ( $cur_prefix !== $prev_prefix ) {
+        wpa_wpc_log( sprintf( 'changing prefix from "%s" to "%s"', $cur_prefix, $prev_prefix ) );
+        wpa_replace_prefix( $cur_prefix, $prev_prefix );
+        $cur_prefix = $prev_prefix;
+
+    }
+
+    return $cur_prefix;
 
 }
 

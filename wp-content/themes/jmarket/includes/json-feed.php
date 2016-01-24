@@ -60,14 +60,14 @@ if ($events):
             $gmte = strtotime($gmte);
             $stime = date('c', $gmts);
             $etime = date('c', $gmte);
-		$st_all_day = get_post_meta($value,'imic_event_start_tm',true);
+		$st_all_day = get_post_meta($value,'imic_event_all_day',true);
 		//if($diff_date>1) { $st_all_day = "12:00"; } 
          
      // - json items -
         $jsonevents[] = array(
             'title' => html_entity_decode(get_the_title($value),ENT_QUOTES,ini_get("default_charset")),
 			 //'title' => get_the_title($value),
-            'allDay' => ($st_all_day!='')?false:true, // <- true by default with FullCalendar
+            'allDay' => ($st_all_day!=1)?false:true, // <- true by default with FullCalendar
             'start' => $stime,
             'end' => $etime,
             'url' => $custom_event_url,

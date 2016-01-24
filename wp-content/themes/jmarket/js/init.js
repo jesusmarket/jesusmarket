@@ -1,4 +1,16 @@
 jQuery(function($) {
+	$("form.sermon-filter-search").submit(function()
+    { 
+		if( !$('#sermons-category').val() ) { 
+			$('#sermons-category').attr("disabled", "disabled");
+		}
+    if( !$('#sermons-tag').val() ) { 
+			$('#sermons-tag').attr("disabled", "disabled");
+		}
+		if( !$('#sermons-speakers').val() ) { 
+			$('#sermons-speakers').attr("disabled", "disabled");
+		}
+    });
     var NATIVE = window.NATIVE || {};
     NATIVE.megaMenu = function() {
         jQuery('.megamenu-sub-title').closest('ul.sub-menu').wrapInner('<div class="row" />').wrapInner('<div class ="megamenu-container container" />').wrapInner('<li />');

@@ -25,7 +25,7 @@ $options = get_option('imic_options');
         $temp_wp_query = clone $wp_query; ?>
                 <?php if ($options['switch_sermon_filters'] == 1) { ?>
                 <div class="search-filters">
-                    <?php echo do_shortcode( '[searchandfilter taxonomies="sermons-category,sermons-tag,sermons-speakers" show_count="1,1,1"]' ); ?>
+                    <?php echo do_shortcode( '[imic-searchandfilter]' ); ?>
                 </div>
                 <?php } ?>
                 <?php 

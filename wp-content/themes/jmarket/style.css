@@ -5,7 +5,7 @@
 	Author: imithemes
 	Author URI: www.imithemes.com
 	Description: <strong>Responsive Wordpress Theme for Churches, Designed & Developed by imithemes</strong> - <a href="http://www.imithemes.com">www.imithemes.com</a>. Follow us for update notifications:<br/> <a href='http://twitter.com/imithemes'>Twitter</a><br/> | <a href='http://www.facebook.com/imithemes'>Facebook</a>
-	Version: 2.6.2
+	Version: 2.6.4
 	License: ThemeForest Split Licence for Wordpress Themes
 			 http://themeforest.net/legal/licences
 			 
@@ -3513,6 +3513,9 @@ p.demo_store{
     text-shadow: none !important;
     box-shadow: none;
 }
+.woocommerce ul.products li.product, .woocommerce-page ul.products li.product{
+	margin-right:3%;
+}
 /* Contact Form 7 Styling */
 .wpcf7-form p{
 	font-weight:700;
@@ -4054,4 +4057,45 @@ only screen and (                min-resolution: 2dppx) {
 	.site-header h1.logo .retina-logo{
 		display:block;
 	}
+}
+
+/* Search & Filter Styles */
+body
+{
+	display:block;
+}
+.searchandfilter p
+{
+	margin-top: 1em;
+	display:inline-block;
+}
+.searchandfilter ul
+{
+	display:inline-block;
+}
+.searchandfilter li
+{
+	list-style: none;
+	display:inline-block;
+	padding-right:10px;
+}
+
+/* If in a widget area make a single column by adding display block  */
+.widget-area .searchandfilter li, .widget-area .searchandfilter p
+{
+	display:block;
+}
+.searchandfilter label
+{
+	display:block;
+}
+.searchandfilter h4
+{
+	margin:15px 0;
+	font-size:16px;
+}
+
+.searchandfilter ul > li > ul:not(.children)
+{
+	margin-left:0;
 }

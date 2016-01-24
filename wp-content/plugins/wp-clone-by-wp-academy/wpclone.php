@@ -4,7 +4,7 @@ Plugin name: WP Clone by WP Academy
 Plugin URI: http://wpacademy.com/software/
 Description: Move or copy a WordPress site to another server or to another domain name, move to/from local server hosting, and backup sites.
 Author: WP Academy
-Version: 2.2
+Version: 2.2.2
 Author URI: http://wpacademy.com/
 */
 
@@ -32,6 +32,7 @@ add_action( 'wp_ajax_wpclone-ajax-size', 'wpa_wpc_ajax_size' );
 add_action( 'wp_ajax_wpclone-ajax-dir', 'wpa_wpc_ajax_dir' );
 add_action( 'wp_ajax_wpclone-ajax-delete', 'wpa_wpc_ajax_delete' );
 add_action( 'wp_ajax_wpclone-ajax-uninstall', 'wpa_wpc_ajax_uninstall' );
+add_action( 'wp_ajax_wpclone-search-n-replace', 'wpa_wpc_ajax_search_n_replace' );
 
 function wpclone_plugin_menu() {
     add_menu_page (
@@ -46,8 +47,17 @@ function wpclone_plugin_menu() {
 function wpa_wpc_ajax_size() {
 
     check_ajax_referer( 'wpclone-ajax-submit', 'nonce' );
-    $size = wpa_wpc_dir_size( WP_CONTENT_DIR );
-    $size['dbsize'] = wpa_wpc_db_size();
+
+    $cached = get_option( 'wpclone_directory_scan' );
+    $interval = 600; /* 10 minutes */
+
+    if( false !== $cached && time() - $cached['time'] < $interval ) {
+        $size = $cached;
+        $size['time'] = date( 'i', time() - $size['time'] );
+    } else {
+        $size = wpa_wpc_dir_size( WP_CONTENT_DIR );
+    }
+
     echo json_encode( $size );
     wp_die();
 
@@ -80,11 +90,38 @@ function wpa_wpc_ajax_delete() {
 function wpa_wpc_ajax_uninstall() {
 
     check_ajax_referer( 'wpclone-ajax-submit', 'nonce' );
-    if( file_exists( WPCLONE_DIR_BACKUP ) ) wpa_delete_dir( WPCLONE_DIR_BACKUP );
+    if( file_exists( WPCLONE_DIR_BACKUP ) ) {
+        wpa_delete_dir( WPCLONE_DIR_BACKUP );
+
+    }
+
+    if( file_exists( WPCLONE_WP_CONTENT . 'wpclone-temp' ) ) {
+        wpa_delete_dir( WPCLONE_WP_CONTENT . 'wpclone-temp' );
+
+    }
+
     delete_option( 'wpclone_backups' );
     wpa_wpc_remove_table();
     wp_die();
 
+}
+
+function wpa_wpc_ajax_search_n_replace() {
+    check_ajax_referer( 'wpclone-ajax-submit', 'nonce' );
+    global $wpdb;
+    $search  = isset( $_POST['search'] ) ? $_POST['search'] : '';
+    $replace = isset( $_POST['replace'] ) ? $_POST['replace'] : '';
+
+    if( empty( $search ) || empty( $replace ) ) {
+        echo '<p class="error">Search and Replace values cannot be empty.</p>';
+        wp_die();
+    }
+
+    wpa_bump_limits();
+    $report = wpa_safe_replace_wrapper( $search, $replace, $wpdb->prefix );
+    echo wpa_wpc_search_n_replace_report( $report );
+
+    wp_die();
 }
 
 function wpclone_plugin_options() {
@@ -100,6 +137,7 @@ function wpa_enqueue_scripts(){
     wp_enqueue_script('wpclone');
     wp_enqueue_style('wpclone');
     wp_deregister_script('heartbeat');
+    add_thickbox();
 }
 if( isset($_GET['page']) && 'wp-clone' == $_GET['page'] ) add_action('admin_enqueue_scripts', 'wpa_enqueue_scripts');
 

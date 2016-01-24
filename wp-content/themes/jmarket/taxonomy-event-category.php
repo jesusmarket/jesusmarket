@@ -39,9 +39,9 @@ echo '<div class="container">
                                       <h4><a href="'.$custom_event_url.'">' . get_the_title($value).'</a>'.imicRecurrenceIcon($value).'</h4>';
                 $stime = '';
                 if ($satime != '') {
-                    $stime = ' | ' . date(get_option('time_format'), $satime);
+                    $stime = ' | ' . date_i18n(get_option('time_format'), $satime);
                 }
-                echo '<span class="event-dayntime meta-data">' . __(date('l', $key),'framework') . $stime . '</span> </div>
+                echo '<span class="event-dayntime meta-data">' . __(date_i18n('l', $key),'framework') . $stime . '</span> </div>
 				  <div class="to-event-url">
 					<div><a href="' .$custom_event_url.'" class="btn btn-default btn-sm">' . __('Details', 'framework') . '</a></div>
 				  </div>

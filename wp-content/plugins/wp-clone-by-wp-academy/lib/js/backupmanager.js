@@ -1,4 +1,3 @@
-
 jQuery(function($) {
 
     initialize();
@@ -14,6 +13,22 @@ jQuery(function($) {
     }
 
     function bindActions() {
+
+        $("a#close-thickbox").click(function(e) {
+            e.preventDefault();
+            tb_remove();
+            $("div#search-n-replace-info").html('');
+            $("input[name='searchfor'], input[name='replacewith']").val('');
+            $("input[name='ignoreprefix']").attr('checked', false);
+        });
+
+        $("input[name='search-n-replace-submit']").click(function(e) {
+            e.preventDefault();
+            if( $(this).data("working") ) return;
+            $("#search-n-replace-info").html('').css( 'background', 'url(' + wpclone.spinner + ') no-repeat center' )
+            $(this).data("working", true);
+            search_and_replace();
+        });
 
         $("input[id='fullBackup']").click(function() {
 
@@ -58,12 +73,12 @@ jQuery(function($) {
 
         $("input[name$='backupUrl']").click(function() {
             prepareBackUrlOption();
-			$("input#submit").removeClass("btn-primary").addClass("btn-warning");
+            $("input#submit").removeClass("btn-primary").addClass("btn-warning");
         });
 
         $("input[name$='restore_from_url']").focus(function() {
             prepareBackUrlOption();
-			$("input#submit").removeClass("btn-primary").addClass("btn-warning");
+            $("input#submit").removeClass("btn-primary").addClass("btn-warning");
         });
 
         $("input#submit").click(function() {
@@ -118,7 +133,7 @@ jQuery(function($) {
         $("#backupChoices").show("fast");
         $("input#submit").val("Create Backup").removeClass("btn-warning").addClass("btn-primary");
         $("input[id='fullBackup']").attr('checked',
-            $("input[name$='createBackup']").is(':checked') && !$("input[id$='customBackup']").is(':checked'));
+        $("input[name$='createBackup']").is(':checked') && !$("input[id$='customBackup']").is(':checked'));
     }
 
     function getSize() {
@@ -132,11 +147,15 @@ jQuery(function($) {
             },
             success: function(data){
                 data = $.parseJSON(data);
-                $("span#filesize").html( "There are <code>" + data.files + "</code> files to backup, and their total size is <code>" + data.size + "</code>. Database size is <code>" + data.dbsize + "</code>." );
+                var cache = '';
+                if( 'undefined' !== typeof data.time ) {
+                    cache = '</br>(calculated ' + data.time + ' minute[s] ago.)';
+                }
+                $("span#filesize").html( "Number of files in wp-content directory - <code>" + data.files + "</code>, and their total size - <code>" + data.size + "</code> (files larger than 25MB will be excluded from the backup, you can change it from advanced settings) </br>Database size is <code>" + data.dbsize + "</code>." + cache );
             },
             error: function(e){
                 $("span#filesize").html( "Unable to calculate size." );
-            }
+            }            
         });
 
     }
@@ -226,5 +245,38 @@ jQuery(function($) {
         });
 
     }
+
+    function search_and_replace() {
+        
+        var prefix = '';
+        
+        if( $("input[name='ignoreprefix']").prop("checked") ) {
+            prefix = 'true';
+        }
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'post',
+            data: {
+                action : 'wpclone-search-n-replace',
+                search : $("input[name='searchfor']").val(),
+                replace: $("input[name='replacewith']").val(),
+                ignore_prefix : prefix,
+                nonce  : wpclone.nonce
+            },
+            success: function(data) {
+                $("div#search-n-replace-info").css('background', '').append(data);
+            },
+            error: function(e){
+                console.log(e);
+            },
+            complete: function(){
+                $("input[name='search-n-replace-submit']").removeData("working");
+            }
+
+        });
+
+    }
+
 
 });

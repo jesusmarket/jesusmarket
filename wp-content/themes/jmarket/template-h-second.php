@@ -12,13 +12,13 @@ get_template_part('flex-slider');
 
 /* End Hero Slider */
 $imic_category_to_show_on_home = get_post_meta($home_id, 'imic_category_to_show_on_home',true);
-$imic_number_of_post_cat = get_post_meta($home_id, 'imic_number_of_post_cat', false);
+$imic_number_of_post_cat = get_post_meta($home_id, 'imic_number_of_post_cat', true);
 $temp_wp_query = clone $wp_query;
 $combined_data =  array();
-if(!empty($imic_category_to_show_on_home[0])||!empty($imic_number_of_post_cat[0])){
-$combined_data = array_merge($imic_category_to_show_on_home, $imic_number_of_post_cat);
-$combined_data = array_unique($combined_data);
-}
+//if(!empty($imic_category_to_show_on_home[0])||!empty($imic_number_of_post_cat[0])){
+//$combined_data = array_merge($imic_category_to_show_on_home, $imic_number_of_post_cat);
+$combined_data = $imic_category_to_show_on_home;
+//}
 
 ?>
 <!-- Start Notice Bar -->
@@ -65,7 +65,7 @@ if($imic_switch_categories_post==1){
                     <!-- Latest News -->
                     <?php 
                     if(!empty($combined_data)){
-                    foreach ($combined_data as $key => $value) { ?>
+                    foreach ($combined_data as $key) { ?>
                         <div class="listing post-listing">
                             <header class="listing-header">
                                 <a href="<?php echo get_category_link($key); ?>" class="btn btn-default pull-right"><?php _e('More', 'framework') ?></a>
@@ -74,7 +74,7 @@ if($imic_switch_categories_post==1){
                             <?php
                             query_posts(array(
                                 'post_type' => 'post',
-                                'posts_per_page' => $value,
+                                'posts_per_page' => $imic_number_of_post_cat,
                                 'cat' => $key
                             ));
                             if (have_posts()):

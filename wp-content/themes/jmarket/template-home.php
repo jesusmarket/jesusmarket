@@ -390,18 +390,26 @@ $i++;
                     <!-- Latest News -->
                     <?php
 						$post_category = get_post_meta($home_id,'imic_recent_post_taxonomy',true);
-						if(!empty($post_category)){
-						$post_categories= get_category($post_category);
-						$post_category= $post_categories->slug; }
+						$post_new_category = explode(',', $post_category);
+						if(!empty($post_new_category)){
+							foreach($post_new_category as $category)
+							{
+								$post_categories = get_category($category);
+								$post_category_make[] = $post_categories->slug; 
+							}
+						}
                     $posts_per_page = get_post_meta($home_id, 'imic_posts_to_show_on', true);
 					$imic_recent_post_area = get_post_meta($home_id,'imic_imic_recent_posts',true);
 					  if($imic_recent_post_area==1) {
                                             
                     if ($posts_per_page == '' ){$posts_per_page = 2;}
-                    $temp_wp_query = clone $wp_query;
                     query_posts(array(
                         'post_type' => 'post',
-							'category_name' => $post_category,
+												'tax_query' => array(array(
+												'taxonomy' => 'category',
+												'field' => 'slug',
+												'terms' => $post_category_make,
+												'operator' => 'IN')),
                         'posts_per_page' => $posts_per_page,
                     ));
                     if (have_posts()):

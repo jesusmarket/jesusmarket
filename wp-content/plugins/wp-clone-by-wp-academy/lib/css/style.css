@@ -52,10 +52,12 @@
     display: none;
 }
 
+.width-60 {
+    max-width: 60%;
+}
 div.info {
     padding: 15px;
     margin: 30px 0;
-    max-width: 60%;
     background: #e1e1ea;
     border-radius: 5px;
     -moz-box-shadow: 5px 5px 15px #aaa;
@@ -96,6 +98,22 @@ table.restore-backup-options td, table.restore-backup-options th {
 .delete-error {
     text-align: center;
     background: #fff0b3;
+}
+
+a#close-thickbox {    
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-weight: bold;
+}
+
+div#search-n-replace {
+    display: none;
+    position: relative;
+}
+
+div#search-n-replace-info{
+    min-height: 20px;
 }
 
 a.copy-button {

@@ -412,3 +412,18 @@ November 07, 2015 - Version 2.6.2
 	UPDATED! Events Google Calendar syncing to now use the API info instead of XML Feed URL
 	UPDATED! Included prayer wall plugin to fix some bugs
 	UPDATED! Revolution Slider plugin to latest version 5.1
+
+December 06, 2015 - Version 2.6.3
+	FIXED! Date function showing error on single event page
+	FIXED! Date not translated on few templates
+	FIXED! Styling bug with Woocommerce related products list
+
+December 24, 2015 - Version 2.6.4
+	FIXED! Gallery filter not working. Filter categories doesn't seems to be clickable.
+	FIXED! Multiple category selection not working on homepage templates, blog templates
+	FIXED! Error init.js Type error for media element 
+	FIXED! Past events shortcakes giving warning
+	FIXED! Calendar shortcode for category filter was not working
+	FIXED! Recurring events showing date of first occurrence of the recurring event on event detailed page.
+	FIXED! Multi-Day Event Posts Wrong End Date
+	UPDATED! Search and Filters for sermons now use custom built function for more accurate results

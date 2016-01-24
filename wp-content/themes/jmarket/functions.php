@@ -79,7 +79,6 @@ if (!function_exists('imic_custom_gravatar')) {
 require_once(IMIC_FILEPATH . '/includes/ReduxCore/framework.php');
 require_once(IMIC_FILEPATH . '/includes/sample/sample-config.php');
 require_once(IMIC_FILEPATH . '/imic-framework/podcasting/podcast-functions.php');
-require_once(IMIC_FILEPATH . '/imic-framework/search-filter/search-filter.php');
 include_once(IMIC_FILEPATH . '/imic-framework/imic-framework.php');
 /* -------------------------------------------------------------------------------------
   For Paginate
@@ -246,4 +245,11 @@ function imic_social_staff_icon() {
         return $output;
     }
 	
+	
+//Remove Redux Framework Notices
+
+add_action( 'admin_menu', 'imic_remove_redux_menu',12 );
+function imic_remove_redux_menu() {
+    remove_submenu_page('tools.php','redux-about');
+}
 ?>

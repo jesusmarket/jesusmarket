@@ -30,7 +30,6 @@
         </title>
         <!--// SITE META //-->
         <meta charset="<?php bloginfo('charset'); ?>" />
-<meta name="google-site-verification" content="yRsJpK4CTzs_xfWyKau2a76pzuEpAAl0O8yaHMDmJ-E" />
         <!-- Mobile Specific Metas
         ================================================== -->
 <?php if ($options['switch-responsive'] == 1) { ?>
@@ -52,38 +51,6 @@
     </head>
     <!--// CLOSE HEAD //-->
     <body <?php body_class($bodyClass); echo $style;  ?>>
-	    <div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=447837278737798";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-70700660-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-<!-- Hotjar Tracking Code for www.jesusmarket.org -->
-<script>
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:114783,hjsv:5};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
-</script>
-
-
         <!--[if lt IE 7]>
                 <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]--> 
@@ -165,7 +132,7 @@
             	           <form method="get" id="searchform" action="' . home_url() . '">
                 	    <div class="input-group">
                  		<span class="input-group-addon"><i class="fa fa-search"></i></span>
-                		<input type="text" class="form-control" name="s" id="s" placeholder="' . __('Type your keywords...', 'framework') . '">
+                		<input type="text" class="form-control" name="s" id="s" placeholder="' . __('Search', 'framework') . '">
                  	   </div>
               	          </form>
                           </div>';
