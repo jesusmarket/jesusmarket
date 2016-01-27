@@ -1,4 +1,4 @@
-import urllib
+import urllib, subprocess
 
 class SanityTests:
 
@@ -34,7 +34,10 @@ class SanityTests:
         print("Warning! The following URLs have issues:");
         for site in check_site_url(site_urls):
             print (site);
-
+	
+	
+	print("");
+	print(subprocess.call(["top", "-n", "1", "-b"]));
         exit(1);
 
     else:
