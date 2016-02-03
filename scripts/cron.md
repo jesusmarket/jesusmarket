@@ -9,3 +9,6 @@
 
 # Disk usage report every sunday at 11am
 0 11 * * 0 df -h | mailx -s "disk usage status" silvian.dragan@gmail.com
+
+# Cron backup scheduled to run every hour
+* * * * * sudo /var/www/html/scripts/cron-backup.sh
