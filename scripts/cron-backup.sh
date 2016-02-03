@@ -20,7 +20,7 @@ echo "adding new files to git"
 git status
 
 #Commit change with message added
-git commit -m $COMMIT_MESSAGE
+git commit -m "$COMMIT_MESSAGE" cron.md
 echo "commiting new changes with message: $COMMIT_MESSAGE"
 
 #Push changes out to origin master
