@@ -11,4 +11,4 @@
 0 11 * * 0 df -h | mailx -s "disk usage status" silvian.dragan@gmail.com
 
 # Cron backup scheduled to run every hour
-* * * * * sudo /var/www/html/scripts/cron-backup.sh
+0 * * * * sudo /var/www/html/scripts/cron-backup.sh
