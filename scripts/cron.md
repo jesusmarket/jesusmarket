@@ -10,5 +10,8 @@
 # Disk usage report every sunday at 11am
 0 11 * * 0 df -h | mailx -s "disk usage status" silvian.dragan@gmail.com
 
+#cleanup tmp folder regularly every 30 mins
+*/30 * * * * sudo rm -f /tmp/*.tmp
+
 # Cron backup scheduled to run every hour
 0 * * * * sudo /var/www/html/scripts/cron-backup.sh
