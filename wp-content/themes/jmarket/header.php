@@ -140,12 +140,12 @@
                                
 									else:
                                     echo '<div class="top-search hidden-sm hidden-xs" align="right">
-            	           <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="J5V9WKR49B7VG">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
+            	            <form method="get" id="searchform" action="' . home_url() . '">
+                	    <div class="input-group">
+                 		<span class="input-group-addon"><i class="fa fa-search"></i></span>
+                		<input type="text" class="form-control" name="s" id="s" placeholder="' . __('Search', 'framework') . '">
+                 	   </div>
+              	          </form>
 
 
                           </div>';
