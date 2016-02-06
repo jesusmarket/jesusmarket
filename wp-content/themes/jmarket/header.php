@@ -51,6 +51,16 @@
     </head>
     <!--// CLOSE HEAD //-->
     <body <?php body_class($bodyClass); echo $style;  ?>>
+	    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-70700660-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
         <!--[if lt IE 7]>
                 <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]--> 
@@ -72,6 +82,7 @@
                     }
                 }
                 echo'</ul>
+                
               	</nav>
          	</div>';
                 if (!empty($menu_locations['top-menu'])) {
@@ -128,13 +139,15 @@
                                     endif;
                                
 									else:
-                                    echo '<div class="top-search hidden-sm hidden-xs">
-            	           <form method="get" id="searchform" action="' . home_url() . '">
-                	    <div class="input-group">
-                 		<span class="input-group-addon"><i class="fa fa-search"></i></span>
-                		<input type="text" class="form-control" name="s" id="s" placeholder="' . __('Search', 'framework') . '">
-                 	   </div>
-              	          </form>
+                                    echo '<div class="top-search hidden-sm hidden-xs" align="right">
+            	           <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="J5V9WKR49B7VG">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+
                           </div>';
                                 endif;
                                 echo '<a href="#" class="visible-sm visible-xs menu-toggle"><i class="fa fa-bars"></i> ' . $options['mobile_menu_text'] .'</a>';
@@ -143,6 +156,7 @@
                             endif;
                             ?>
                         </div>
+                        
                     </div>
                 </div>
 <?php if ($options['header_layout'] != 4) { ?>
@@ -269,7 +283,7 @@
                             if (is_search()) {
                                 echo '<div class="col-md-12 col-sm-12"><h1>';
                                 printf(__('Search Results for :  %s', 'framework'), get_search_query());
-                                echo'</h1>
+                                echo'</h1> 
                                   </div>';
                             } else if (is_404()) {
                                 echo '<div class="col-md-12 col-sm-12"><h1>';
