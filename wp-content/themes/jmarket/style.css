@@ -10,7 +10,35 @@
 			 http://themeforest.net/legal/licences
 			 
 /*  CSS definations for Native Church  */
-/*-------------------------------------------------------------------------------------------*/
+.doneaza {
+  background: #d93434;
+  background-image: -webkit-linear-gradient(top, #d93434, #b50404);
+  background-image: -moz-linear-gradient(top, #d93434, #b50404);
+  background-image: -ms-linear-gradient(top, #d93434, #b50404);
+  background-image: -o-linear-gradient(top, #d93434, #b50404);
+  background-image: linear-gradient(to bottom, #d93434, #b50404);
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 14px;
+  padding-top: px;
+  padding-right: px;
+  padding-bottom: px;
+  padding-left: px;
+  text-decoration: none;
+}
+
+.doneaza:hover {
+  background: #c92626;
+  background-image: -webkit-linear-gradient(top, #c92626, #de2c2c);
+  background-image: -moz-linear-gradient(top, #c92626, #de2c2c);
+  background-image: -ms-linear-gradient(top, #c92626, #de2c2c);
+  background-image: -o-linear-gradient(top, #c92626, #de2c2c);
+  background-image: linear-gradient(to bottom, #c92626, #de2c2c);
+  text-decoration: none;
+}/*-------------------------------------------------------------------------------------------*/
 /* 0. RESET */
 /*-------------------------------------------------------------------------------------------*/
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
