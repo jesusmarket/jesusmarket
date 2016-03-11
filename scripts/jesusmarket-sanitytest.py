@@ -14,8 +14,11 @@ class SanityTests:
                  "http://jesusmarket.org/despre/",
 		 "http://jesusmarket.org/doneaza/",
 		 "http://jesusmarket.org/blog/",
+		 "http://jesusmarket.org/despre/de-ce-jesus-market/",
                  "http://jesusmarket.org/despre/nicu-butoi/",
                  "http://jesusmarket.org/despre/misiune/",
+		 "http://jesusmarket.org/despre/echipa/",
+		 "http://jesusmarket.org/despre/implica-te/",
                  "http://jesusmarket.org/gradina-rugaciunii/",
                  "http://jesusmarket.org/contact/"];
 
