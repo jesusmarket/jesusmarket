@@ -3,8 +3,8 @@ Contributors: smp7, wp.insider, amijanina
 Donate link: https://simple-membership-plugin.com/
 Tags: member, members, members only, membership, memberships, register, WordPress membership plugin, content, content protection, paypal, restrict, restrict access, Restrict content, admin, access control, subscription, teaser, protection, profile, login, login page, bbpress,
 Requires at least: 3.3
-Tested up to: 4.4.1
-Stable tag: 3.1.6
+Tested up to: 4.4
+Stable tag: 3.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,8 @@ All the payments from your members are recorded in the plugin. You can view them
 = Member Login Widget on The Sidebar =
 You can easily add a member login widget on the sidebar of your site. Simply use the login form shortcode in the sidebar widget.
 
+You can also customize the member login widget by creating a custom template file in your theme (or child theme) folder.
+
 = Documentation =
 
 Read the [setup documentation](https://simple-membership-plugin.com/simple-membership-documentation/) after you install the plugin to get started.
@@ -54,12 +56,14 @@ You can create a free forum user account and ask your questions.
 * Comments on your protected posts will also be protected automatically.
 * There is an option to enable debug logging so you can troubleshoot membership payment related issues easily (if any).
 * Ability to customize the content protection message that gets shown to non-members.
+* Ability to use merge vars in the membership email notification.
 * Membership management side is handled by the plugin.
 * Ability to manually approve your members.
 * Ability to import WordPress users as members.
+* Filter members list by account status.
 * Can be translated to any language.
 * Hide the admin toolbar from the frontend of your site.
-* Allow your members to deleter their membership accounts.
+* Allow your members to delete their membership accounts.
 * Send quick notification email to your members.
 * Customize the password reset email for members.
 * Use Google reCAPTCHA on your member registration form.
@@ -95,6 +99,7 @@ The following language translations are already available:
 * Latvian
 * Indonesian
 * Hebrew
+* Catalan
 
 You can translate the plugin using the language [translation documentation](https://simple-membership-plugin.com/translate-simple-membership-plugin/).
 
@@ -115,6 +120,40 @@ Please visit the memberhsip plugin page to view screenshots:
 https://simple-membership-plugin.com/
 
 == Changelog ==
+
+= 3.2.0 =
+- Added Catalan language translation file. The translation was submitted by Josep Ramon.
+- Custom post type categories are also listed in the category protection menu.
+- Added a new filter (swpm_members_menu_items_per_page) that can be used to customize the number of items that is listed in the members menu.
+- The default number of items listed in the members menu by default has been increased to 50.
+- Comment protection fix for posts using "more" tag.
+- Comments of protected posts are also protected.
+- Added CSS classes for all the field rows in the standard membership registration form.
+- Added CSS classes for all the field rows in the edit profile form.
+
+= 3.1.9 =
+- Added new merge vars that can be used in the registration complete email. These are {member_id}, {account_state}, {email}, {member_since}
+- Added trailingslashit() to the after logout redirect URL.
+- Created a new extension to show member info. [usage documentation](https://simple-membership-plugin.com/simple-membership-addon-show-member-info/)
+- A new cookie is dropped when a member logs into the site. It can be used for caching plugin compatibility.
+- Added a new function to load the template for login widget and password reset form. This will allow customization of the login widget by adding the custom template to the theme folder.
+
+= 3.1.8 =
+- Improved the members and payments menu rendering for smaller screen devices.
+- Added a utility function to easily output a formatted date in the plugin according to the WordPress's date format settings.
+- Fixed a bug in the wp username and email validation functionality. Thanks to Klaas van der Linden for pointing it out.
+- The membership password reset form has been restructured (the HTML table has been removed).
+
+= 3.1.7 =
+- Added debug logging for after a password is reset successfully.
+- The plugin will prevent WordPress's default password reset email notification from going out when a member resets the password.
+- Added a new bulk action item. Activate account and notify members in bulk. Customize the activation email from the email settings menu of the plugin.
+- Added validation in the bulk operation function to check and make sure that multiple records were selected before trying the bulk action.
+- Updated the Portuguese (Brazil) language translation file. The translation was updated by Fernando Telles.
+- Updated the Tools interface of the plugin.
+- The members list can now be filtered by account status (from the members interface)
+- The members list now shows "incomplete" keyword in the username field for the member profiles that are incomplete.
+- Added an "Add Member" tab in the members menu.
 
 = 3.1.6 =
 - Added a new feature to show the admin toolbar to admin users only.

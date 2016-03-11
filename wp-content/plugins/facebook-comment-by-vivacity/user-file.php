@@ -98,12 +98,34 @@ if (!isset($fboptn['hideWpComments'])) {$fboptn['hideWpComments'] = "";}
 function commentscode($content) {
 $fboptn = get_option('fbcomment');
 $pages = $fboptn['pagesid'];
-$totalpages = explode(",",$pages);
- $allpage=get_all_page_ids();
-// print_r($allpage);
- $allpage=array_diff($allpage,$totalpages);
- //print_r($allpage);
-//print_r($totalpages);
+ $postid = get_the_ID();  
+$post_type_name = get_post_type( get_the_ID() );
+ 
+ $admin_post_type = isset($fboptn['custompostytpe']);
+ $total_admin_post_type = count(isset($fboptn['custompostytpe']));
+ 
+  for($k=0;$k<= $total_admin_post_type;$k++)
+ 	{
+ if ( ! isset($fboptn['custompostytpe'][$k])) {
+   $fboptn['custompostytpe'][$k] = null;
+}
+ 	 if($fboptn['custompostytpe'][$k] == $post_type_name)
+ 	 {
+ 	 		return $content;
+ 	 	}					
+ 	}
+ $get_exclude_id = explode(',', $pages); 
+	 $get_total_id = count($get_exclude_id);
+ 
+  for($j=0;$j<= $get_total_id;$j++)
+ 				{	
+ if ( ! isset($get_exclude_id[$j])) {
+   $get_exclude_id[$j] = null;
+}
+					 if($postid ==   $get_exclude_id[$j] )  {
+ 						return $content;
+ 						}
+ 				}
 if (!isset($fboptn['html5'])) {$fboptn['html5'] = "off";}
 if (!isset($fboptn['pluginsite'])) {$fboptn['pluginsite'] = "off";}
 if (!isset($fboptn['posts'])) {$fboptn['posts'] = "off";}
@@ -113,7 +135,7 @@ if (!isset($fboptn['count'])) {$fboptn['count'] = "off";}
 if (!isset($fboptn['countmsg'])) {$fboptn['countmsg'] = "0";}
 	if (
 	   (is_single() && $fboptn['posts'] == 'on') ||
-       (is_page($allpage) && $fboptn['pages'] == 'on') ||
+     ($fboptn['pages'] == 'on') ||
        ((is_home() || is_front_page()) && $fboptn['homepage'] == 'on')) {
 if($fboptn['appID'] != "") {
 		if ($fboptn['count'] == 'on') {

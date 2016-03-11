@@ -1,7 +1,7 @@
 .admintbl tr th {text-align: left;}
 .clr{clear: both;}
 a {text-decoration: none !important;}
-h3.title {font-size:18px; color:#1E6CBE;font-weight:bold;text-transform: uppercase;width: 680px;
+h3.title {font-size:18px; color:#1E6CBE;font-weight:bold;text-transform: uppercase;width: 582px;
 margin:15px 0px;padding:10px; background:#ffffff;border-left: 4px solid #1E6CBE;}
 h3.setup {font-size: 18px;}
 .top {background: none repeat scroll 0 0 #FFFFFF;
@@ -10,7 +10,7 @@ h3.setup {font-size: 18px;}
     padding: 0 1em;}
 .top a {color:#1E6CBE;}
 .inner_wrap {margin:15px 0;}
-.inner_wrap .left{max-width:65%;width: 65%;float: left;}
+.inner_wrap .left{max-width:57%;width: 57%;float: left;}
 .right {max-width:33%;width: 33%;float: right;}
 .submitform {margin: 20px 0;}
 .admintbl {margin-top: 0px;}

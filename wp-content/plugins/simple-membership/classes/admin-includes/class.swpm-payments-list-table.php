@@ -2,7 +2,7 @@
 
 include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/common/class.swpm-list-table.php');
 
-class SWPMPaymentsListTable extends SWPM_List_Table {
+class SWPMPaymentsListTable extends WP_List_Table {
 
     function __construct() {
         global $status, $page;
@@ -41,10 +41,12 @@ class SWPMPaymentsListTable extends SWPM_List_Table {
         $column_value = '';
 
         if(empty($member_id)){//Lets try to get the member id using unique reference
-            $resultset = $wpdb->get_row($wpdb->prepare("SELECT * FROM $members_table_name where subscr_id=%s", $subscr_id), OBJECT);
-            if ($resultset) {
-                //Found a record
-                $member_id = $resultset->member_id;
+            if(!empty($subscr_id)){
+                $resultset = $wpdb->get_row($wpdb->prepare("SELECT * FROM $members_table_name where subscr_id=%s", $subscr_id), OBJECT);
+                if ($resultset) {
+                    //Found a record
+                    $member_id = $resultset->member_id;
+                }
             }
         }
         

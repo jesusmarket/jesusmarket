@@ -32,7 +32,8 @@ function fbcomment_init(){
 		'postshideWpComments' => 'off',
 		'pageshideWpComments' => 'off',
 		'selected_types' => 'selected_types',
-		'lang' => 'en_Us'
+		'lang' => 'en_Us',
+ 		'custompostytpe' =>''
 	);
 
 	// if old fboptn exist, update to array
@@ -96,7 +97,8 @@ if (!isset($fboptn['selected_types'])) {$fboptn['selected_types'] = "";}
 if (!isset($fboptn['postshideWpComments'])) {$fboptn['postshideWpComments'] = "";}
 if (!isset($fboptn['pageshideWpComments'])) {$fboptn['pageshideWpComments'] = "";}
 if (!isset($fboptn['lang'])) {$fboptn['lang'] = "en_Us";}
-if (!is_numeric($fboptn['pagesid'])) {$fboptn['pagesid'] = 00;}
+if (!isset($fboptn['pagesid'])) {$fboptn['pagesid'] = 00;}
+if (!isset($fboptn['custompostytpe'])) {$fboptn['custompostytpe'] = "";}
 ?>		
 <!-- get domain name -->
 <?php  $domainname = get_option('siteurl');
@@ -170,14 +172,49 @@ $domainname = str_replace('www.', '', $domainname);?>
 	<h3 id="displaysettings" class="title"><?php _e("Display Settings","facebook-comment-by-vivacity") ?></h3> <!-- ---Display Settings -->
 	<div id="displaysettingstbl" class="togglediv">
 	 <table class="form-table admintbl">
+<?php $args = array(
+   'public'   => true,
+   '_builtin' => false
+);
+$output = 'names'; // names or objects, note names is the default
+$operator = 'and'; // 'and' or 'or'
+$post_types = get_post_types( $args, $output, $operator ); 
+if (!empty($post_types)) 
+{
+ ?>
+		<tr><th><label for="posts"><?php _e( 'Exclude Post Type', 'facebook-comment-by-vivacity' ); ?></label></th>
+		<td> <?php
+
+ $k=0;
+ 
+   foreach ( $post_types as $post_type ) {
+$con='';
+$con.='<input type="checkbox"';
+if (!empty($fboptn['custompostytpe'])) 
+{
+if (in_array($post_type, $fboptn['custompostytpe'])) {
+ $con.='checked="checked"';
+	}
+}
+$con.='name="fbcomment[custompostytpe][]" value="'.$post_type.'" />'.$post_type.'<br>';
+  echo $con;  
+$k++;
+}
+
+?>  </td>
+		</tr>
+		<?php } ?>
 		<tr><th><label for="posts"><?php _e( 'Posts', 'facebook-comment-by-vivacity' ); ?></label></th>
 		<td><input id="posts" name="fbcomment[posts]" type="checkbox" value="on" <?php checked('on', $fboptn['posts']); ?> /> </td>
 		</tr>
 		<tr><th><label for="pages"><?php _e( 'Pages', 'facebook-comment-by-vivacity' ); ?></label></th>
 		<td><input id="pages" name="fbcomment[pages]" type="checkbox" value="on" <?php checked('on', $fboptn['pages']); ?> />
-			<span><input id="pageid" name="fbcomment[pagesid]" type="text"  value="<?php  echo $fboptn['pagesid']; ?>"  /> 
-			<small><?php _e( "Enter page id's where you dont want to show FB comments (Ex:-73,37)." ); ?></small> </span>		
+ 	
 		</td>
+		</tr>
+<tr><th><label for="posts"><?php _e( 'Exclude page and post id', 'facebook-comment-by-vivacity' ); ?></label></th>
+		<td><span><input id="pageid" name="fbcomment[pagesid]" type="text"  value="<?php  echo $fboptn['pagesid']; ?>"  /> 
+			<small><?php _e( "Enter page id's where you dont want to show FB comments (Ex:-73,37)." ); ?></small> </span>		</td>
 		</tr>
 		<tr><th><label for="homepage"><?php _e( 'Home', 'facebook-comment-by-vivacity' ); ?></label></th>
 		<td><input id="home" name="fbcomment[homepage]" type="checkbox" value="on" <?php checked('on', $fboptn['homepage']); ?> />

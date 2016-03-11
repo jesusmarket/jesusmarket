@@ -3,8 +3,8 @@ Contributors: dgewirtz
 Donate link: http://zatzlabs.com/project-donations/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts, church, worship, churches, crowdfunding, donation plugin, fundraiser, fundraising, giving, nonprofit, paypal, PayPal Donate, paypal donations, recurring, recurring donations, wordpress donation plugin, wordpress donations, wp donation
 Requires at least: 3.4
-Tested up to: 4.3
-Stable tag: 4.0.13
+Tested up to: 4.4
+Stable tag: 4.0.14
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -196,6 +196,9 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 == Changelog ==
 
 * **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
+
+= 4.0.14 =
+* Update fixing PayPal chatback bug. See [Working around PayPal breakage: the joys of being middleware](http://zatzlabs.com/working-around-paypal-breakage-the-joys-of-being-middleware/).
 
 = 4.0.13 =
 * On the donor detail page, each donation now shows as Yes or No depending on whether the donation was made anonymously

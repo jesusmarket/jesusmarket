@@ -4,8 +4,7 @@ Donate link: http://bit.ly/1icl56K
 Tags: Facebook Comments, Comments , Social Plugin, Facebook, Comment ,Social, Open Graph, Opengraph, Protocol , XFBML , HTML5 , Moderation , Moderator, shortcode , template , template shortcode , WP comments , WP default comments.
 License: GPLv2 or later
 Requires at least:3.0
-Tested up to: 4.2
-Stable tag: 1.3
+Tested up to: 4.4
 
 == Description ==
 
@@ -86,6 +85,15 @@ For Example:
 4. Displaying Facebook Comments on page.
 
 == Changelog ==
+= 1.4 =
+* Exclude page and post id.
+* Exclude post type.
+
+= 1.3 =
+* Compatible with Wordpress 4.3.
+
+= 1.2 =
+* Compatible with Wordpress 4.2.
 
 = 1.0.9 =
 * Rolled back to 1.0.6 version due to having bugs in new version.

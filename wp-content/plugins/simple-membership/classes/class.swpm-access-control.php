@@ -38,7 +38,7 @@ class SwpmAccessControl {
         $protect_older_posts = apply_filters('swpm_should_protect_older_post', false, $id);
         if ($protect_older_posts){
             $this->lastError = apply_filters ('swpm_restricted_post_msg_older_post', 
-                    SwpmUtils::_('This content can only be viewed by members who joined on or before ' . date(get_option( 'date_format' ), strtotime($post->post_date)))) ;
+                    SwpmUtils::_('This content can only be viewed by members who joined on or before ' . SwpmUtils::get_formatted_date_according_to_wp_settings($post->post_date) ));
             return false;
         }
         $perms = SwpmPermission::get_instance($auth->get('membership_level'));
@@ -88,14 +88,13 @@ class SwpmAccessControl {
                 $error_msg = '<div class="swpm-margin-top-10">' . SwpmUtils::_("You need to login to view the rest of the content. ") . SwpmSettings::get_instance()->get_login_link() . '</div>';
                 $this->lastError = apply_filters('swpm_not_logged_in_more_tag_msg', $error_msg);
             }
-
             return do_shortcode($post_segments[0]) . $this->lastError;
         }
 
         return $this->lastError;
     }
-    public function filter_comment($id,$content){
-        if($this->can_i_read_comment($id)) { return $content; }
+    public function filter_comment($parent_post_id,$content){
+        if($this->can_i_read_post($parent_post_id)) { return $content; }
         return $this->lastError;
     }
     public function filter_post_with_moretag($id, $more_link, $more_link_text){

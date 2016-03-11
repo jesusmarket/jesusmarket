@@ -1,2 +1,0 @@
-[01/24/2016 4:52 PM] - SUCCESS :login
-[01/24/2016 4:52 PM] - SUCCESS :Authenticate request - Username: admin
