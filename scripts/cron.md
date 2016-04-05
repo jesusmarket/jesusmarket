@@ -4,8 +4,8 @@
 # Runs once a month (first of every month at 1 am) to archive a backup of all the sql files and backs them up on remote backup server host
 0 1 1 * * /home/ec2-user/database_backup/script/copy-to-backup.sh
 
-# Check yum updates every friday at 8pm
-0 20 * * 5 sudo yum check-update | mailx -s "yum check-update" silvian.dragan@gmail.com
+# Check yum updates every thursday at 8pm
+0 20 * * 4 sudo yum check-update | mailx -s "yum check-update" silvian.dragan@gmail.com
 
 # Disk usage report every sunday at 11am
 0 11 * * 0 df -h | mailx -s "disk usage status" silvian.dragan@gmail.com
