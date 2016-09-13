@@ -17,7 +17,7 @@ input[disabled] + label, select[disabled] + label, textarea[disabled] + label {c
 p.info {clear: both;float: left;font-size: 13px;font-style:italic;}
 .sep {margin-bottom: 10px;border-bottom: 1px solid #e8e8e8;}
 .buttons {padding: 12px 0 20px 0;border-top: 1px solid #e8e8e8;height: auto;overflow: hidden;}
-.buttons input#insert {width: 115px;height: 30px;float: right;}
+.buttons input#insert {width: auto;height: 30px;float: right;}
 .font-icon-grid {
 	height: auto;
 	overflow: hidden;

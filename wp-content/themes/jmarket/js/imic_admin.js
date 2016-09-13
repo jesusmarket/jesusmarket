@@ -273,10 +273,10 @@ jQuery(function(jQuery) {
     var imic_gallery_meta_box = jQuery('#gallery_meta_box');
     var imic_gallery_video_url = jQuery('#imic_gallery_video_url').parent().parent();
     var imic_gallery_link_url = jQuery('#imic_gallery_link_url').parent().parent();
-    var imic_gallery_slider_images = jQuery('#imic_gallery_images_description').parent().parent();
+    var imic_gallery_slider_images = jQuery('#imic_gallery_images-description').parent().parent();
     var imic_gallery_audio = jQuery('#imic_gallery_audio').parent().parent();
      var imic_gallery_audio_display = jQuery('#imic_gallery_audio_display').parent().parent();
-    var imic_gallery_audio_uploaded = jQuery('#imic_gallery_uploaded_audio_description').parent().parent();
+    var imic_gallery_audio_uploaded = jQuery('#imic_gallery_uploaded_audio-description').parent().parent();
    var imic_gallery_slider_all =jQuery('#imic_gallery_slider_pagination,#imic_gallery_slider_speed,#imic_gallery_slider_auto_slide,#imic_gallery_slider_direction_arrows,#imic_gallery_slider_effects').parent().parent();
    function checkPostFormat(radio_val) {
         if (jQuery.trim(radio_val) == 'video') {
@@ -288,7 +288,7 @@ jQuery(function(jQuery) {
             imic_gallery_slider_all.hide();
             imic_gallery_audio.hide();
             imic_gallery_video_url.show();
-            imic_gallery_meta_box.find('#imic_gallery_slider_image_description').closest('.rwmb-field').show();
+            imic_gallery_meta_box.find('#imic_gallery_slider_image-description').closest('.rwmb-field').hide();
         }
         else if (jQuery.trim(radio_val) == 'link') {
             imic_gallery_meta_box.show();
@@ -299,7 +299,7 @@ jQuery(function(jQuery) {
             imic_gallery_slider_all.hide();
             imic_gallery_audio_uploaded.hide();
             imic_gallery_video_url.hide();
-            imic_gallery_meta_box.find('#imic_gallery_slider_image_description').closest('.rwmb-field').show();
+            imic_gallery_meta_box.find('#imic_gallery_slider_image-description').closest('.rwmb-field').hide();
         }
         else if (jQuery.trim(radio_val) == 'gallery') {
             imic_gallery_meta_box.show();
@@ -310,7 +310,7 @@ jQuery(function(jQuery) {
             imic_gallery_audio_uploaded.hide();
             imic_gallery_slider_all.show();
             imic_gallery_video_url.hide();
-            imic_gallery_meta_box.find('#imic_gallery_slider_image_description').closest('.rwmb-field').hide();
+            imic_gallery_meta_box.find('#imic_gallery_slider_image-description').closest('.rwmb-field').hide();
         }
          else if (jQuery.trim(radio_val) == 'audio') {
             imic_gallery_meta_box.show();
@@ -321,7 +321,7 @@ jQuery(function(jQuery) {
             imic_gallery_audio.show();
             imic_gallery_audio_display.show();
             imic_gallery_audio_uploaded.show();
-            imic_gallery_meta_box.find('#imic_gallery_slider_image_description').closest('.rwmb-field').show();
+            imic_gallery_meta_box.find('#imic_gallery_slider_image-description').closest('.rwmb-field').show();
             audio_display();
         }
         else {
@@ -459,11 +459,12 @@ jQuery(function(jQuery) {
     $imic_sermons_audio_upload.change(function() {
         sermon_audio_display();
     });
-    jQuery("#staff_meta_box").on('click','#Social',function(){
+    jQuery(".rwmb-text-list").live('click',function(){
 	var text_name = jQuery(this).find('input[type=text]').attr('name');
         jQuery( "body" ).data("text_name", text_name );
         jQuery("label#Social input").removeClass("fb");
 	jQuery("label#Social").addClass("sfb");
+	jQuery('body').attr('data-social', jQuery(this).attr('Name'));
 	name = jQuery("label.sfb input").addClass("fb");
 	var label = jQuery('label[for="'+jQuery(this).attr('id')+'"]');
 	if(jQuery("#socialicons").length == 0) {
@@ -473,15 +474,23 @@ jQuery(function(jQuery) {
 jQuery("#staff_meta_box").on('change','div#socialicons select#social',function(text_id){
 		text_name=jQuery( "body" ).data( "text_name" );
                 jQuery("#socialicons").remove();
-                jQuery("label[id='Social']").find('input[name$="'+text_name+'"]').val(this.value);
+                var social_field = jQuery("body").attr('data-social');
+				jQuery('input[name="'+social_field+'"]').val(this.value);
 //		jQuery( 'input[name$="'+text_name+'"]').val(this.value);
 		jQuery("input").removeClass("fb");
 	});
-        jQuery("label[for='imic_social_icon_list']").click(function(e){
-            e.preventDefault();
-        });
+        jQuery(".rwmb-text_list-clone").children("label").last().find("input").click(function(e){
+            e.preventDefault();        
+			});
 });
-jQuery('input#imic_cause_amount_received').attr('disabled','disabled');
+//jQuery('input#imic_cause_amount_received').attr('disabled','disabled');
+
+// Hide Redux Messages
+jQuery(window).load(function(){
+	jQuery('.redux-message').hide();
+	jQuery('.redux-container #redux-header .rAds').hide();
+});
+
 
 /* all day event */
 jQuery(document).ready(function() {

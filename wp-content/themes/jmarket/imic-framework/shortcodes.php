@@ -53,7 +53,8 @@ function imic_staff($atts, $content = null) {
         "number" => "",
         "order" => "",
         "category" => "",
-        "column" => ""
+        "column" => "",
+        "excerpt_length" => ""
                     ), $atts));
     $output = '';
    if ($order == "no") {
@@ -63,9 +64,20 @@ function imic_staff($atts, $content = null) {
         $orderby = "menu_order";
         $sort_order = "ASC";
     }
-    if ($column == 0) {
-        $column = 4;
-    }
+	if($excerpt_length == ''){
+		$excerpt_length = 30;
+	}
+	if($column == 3){
+		  $column = 4;	
+	  }elseif($column == 4){
+		  $column = 3;	
+	  }elseif($column == 2){
+		  $column = 6;	
+	  }elseif($column == 1){
+		  $column = 12;	
+	  }else{
+		  $column = 4;
+	  }
     query_posts(array(
         'post_type' => 'staff',
         'staff-category' => $category,
@@ -93,18 +105,22 @@ function imic_staff($atts, $content = null) {
             $output .= '<div class="grid-content">
                                 <h3> <a href="' . get_permalink(get_the_ID()) . '">' . get_the_title() . '</a></h3>';
             $output .= $job;
-             $output .= imic_social_staff_icon();
-            $description = imic_excerpt();
-            if (!empty($description)) {
-                $output .= $description;
-            }
+             $output .= imic_social_staff_icon(); $excerpt_length;
+            $description = imic_excerpt($excerpt_length);
+			if($excerpt_length != 0){
+				if (!empty($description)) {
+					$output .= $description;
+				}
+			}
 			global $imic_options;
-			$staff_read_more_text = $imic_options['staff_read_more_text'];
-							if ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '0') {
-								$output .='<p><a href="' . get_permalink() . '" class="btn btn-default">' . $staff_read_more_text . '</a></p>';
-							} elseif ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '1') {
-								$output .='<p><a href="' . get_permalink() . '">' . $staff_read_more_text . '</a></p>';
-                        	}
+			if($excerpt_length != 0){
+				$staff_read_more_text = $imic_options['staff_read_more_text'];
+				if ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '0') {
+					$output .='<p><a href="' . get_permalink() . '" class="btn btn-default">' . $staff_read_more_text . '</a></p>';
+				} elseif ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '1') {
+					$output .='<p><a href="' . get_permalink() . '">' . $staff_read_more_text . '</a></p>';
+				}
+			}
             $output .='</div></div>
                     </div>
                 </div>';
@@ -238,7 +254,6 @@ if($style=="list")
 	{
 	foreach($events as $key=>$value)
 	{
-		$target = '';
 		if(preg_match('/^[0-9]+$/',$value))
 		{
 			$eventStartTime =  strtotime(get_post_meta($value, 'imic_event_start_tm', true));
@@ -269,11 +284,7 @@ if($style=="list")
 			$event_title=$google_data[0];
 			$custom_event_url=$google_data[1];
 			$options = get_option('imic_options');
-    	$event_google_open_link = isset($options['event_google_open_link'])?$options['event_google_open_link']:0;
-			if($event_google_open_link)
-			{
-				$target = 'target ="_blank"';
-			}
+    	
 			$eventTime =$key;
 			if($eventTime!='') 
 			{ 
@@ -304,7 +315,7 @@ if($style=="list")
 									</div>
                 	<div class="to-event-url">
               	<div>
-								<a href="'.$custom_event_url.'" '.$target.' class="btn btn-default btn-sm">'.__('Details','framework').'</a></div>
+								<a href="'.$custom_event_url.'" class="btn btn-default btn-sm">'.__('Details','framework').'</a></div>
                       </div>
                     </li>';
 		if($count++>=$number)
@@ -312,9 +323,9 @@ if($style=="list")
 			break;
 		}
 	}
+	}
 	$output .= '</ul>
 				</section></div>';
-	}
 }
 else
 {

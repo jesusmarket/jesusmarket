@@ -5,40 +5,12 @@
 	Author: imithemes
 	Author URI: www.imithemes.com
 	Description: <strong>Responsive Wordpress Theme for Churches, Designed & Developed by imithemes</strong> - <a href="http://www.imithemes.com">www.imithemes.com</a>. Follow us for update notifications:<br/> <a href='http://twitter.com/imithemes'>Twitter</a><br/> | <a href='http://www.facebook.com/imithemes'>Facebook</a>
-	Version: 2.6.4
+	Version: 2.7.2
 	License: ThemeForest Split Licence for Wordpress Themes
 			 http://themeforest.net/legal/licences
 			 
 /*  CSS definations for Native Church  */
-.doneaza {
-  background: #d93434;
-  background-image: -webkit-linear-gradient(top, #d93434, #b50404);
-  background-image: -moz-linear-gradient(top, #d93434, #b50404);
-  background-image: -ms-linear-gradient(top, #d93434, #b50404);
-  background-image: -o-linear-gradient(top, #d93434, #b50404);
-  background-image: linear-gradient(to bottom, #d93434, #b50404);
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0px;
-  font-family: Arial;
-  color: #ffffff;
-  font-size: 14px;
-  padding-top: px;
-  padding-right: px;
-  padding-bottom: px;
-  padding-left: px;
-  text-decoration: none;
-}
-
-.doneaza:hover {
-  background: #c92626;
-  background-image: -webkit-linear-gradient(top, #c92626, #de2c2c);
-  background-image: -moz-linear-gradient(top, #c92626, #de2c2c);
-  background-image: -ms-linear-gradient(top, #c92626, #de2c2c);
-  background-image: -o-linear-gradient(top, #c92626, #de2c2c);
-  background-image: linear-gradient(to bottom, #c92626, #de2c2c);
-  text-decoration: none;
-}/*-------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------*/
 /* 0. RESET */
 /*-------------------------------------------------------------------------------------------*/
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
@@ -1391,6 +1363,14 @@ body.siteorigin-panels.boxed .body{
 .navigation .megamenu-container ul li a:hover{
 	text-decoration:none;
 }
+.megamenu-container .widgettitle{
+	margin-bottom:30px;
+}
+.megamenu-container .widget{
+	margin-bottom:0;
+	margin:0 2%;
+	text-align:left
+}
 .sticky-wrapper{
 	max-height:50px;
 }
@@ -1807,6 +1787,13 @@ html[xmlns] .slides {
 .listing-cont, .post-content{
 	border-top:4px solid #f8f7f3;
 }
+.listing-cont ul:before, .listing-cont ul:after {
+	display:table;
+	content:""
+}
+.listing-cont ul:after {
+	clear:both;
+}
 .listing .item{
 	width:100%;
 	padding:10px 0;
@@ -1821,6 +1808,21 @@ html[xmlns] .slides {
 }
 .event_calendar{
 	margin-bottom:30px;
+}
+#loading-image{
+	width:100%;
+	height:100%;
+	position:absolute;
+	left:0;
+	top:0;
+	background:rgba(255,255,255,.7);
+	z-index:2;
+}
+#loading-image-img{
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin:-64px 0 0 -64px;
 }
 .events-listing-header .calender_filter{
 	margin-bottom:30px!important;
@@ -2139,6 +2141,9 @@ ol.breadcrumb > .active{
 }
 .single-post-header .btn-toolbar .donate-paypal{
 	margin-left:10px!important;
+	border:0!important;
+	padding-top:7px;
+	padding-bottom:7px;
 }
 .single-post-header .sermon-actions, .post-comments-count{
 	margin-top:15px;
@@ -2391,6 +2396,9 @@ ol.breadcrumb > .active{
 .featured-event-container h4 a{
 	text-decoration:none;
 }
+.widget_featured_event .media-box .zoom{
+	z-index:8;
+}
 .sidebar-widget-title .featured-star{
 	width:20px;
 	height:20px;
@@ -2408,7 +2416,7 @@ ol.breadcrumb > .active{
 }
 .featured-event-time{
 	position:static;
-	z-index:9;
+	z-index:99;
 	right:10px;
 	top:-40px;
 	width:80px;
@@ -3368,12 +3376,25 @@ ol.breadcrumb > .current_item{
 a img.alignright {float:right; margin:0 0 1em 1em}
 a img.alignleft {float:left; margin:0 1em 1em 0}
 a img.aligncenter {display: block; margin-left: auto; margin-right: auto}
+
 /* WooCommerce Styling */
 p.demo_store{
 	-webkit-box-shadow:none;
 	-moz-box-shadow:none;
 	box-shadow:none;
 	border:0;
+}
+.woocommerce ul.cart_list li a, .woocommerce ul.product_list_widget li a{
+	display:block!important;
+}
+.woocommerce ul.cart_list li a{
+	padding-left:25px;
+}
+.woocommerce ul.cart_list .quantity{
+	padding-left:25px;
+}
+.woocommerce ul.cart_list li a.remove{
+	padding-left:0;
 }
 .woocommerce a.button, .woocommerce button.button, .woocommerce input.button, .woocommerce #respond input#submit, .woocommerce #content input.button, .woocommerce-page a.button, .woocommerce-page button.button, .woocommerce-page input.button, .woocommerce-page #respond input#submit, .woocommerce-page #content input.button, .widget input[type="button"], .widget input[type="reset"], .widget input[type="submit"], .bbp-submit-wrapper button {
     	font-family: 'Roboto Condensed', sans-serif;
@@ -3465,6 +3486,11 @@ p.demo_store{
 .woocommerce ul.products li.product a img,.woocommerce-page ul.products li.product a img{
 	box-shadow:none;
 	-webkit-box-shadow:none;
+	width:auto;
+	height:auto;
+}
+.woocommerce-page ul.products li.product.first{
+	clear:none;
 }
 .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page a.button.alt, .woocommerce-page button.button.alt, .woocommerce-page input.button.alt, .woocommerce-page #respond input#submit.alt, .woocommerce-page #content input.button.alt {
     	border: 0!important;
@@ -3543,6 +3569,13 @@ p.demo_store{
 }
 .woocommerce ul.products li.product, .woocommerce-page ul.products li.product{
 	margin-right:3%;
+}
+.woocommerce ul.products li.product, .woocommerce-page ul.products li.product{
+	margin-right:0;
+	margin-left:2.95%;
+}
+.woocommerce .products ul, .woocommerce ul.products{
+	margin-left:-2.95%;
 }
 /* Contact Form 7 Styling */
 .wpcf7-form p{
@@ -3800,6 +3833,43 @@ body.boxed .siteorigin-panels-stretch{
 }
 .carousel-container{
 	overflow:hidden;
+}
+
+/* Search & Filter Styles */
+.searchandfilter p
+{
+	margin-top: 1em;
+	display:inline-block;
+}
+.searchandfilter ul
+{
+	display:inline-block;
+}
+.searchandfilter li
+{
+	list-style: none;
+	display:inline-block;
+	padding-right:10px;
+}
+
+/* If in a widget area make a single column by adding display block  */
+.widget-area .searchandfilter li, .widget-area .searchandfilter p
+{
+	display:block;
+}
+.searchandfilter label
+{
+	display:block;
+}
+.searchandfilter h4
+{
+	margin:15px 0;
+	font-size:16px;
+}
+
+.searchandfilter ul > li > ul:not(.children)
+{
+	margin-left:0;
 }
 /*-------------------------------------------------------------------------------------------*/
 /* Responsive Classes
@@ -4069,6 +4139,27 @@ body.boxed .siteorigin-panels-stretch{
 	.body #content-col, .body #sidebar-col{
 		float:none!important;
 	}
+	.alignright, .alignleft {
+		float:none;
+		margin: 0;
+		width:auto!important;
+		margin-bottom:20px;
+	}
+	.megamenu-container .widget{
+		width:100%!important;
+		float:none!important;
+	}
+	.events-listing .to-event-url{
+		height:auto!important;
+	}
+	.product-archive .products ul, .product-archive ul.products{
+		margin-left:0;
+	}
+	.product-archive ul.products li.product, .product-archive ul.products li.product{
+		margin-left:0;
+		margin-right:0;
+		float:none!important;
+	}
 }
 @media only screen and (min-width: 320px) and (max-width: 480px) {
 }
@@ -4085,45 +4176,4 @@ only screen and (                min-resolution: 2dppx) {
 	.site-header h1.logo .retina-logo{
 		display:block;
 	}
-}
-
-/* Search & Filter Styles */
-body
-{
-	display:block;
-}
-.searchandfilter p
-{
-	margin-top: 1em;
-	display:inline-block;
-}
-.searchandfilter ul
-{
-	display:inline-block;
-}
-.searchandfilter li
-{
-	list-style: none;
-	display:inline-block;
-	padding-right:10px;
-}
-
-/* If in a widget area make a single column by adding display block  */
-.widget-area .searchandfilter li, .widget-area .searchandfilter p
-{
-	display:block;
-}
-.searchandfilter label
-{
-	display:block;
-}
-.searchandfilter h4
-{
-	margin:15px 0;
-	font-size:16px;
-}
-
-.searchandfilter ul > li > ul:not(.children)
-{
-	margin-left:0;
 }

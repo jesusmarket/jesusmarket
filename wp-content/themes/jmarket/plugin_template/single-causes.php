@@ -1,23 +1,24 @@
 <?php get_header();
 while(have_posts()):the_post();
 $transaction_id=isset($_REQUEST['tx'])?esc_attr($_REQUEST['tx']):'';
+$payment_array = '';
 if($transaction_id!='') {
 	global $wpdb;
 	$table_name = $wpdb->prefix . "imic_payment_transaction";
 	$payment_array=imic_validate_payment($transaction_id);
-	$st = $payment_array['payment_status'];
+	$st = isset($_REQUEST['st'])?esc_attr($_REQUEST['st']):'';
 	$user_id=isset($_REQUEST['item_number'])?esc_attr($_REQUEST['item_number']):'';
 	$cause_id=strstr($user_id, '-', true);
 	$cause_name=get_the_title($cause_id);
-	if(!empty($transaction_id)&&!empty($st)){
+	if(!empty($transaction_id)){
 		$sql_select=$wpdb->get_var( $wpdb->prepare("select transaction_id from $table_name WHERE `transaction_id` = '$transaction_id'"));
 		$data =$wpdb->get_results($sql_select,ARRAY_A)or print mysql_error();
 		if(empty($data)){
 			$amt=isset($_REQUEST['amt'])?esc_attr($_REQUEST['amt']):'';
 			$received_amount = get_post_meta($cause_id,'imic_cause_amount_received',true);
 			$updated_amount = $received_amount+$amt;
-			if($st=='Completed') {
-			update_post_meta($cause_id,'imic_cause_amount_received',$updated_amount); }
+			//if($st=='Completed') {
+			update_post_meta($cause_id,'imic_cause_amount_received',$updated_amount); //}
 			$sql = $wpdb->update($table_name, array('transaction_id'=>$transaction_id,'status'=>$st), array('cause_id'=>$user_id));
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);

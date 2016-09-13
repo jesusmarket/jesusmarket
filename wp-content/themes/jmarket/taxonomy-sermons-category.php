@@ -1,8 +1,8 @@
-<?php get_header(); 
+<?php get_header();
 $pages_e = get_pages(array(
     'meta_key' => '_wp_page_template',
     'meta_value' => 'template-sermons.php'
-        ));
+));
 $variable_post_id = $pages_e[0]->ID;
 $SermonPageURL = get_permalink( $variable_post_id );
 $pageOptions = imic_page_design($variable_post_id, 9); //page design options 

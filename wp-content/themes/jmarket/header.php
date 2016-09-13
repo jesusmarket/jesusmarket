@@ -32,12 +32,40 @@
         <meta charset="<?php bloginfo('charset'); ?>" />
         <!-- Mobile Specific Metas
         ================================================== -->
-<?php if ($options['switch-responsive'] == 1) { ?>
-            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><?php } ?>
+		<?php if (isset($options['switch-responsive'])&&$options['switch-responsive'] == 1){
+		$switch_zoom_pinch = (isset($options['switch-zoom-pinch']))?$options['switch-zoom-pinch']:''; ?>
+		<?php if ($switch_zoom_pinch == 1){ ?>
+                <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0">
+        <?php } else { ?>
+                <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+        <?php } ?>
         <meta name="format-detection" content="telephone=no">
+		<?php } ?>
         <!--// PINGBACK & FAVICON //-->
         <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-        <?php if (isset($options['custom_favicon']) && $options['custom_favicon'] != "") { ?><link rel="shortcut icon" href="<?php echo $options['custom_favicon']['url']; ?>" /><?php
+        <?php   if (function_exists( 'wp_site_icon') && has_site_icon()) {
+					echo '<link rel="shortcut icon" href="'.get_site_icon_url().'" />';
+  				}
+				else
+				{
+					if (isset($options['custom_favicon']) && $options['custom_favicon'] != "") { ?><link rel="shortcut icon" href="<?php echo esc_url($options['custom_favicon']['url']); ?>" /><?php
+					}
+				}
+		if (isset($options['iphone_icon']) && $options['iphone_icon'] != "")
+		{ ?>
+        	<link rel="apple-touch-icon-precomposed" href="<?php echo $options['iphone_icon']['url']; ?>"><?php
+        }
+		if (isset($options['iphone_icon_retina']) && $options['iphone_icon_retina'] != "")
+		{ ?>
+        	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="<?php echo $options['iphone_icon_retina']['url']; ?>"><?php
+        }
+		if (isset($options['ipad_icon']) && $options['ipad_icon'] != "")
+		{ ?>
+        	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="<?php echo $options['ipad_icon']['url']; ?>"><?php
+        }
+		if (isset($options['ipad_icon_retina']) && $options['ipad_icon_retina'] != "")
+		{ ?>
+        	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="<?php echo $options['ipad_icon_retina']['url']; ?>"><?php
         }
         $offset = get_option('timezone_string');
 		if($offset=='') { $offset = "Australia/Melbourne"; }
@@ -46,21 +74,16 @@
         <!-- CSS
         ================================================== -->
         <!--[if lte IE 8]><link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri() ?>/css/ie8.css" media="screen" /><![endif]-->
+		 <?php 
+             $space_before_head = (isset($options['space-before-head']))?$options['space-before-head']:'';
+             $SpaceBeforeHead = $space_before_head;
+                echo $SpaceBeforeHead;
+         ?>
         <?php //  WORDPRESS HEAD HOOK 
          wp_head(); ?>
     </head>
     <!--// CLOSE HEAD //-->
     <body <?php body_class($bodyClass); echo $style;  ?>>
-	    <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-70700660-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
         <!--[if lt IE 7]>
                 <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]--> 
@@ -77,12 +100,17 @@
                 	<ul>';
                 $socialSites = $options['header_social_links'];
                 foreach ($socialSites as $key => $value) {
-                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        echo '<li><a href="mailto:' . $value . '"><i class="fa ' . $key . '"></i></a></li>';
+                    }
+					elseif (filter_var($value, FILTER_VALIDATE_URL)) {
                         echo '<li><a href="' . $value . '" target="_blank"><i class="fa ' . $key . '"></i></a></li>';
+                    }
+					elseif($key == 'fa-skype' && $value != '') {
+                        echo '<li><a href="skype:' . $value . '?call"><i class="fa ' . $key . '"></i></a></li>';
                     }
                 }
                 echo'</ul>
-                
               	</nav>
          	</div>';
                 if (!empty($menu_locations['top-menu'])) {
@@ -139,15 +167,13 @@
                                     endif;
                                
 									else:
-                                    echo '<div class="top-search hidden-sm hidden-xs" align="right">
-            	            <form method="get" id="searchform" action="' . home_url() . '">
+                                    echo '<div class="top-search hidden-sm hidden-xs">
+            	           <form method="get" id="searchform" action="' . home_url() . '">
                 	    <div class="input-group">
                  		<span class="input-group-addon"><i class="fa fa-search"></i></span>
-                		<input type="text" class="form-control" name="s" id="s" placeholder="' . __('Search', 'framework') . '">
+                		<input type="text" class="form-control" name="s" id="s" placeholder="' . __('Type your keywords...', 'framework') . '">
                  	   </div>
               	          </form>
-
-
                           </div>';
                                 endif;
                                 echo '<a href="#" class="visible-sm visible-xs menu-toggle"><i class="fa fa-bars"></i> ' . $options['mobile_menu_text'] .'</a>';
@@ -156,7 +182,6 @@
                             endif;
                             ?>
                         </div>
-                        
                     </div>
                 </div>
 <?php if ($options['header_layout'] != 4) { ?>
@@ -283,7 +308,7 @@
                             if (is_search()) {
                                 echo '<div class="col-md-12 col-sm-12"><h1>';
                                 printf(__('Search Results for :  %s', 'framework'), get_search_query());
-                                echo'</h1> 
+                                echo'</h1>
                                   </div>';
                             } else if (is_404()) {
                                 echo '<div class="col-md-12 col-sm-12"><h1>';
@@ -328,7 +353,7 @@
 											{
 										  ?>
 											<li data-option-value="*" class="active"><a href="#">
-                                            <i class="fa fa-th"></i> <span><?php echo $gallery_cats[0]; ?></span></a></li>
+                                            <i class="fa fa-th"></i> <span><?php $term = get_term_by('slug', $gallery_cats[0], 'gallery-category'); $name = $term->name;  echo esc_html( $name ); ?></span></a></li>
 									  <?php 
                                             $current_term = get_term_by('slug',$gallery_cats[0],'gallery-category');
 											$args = array(
@@ -353,7 +378,7 @@
                                      	<?php foreach($gallery_cats as $gallery_cat) { ?>
                                             <li data-option-value=".format-<?php echo $gallery_cat; ?>">
                                             <a href="#"><i class="fa <?php echo $gallery_cat; ?>"></i>
-                                             <span><?php echo ucfirst($gallery_cat); ?></span></a></li>
+                                             <span><?php $term = get_term_by('slug', $gallery_cat, 'gallery-category'); $name = $term->name;  echo esc_html( $name ); ?></span></a></li>
                                     	<?php } } ?>
 										 <?php if(empty($gallery_category))
 											{

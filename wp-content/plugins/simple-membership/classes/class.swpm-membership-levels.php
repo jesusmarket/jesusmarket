@@ -1,7 +1,8 @@
 <?php
 
-if (!class_exists('WP_List_Table'))
+if (!class_exists('WP_List_Table')){
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
 
 class SwpmMembershipLevels extends WP_List_Table {
 
@@ -67,9 +68,8 @@ class SwpmMembershipLevels extends WP_List_Table {
 
     function column_id($item) {
         $actions = array(
-            'edit' => sprintf('<a href="admin.php?page=%s&level_action=edit&id=%s">Edit</a>', $_REQUEST['page'], $item['id']),
-            'delete' => sprintf('<a href="?page=%s&level_action=delete&id=%s"
-                                    onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', $_REQUEST['page'], $item['id']),
+            'edit' => sprintf('<a href="admin.php?page=simple_wp_membership_levels&level_action=edit&id=%s">Edit</a>', $item['id']),
+            'delete' => sprintf('<a href="admin.php?page=simple_wp_membership_levels&level_action=delete&id=%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', $item['id']),
         );
         return $item['id'] . $this->row_actions($actions);
     }
@@ -86,8 +86,11 @@ class SwpmMembershipLevels extends WP_List_Table {
         $this->process_bulk_action();
 
         $query = "SELECT * FROM " . $wpdb->prefix . "swpm_membership_tbl WHERE  id !=1 ";
-        if (isset($_POST['s']))
-            $query .= " AND alias LIKE '%" . strip_tags($_POST['s']) . "%' ";
+        if (isset($_POST['s'])){
+            $query .= " AND alias LIKE '%" . sanitize_text_field($_POST['s']) . "%' ";
+        }
+        
+        //Read and sanitize the sort inputs.
         $orderby = !empty($_GET["orderby"]) ? esc_sql($_GET["orderby"]) : 'id';
         $order = !empty($_GET["order"]) ? esc_sql($_GET["order"]) : 'DESC';
 
@@ -99,9 +102,9 @@ class SwpmMembershipLevels extends WP_List_Table {
             $query.=' ORDER BY ' . $orderby . ' ' . $order;
         }
 
-        $totalitems = $wpdb->query($query); //return the total number of affected rows
-        $perpage = 20;
-        $paged = !empty($_GET["paged"]) ? esc_sql($_GET["paged"]) : '';
+        $totalitems = $wpdb->query($query); //Return the total number of affected rows
+        $perpage = 50;
+        $paged = !empty($_GET["paged"]) ? sanitize_text_field($_GET["paged"]) : '';
         if (empty($paged) || !is_numeric($paged) || $paged <= 0) {
             $paged = 1;
         }
@@ -130,18 +133,20 @@ class SwpmMembershipLevels extends WP_List_Table {
 
     function process_form_request() {
         if (isset($_REQUEST['id'])) {
-            return $this->edit($_REQUEST['id']);
+            //This is a level edit action
+            $record_id = sanitize_text_field($_REQUEST['id']);
+            if(!is_numeric($record_id)){
+                wp_die('Error! ID must be numeric.');
+            }            
+            return $this->edit($record_id);
         }
+        
+        //Level add action
         return $this->add();
     }
 
     function add() {
-        global $wpdb;
-        $member = SwpmTransfer::$default_fields;
-        if (isset($_POST['createswpmlevel'])) {
-            $member = $_POST;
-        }
-        extract($member, EXTR_SKIP);
+        //Level add interface
         include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_add_level.php');
         return false;
     }
@@ -160,14 +165,15 @@ class SwpmMembershipLevels extends WP_List_Table {
         global $wpdb;
 
         if ('bulk_delete' === $this->current_action()) {
-            //print_r($_REQUEST);
-
-            $records_to_delete = $_REQUEST['ids'];
+            $records_to_delete = array_map( 'sanitize_text_field', $_REQUEST['ids'] );
             if (empty($records_to_delete)) {
                 echo '<div id="message" class="updated fade"><p>Error! You need to select multiple records to perform a bulk action!</p></div>';
                 return;
             }
             foreach ($records_to_delete as $record_id) {
+                if( !is_numeric( $record_id )){
+                    wp_die('Error! ID must be numeric.');
+                }
                 $query = $wpdb->prepare("DELETE FROM " . $wpdb->prefix . "swpm_membership_tbl WHERE id = %d", $record_id);
                 $wpdb->query($query);
             }
@@ -178,19 +184,38 @@ class SwpmMembershipLevels extends WP_List_Table {
     function delete() {
         global $wpdb;
         if (isset($_REQUEST['id'])) {
-            $id = absint($_REQUEST['id']);
+            $id = sanitize_text_field($_REQUEST['id']);
+            $id = absint($id);
             $query = $wpdb->prepare("DELETE FROM " . $wpdb->prefix . "swpm_membership_tbl WHERE id = %d", $id);
             $wpdb->query($query);
+            echo '<div id="message" class="updated fade"><p>Selected record deleted successfully!</p></div>';
         }
     }
 
     function show() {
-        $selected = "";
-        include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_membership_levels.php');
+        ?>
+        <div class="swpm-margin-top-10"></div>
+        <form method="post">
+            <p class="search-box">
+                <label class="screen-reader-text" for="search_id-search-input">
+                    search:</label>
+                <input id="search_id-search-input" type="text" name="s" value="" />
+                <input id="search-submit" class="button" type="submit" name="" value="<?php echo  SwpmUtils::_('Search')?>" />
+            </p>
+        </form>
+
+        <?php $this->prepare_items(); ?>
+        <form method="post">
+            <?php $this->display(); ?>
+        </form>
+
+        <p>
+            <a href="admin.php?page=simple_wp_membership_levels&level_action=add" class="button-primary"><?php SwpmUtils::e('Add New') ?></a>
+        </p>
+        <?php
     }
 
     function manage() {
-        $selected = "manage";
         include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_membership_manage.php');
     }
 
@@ -201,4 +226,78 @@ class SwpmMembershipLevels extends WP_List_Table {
         include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_category_list.php');
     }
 
+    function handle_main_membership_level_admin_menu(){
+        
+        do_action( 'swpm_membership_level_menu_start' );
+        
+        $level_action = filter_input(INPUT_GET, 'level_action');
+        $action = $level_action;
+        $selected= $action;
+        
+        ?>
+        <div class="wrap swpm-admin-menu-wrap"><!-- start wrap -->
+
+        <!-- page title -->
+        <h1><?php echo  SwpmUtils::_('Simple WP Membership::Membership Levels') ?></h1>
+            
+        <!-- start nav menu tabs -->
+        <h2 class="nav-tab-wrapper">
+            <a class="nav-tab <?php echo ($selected == "") ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership_levels"><?php echo SwpmUtils::_('Membership Levels') ?></a>
+            <a class="nav-tab <?php echo ($selected == "add") ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership_levels&level_action=add"><?php echo SwpmUtils::_('Add Level') ?></a>
+            <a class="nav-tab <?php echo ($selected == "manage") ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership_levels&level_action=manage"><?php echo SwpmUtils::_('Manage Content Production') ?></a>
+            <a class="nav-tab <?php echo ($selected == "category_list") ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership_levels&level_action=category_list"><?php echo SwpmUtils::_('Category Protection') ?></a>
+            <?php
+            
+            //Trigger hooks that allows an extension to add extra nav tabs in the membership levels menu.
+            do_action ('swpm_membership_levels_menu_nav_tabs', $selected);
+            
+            $menu_tabs = apply_filters('swpm_membership_levels_additional_menu_tabs_array', array());
+            foreach ($menu_tabs as $level_action => $title){
+                ?>
+                <a class="nav-tab <?php echo ($selected == $member_action) ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership_levels&level_action=<?php echo $level_action; ?>" ><?php SwpmUtils::e($title); ?></a>
+                <?php
+            }
+            
+            ?>            
+        </h2>
+        <!-- end nav menu tabs -->
+        
+        <?php
+        
+        do_action( 'swpm_membership_level_menu_after_nav_tabs' );
+        
+        //Trigger hook so anyone listening for this particular action can handle the output.
+        do_action( 'swpm_membership_level_menu_body_' . $action );
+        
+        //Allows an addon to completely override the body section of the membership level admin menu for a given action.
+        $output = apply_filters('swpm_membership_level_menu_body_override', '', $action);
+        if (!empty($output)) {
+            //An addon has overriden the body of this page for the given action. So no need to do anything in core.
+            echo $output;
+            echo '</div>';//<!-- end of wrap -->
+            return;
+        }
+        
+        //Switch case for the various different actions handled by the core plugin.
+        switch ($action) {
+            case 'add':
+            case 'edit':
+                $this->process_form_request();
+                break;
+            case 'manage':
+                $this->manage();
+                break;
+            case 'category_list':
+                $this->manage_categroy();
+                break;
+            case 'delete':
+                $this->delete();
+            default:
+                $this->show();
+                break;
+        }
+
+        echo '</div>';//<!-- end of wrap --> 
+    }
+    
 }

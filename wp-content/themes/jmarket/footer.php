@@ -31,8 +31,14 @@ $show_on_front = get_option('show_on_front');
                     <?php
                     $socialSites = $imic_options['footer_social_links'];
 					foreach($socialSites as $key => $value) {
-						if(filter_var($value, FILTER_VALIDATE_URL)){ 
-							echo '<a href="'. $value .'" target="_blank"><i class="fa '. $key .'"></i></a>';
+						if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        echo '<a href="mailto:' . $value . '"><i class="fa ' . $key . '"></i></a>';
+						}
+						elseif (filter_var($value, FILTER_VALIDATE_URL)) {
+							echo '<a href="' . $value . '" target="_blank"><i class="fa ' . $key . '"></i></a>';
+						}
+						elseif($key == 'fa-skype' && $value != '') {
+							echo '<a href="skype:' . $value . '?call"><i class="fa ' . $key . '"></i></a>';
 						}
 					}
                     ?>
@@ -55,25 +61,27 @@ echo'<a id="back-to-top"><i class="fa fa-angle-double-up"></i></a>';
 				  opacity: <?php if(isset($imic_options['prettyphoto_opacity']) && $imic_options['prettyphoto_opacity']!= ""){ echo $imic_options['prettyphoto_opacity']; } ?>,
 				  social_tools: "",
 				  deeplinking: false,
-				  allow_resize:false,
+				  allow_resize: <?php if(isset($imic_options['prettyphoto_opt_resize']) && $imic_options['prettyphoto_opt_resize']!= ""){ echo $imic_options['prettyphoto_opt_resize']; } else { echo 'true'; } ?>,
 				  show_title: <?php if(isset($imic_options['prettyphoto_title']) && $imic_options['prettyphoto_title']== 0){ echo 'true'; } else echo 'false'; ?>,
 				  theme: '<?php if(isset($imic_options['prettyphoto_theme']) && $imic_options['prettyphoto_theme']!= ""){ echo $imic_options['prettyphoto_theme']; } ?>',
 				});
-				jQuery('.sort-source a').click(function(){
+				/*jQuery('.sort-source a').click(function(){
 					var sortval = jQuery(this).parent().attr('data-option-value');
 					jQuery(".sort-destination li a").removeAttr('data-rel');
     				jQuery(".sort-destination li a").attr('data-rel', "prettyPhoto["+sortval+"]");
-				});
+				});*/
             });
 		</script>
 	<?php }elseif(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 1){ ?>
     	<script>
 			jQuery(document).ready(function() {
-				jQuery('.format-gallery').magnificPopup({
-  					delegate: 'a.magnific-gallery-image', // child items selector, by clicking on it popup will open
-  					type: 'image',
-					gallery:{enabled:true}
-  				// other options
+				jQuery('.format-gallery').each(function(){
+					jQuery(this).magnificPopup({
+  						delegate: 'a.magnific-gallery-image', // child items selector, by clicking on it popup will open
+  						type: 'image',
+						gallery:{enabled:true}
+  						// other options
+					});
 				});
 				jQuery('.magnific-image').magnificPopup({ 
   					type: 'image'
@@ -92,8 +100,21 @@ echo'<a id="back-to-top"><i class="fa fa-angle-double-up"></i></a>';
 			});
 		</script>
 	<?php }
-?>
+	
+	// Google events link target 
+   $event_google_open_link = isset($imic_options['event_google_open_link'])?$imic_options['event_google_open_link']:0;
+   if($event_google_open_link == 1)
+   { ?>
+	 <script>
+	 jQuery(document).ready(function(){
+		jQuery('a[href^="https://www.google.com/calendar"]').attr('target','_blank');
+	});
+	</script>
+   <?php } ?>
 <?php wp_footer(); ?>
+ <?php $SpaceBeforeBody = $imic_options['space-before-body'];
+    echo $SpaceBeforeBody;
+ ?>
 </body>
 <?php
 $event_id = get_the_ID();
@@ -112,7 +133,7 @@ if(empty($date)){
 $date = strtotime($date);
 if(is_user_logged_in()||$event_guest_switch==1) {
 	global $current_user;
-      get_currentuserinfo();
+      wp_get_current_user();
 	  $this_email = $current_user->user_email;
 	  $this_fname = $current_user->user_firstname;
 	  $this_lname = $current_user->user_lastname;

@@ -428,10 +428,6 @@ jQuery(function($) {
         NATIVE.IsoTope();
 		$("#additional-media-sermons").find(".tab-content").find('.tab-pane:first-child').addClass('active');
 		$("#additional-media-sermons").find(".nav-tabs").find('li:first-child').addClass('active');
-		$('#ticketModal .modal-footer button.btn-primary').click(function(){
-			$('body').addClass('event-printing');
-			$("<link/>", {rel: "stylesheet",type: "text/css",href: initval.tmp+"/css/event-printing.css"}).appendTo("head");
-		});
     });
 	
 	$( document ).ajaxStop( function() {

@@ -23,11 +23,12 @@ class SwpmInitTimeTasks {
         //Crete the custom post types
         $this->create_post_type();
 
-        if (current_user_can('manage_options')) { // Admin stuff
+        if (current_user_can(SWPM_MANAGEMENT_PERMISSION)) { 
+            // Admin dashboard stuff
             $this->admin_init();
         }
 
-        //Do frontend-only init time taks
+        //Do frontend-only init time tasks
         if (!is_admin()) {
             SwpmAuth::get_instance();
             $this->verify_and_delete_account();
@@ -41,6 +42,7 @@ class SwpmInitTimeTasks {
             $this->process_password_reset();
             $this->register_member();
             $this->edit_profile();
+            SwpmCommentFormRelated::check_and_restrict_comment_posting_to_members();
         }
 
         //IPN listener
@@ -144,11 +146,21 @@ class SwpmInitTimeTasks {
     /* PayPal Payment IPN listener */
 
     public function swpm_ipn_listener() {
+        
+        //Listen and handle PayPal IPN
         $swpm_process_ipn = filter_input(INPUT_GET, 'swpm_process_ipn');
         if ($swpm_process_ipn == '1') {
             include(SIMPLE_WP_MEMBERSHIP_PATH . 'ipn/swpm_handle_pp_ipn.php');
             exit;
         }
+        
+        //Listen and handle Stripe Buy Now IPN
+        $swpm_process_stripe_buy_now = filter_input(INPUT_GET, 'swpm_process_stripe_buy_now');
+        if ($swpm_process_stripe_buy_now == '1') {
+            include(SIMPLE_WP_MEMBERSHIP_PATH . 'ipn/swpm-stripe-buy-now-ipn.php');
+            exit;
+        }
+        
     }
 
 }

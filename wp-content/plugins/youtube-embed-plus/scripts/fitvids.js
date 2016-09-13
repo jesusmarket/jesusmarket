@@ -69,6 +69,13 @@ var epdofitvids = epdofitvids || function ($)
 
     $(document).ready(function () {
         $("body").fitVidsEP();
+
+        $(document).ajaxSuccess(function (e, xhr, settings) {
+            if (xhr.responseText.indexOf('<iframe ') !== -1)
+            {
+                $("body").fitVidsEP();
+            }
+        });
     });
     return true;
 };

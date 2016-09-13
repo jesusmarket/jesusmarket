@@ -15,7 +15,6 @@ module.exports = function( grunt ) {
                 core: {
                     src: [
                         'ReduxCore/assets/js/vendor/cookie.js',
-                        'ReduxCore/assets/js/vendor/qtip/jquery.qtip.js',
                         'ReduxCore/assets/js/vendor/jquery.typewatch.js',
                         'ReduxCore/assets/js/vendor/jquery.serializeForm.js',
                         'ReduxCore/assets/js/vendor/jquery.alphanum.js',
@@ -26,7 +25,6 @@ module.exports = function( grunt ) {
                 vendor: {
                     src: [
                         'ReduxCore/assets/js/vendor/cookie.js',
-                        'ReduxCore/assets/js/vendor/qtip/jquery.qtip.js',
                         'ReduxCore/assets/js/vendor/jquery.serializeForm.js',
                         'ReduxCore/assets/js/vendor/jquery.typewatch.js',
                         'ReduxCore/assets/js/vendor/jquery.alphanum.js'
@@ -113,7 +111,7 @@ module.exports = function( grunt ) {
                 },
                 files: [
                     //'Gruntfile.js',
-                    'ReduxCore/assets/js/import_export/import_export.js',
+                    //'ReduxCore/assets/js/import_export/import_export.js',
                     'ReduxCore/assets/js/media/media.js',
                     'ReduxCore/inc/fields/ace_editor/field_ace_editor.js',
                     'ReduxCore/inc/fields/background/field_background.js',
@@ -128,6 +126,7 @@ module.exports = function( grunt ) {
                     'ReduxCore/inc/fields/gallery/field_gallery.js',
                     'ReduxCore/inc/fields/image_select/field_image_select.js',
                     'ReduxCore/inc/fields/multi_text/field_multitext.js',
+                    'ReduxCore/inc/fields/palette/field_palette.js',
                     'ReduxCore/inc/fields/select/field_select.js',
                     'ReduxCore/inc/fields/select_image/field_select_image.js',
                     'ReduxCore/inc/fields/slider/field_slider.js',
@@ -138,9 +137,9 @@ module.exports = function( grunt ) {
                     'ReduxCore/inc/fields/spinner/field_spinner.js',
                     'ReduxCore/inc/fields/switch/field_switch.js',
                     'ReduxCore/inc/fields/typography/field_typography.js',
-                    // 'ReduxCore/inc/fields/**/*.js',
-                    'ReduxCore/extensions/**/*.js',
-                    'ReduxCore/extensions/**/**/*.js',
+                    //'ReduxCore/inc/extensions/customizer/extension_customizer.js',
+                    'ReduxCore/inc/extensions/import_export/import_export/field_import_export.js',
+                    'ReduxCore/inc/extensions/options_object/options_object/field_options_object.js',
                     'ReduxCore/assets/js/redux.js'
                 ]
             },

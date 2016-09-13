@@ -35,6 +35,7 @@ function embedSelectedShortcode() {
 		var staff_order = document.getElementById('staff-order').value;	
 		var staff_category = document.getElementById('staff-category').value;
 		var staff_column = document.getElementById('staff-column').value;		
+		var staff_excerpt_length = document.getElementById('staff-excerpt-length').value;
 		// Sermon
 		var sermon_number = document.getElementById('sermon-number').value;
 		var sermon_title = document.getElementById('sermon-title').value;
@@ -310,7 +311,7 @@ function embedSelectedShortcode() {
 		////	STAFF SHORTCODE OUTPUT
 		/////////////////////////////////////////
 		if (shortcode_select == 'shortcode-staff') {
-			shortcodeHTML = '<br/>[staff number="'+staff_number+'" category="'+staff_category+'" column="'+staff_column+'" order="'+staff_order+'"]<br/>';	
+			shortcodeHTML = '<br/>[staff number="'+staff_number+'" category="'+staff_category+'" column="'+staff_column+'" order="'+staff_order+'" excerpt-length="'+staff_excerpt_length+'"]<br/>';
 		}
 		/////////////////////////////////////////
 		////	Sermon SHORTCODE OUTPUT

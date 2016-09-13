@@ -1,6 +1,8 @@
 <?php
 
-include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/common/class.swpm-list-table.php');
+if (!class_exists('WP_List_Table')){
+    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
 
 class SwpmMembers extends WP_List_Table {
 
@@ -54,9 +56,8 @@ class SwpmMembers extends WP_List_Table {
 
     function column_member_id($item) {
         $actions = array(
-            'edit' => sprintf('<a href="admin.php?page=%s&member_action=edit&member_id=%s">Edit</a>', $_REQUEST['page'], $item['member_id']),
-            'delete' => sprintf('<a href="?page=%s&member_action=delete&member_id=%s"
-                                    onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', $_REQUEST['page'], $item['member_id']),
+            'edit' => sprintf('<a href="admin.php?page=simple_wp_membership&member_action=edit&member_id=%s">Edit</a>', $item['member_id']),
+            'delete' => sprintf('<a href="admin.php?page=simple_wp_membership&member_action=delete&member_id=%s" onclick="return confirm(\'Are you sure you want to delete this entry?\')">Delete</a>', $item['member_id']),
         );
         return $item['member_id'] . $this->row_actions($actions);
     }
@@ -184,8 +185,15 @@ class SwpmMembers extends WP_List_Table {
 
     function process_form_request() {
         if (isset($_REQUEST['member_id'])){
-            return $this->edit(absint($_REQUEST['member_id']));
+            //This is a member profile edit action
+            $record_id = sanitize_text_field($_REQUEST['member_id']);
+            if(!is_numeric($record_id)){
+                wp_die('Error! ID must be numeric.');
+            }
+            return $this->edit(absint($record_id));
         }
+        
+        //This is an profile add action.
         return $this->add();
     }
 
@@ -199,8 +207,8 @@ class SwpmMembers extends WP_List_Table {
         $member = SwpmTransfer::$default_fields;
         $member['member_since'] = date('Y-m-d');
         $member['subscription_starts'] = date('Y-m-d');
-        if (isset($_POST['createswpmuser'])) {
-            $member = $_POST;
+        if (isset($_POST['createswpmuser'])) {            
+            $member = array_map( 'sanitize_text_field', $_POST );
         }
         extract($member, EXTR_SKIP);
         $query = "SELECT * FROM " . $wpdb->prefix . "swpm_membership_tbl WHERE  id !=1 ";
@@ -215,10 +223,15 @@ class SwpmMembers extends WP_List_Table {
         $query = "SELECT * FROM {$wpdb->prefix}swpm_members_tbl WHERE member_id = $id";
         $member = $wpdb->get_row($query, ARRAY_A);
         if (isset($_POST["editswpmuser"])) {
-            $_POST['user_name'] = $member['user_name'];
-            $_POST['email'] = $member['email'];
+            $_POST['user_name'] = sanitize_text_field($member['user_name']);
+            $_POST['email'] = sanitize_email($member['email']);
             foreach($_POST as $key=>$value){
-                $member[$key] = $value;
+                $key = sanitize_text_field($key);
+                if($key == 'email'){
+                    $member[$key] = sanitize_email($value);
+                } else {
+                    $member[$key] = sanitize_text_field($value);
+                }
             }
         }
         extract($member, EXTR_SKIP);
@@ -231,6 +244,7 @@ class SwpmMembers extends WP_List_Table {
     function process_bulk_action() {
         //Detect when a bulk action is being triggered... then perform the action.
         $members = isset($_REQUEST['members'])? $_REQUEST['members']: array();
+        $members = array_map( 'sanitize_text_field', $members );
         
         $current_action = $this->current_action();
         if(!empty($current_action)){         
@@ -247,6 +261,9 @@ class SwpmMembers extends WP_List_Table {
         //perform the bulk operation according to the selection
         if ('bulk_delete' === $current_action) {
             foreach ($members as $record_id) {
+                if(!is_numeric($record_id)){
+                    wp_die('Error! ID must be numeric.');
+                }
                 SwpmMembers::delete_user_by_id($record_id);
             }
             echo '<div id="message" class="updated fade"><p>Selected records deleted successfully!</p></div>';
@@ -304,12 +321,16 @@ class SwpmMembers extends WP_List_Table {
     
     function delete() {
         if (isset($_REQUEST['member_id'])) {
-            $id = absint($_REQUEST['member_id']);
+            $id = sanitize_text_field($_REQUEST['member_id']);
+            $id = absint($id);
             SwpmMembers::delete_user_by_id($id);
         }
     }
 
     public static function delete_user_by_id($id) {
+        if(!is_numeric($id)){
+            wp_die('Error! Member ID must be numeric.');
+        }
         $swpm_user = SwpmMemberUtils::get_user_by_id($id);
         $user_name = $swpm_user->user_name;
         SwpmMembers::delete_wp_user($user_name);//Deletes the WP User record
@@ -332,16 +353,109 @@ class SwpmMembers extends WP_List_Table {
 
     public static function delete_wp_user($user_name) {
         $wp_user_id = username_exists($user_name);
-        $ud = get_userdata($wp_user_id);
-        if (!empty($ud) && (isset($ud->wp_capabilities['administrator']) || $ud->wp_user_level == 10)) {
-            SwpmTransfer::get_instance()->set('status', 'For consistency, we do not allow deleting any associated wordpress account with administrator role.<br/>'
-                    . 'Please delete from <a href="users.php">Users</a> menu.');
+        if (empty($wp_user_id) || !is_numeric($wp_user_id)) {return;}
+        
+        if (!self::is_wp_super_user($wp_user_id)){
+            //Not an admin user so it is safe to delete this user.
+            include_once(ABSPATH . 'wp-admin/includes/user.php');
+            wp_delete_user($wp_user_id, 1); //assigns all related to this user to admin.            
+        }
+        else  {
+            //This is an admin user. So not going to delete the WP User record.
+            SwpmTransfer::get_instance()->set('status', 'For safety, we do not allow deletion of any associated wordpress account with administrator role.');
             return;
         }
-        if ($wp_user_id) {
-            include_once(ABSPATH . 'wp-admin/includes/user.php');
-            wp_delete_user($wp_user_id, 1); //assigns all related to this user to admin.
+    }
+    
+    public static function is_wp_super_user($wp_user_id){
+        $user_data = get_userdata($wp_user_id);
+        if (empty($user_data)){
+            //Not an admin user if we can't find his data for the given ID.
+            return false;
         }
+        if (isset($user_data->wp_capabilities['administrator'])){//Check capability
+            //admin user
+            return true;
+        }
+        if ($user_data->wp_user_level == 10){//Check for old style wp user level
+            //admin user
+            return true;            
+        }
+        //This is not an admin user
+        return false;
     }
 
+    function handle_main_members_admin_menu()
+    {
+        do_action( 'swpm_members_menu_start' );
+        
+        $action = filter_input(INPUT_GET, 'member_action');
+        $action = empty($action) ? filter_input(INPUT_POST, 'action') : $action;
+        $selected = $action;
+        
+        ?>
+        <div class="wrap swpm-admin-menu-wrap"><!-- start wrap -->
+
+        <h1><?php echo SwpmUtils::_('Simple WP Membership::Members') ?><!-- page title -->
+            <a href="admin.php?page=simple_wp_membership&member_action=add" class="add-new-h2"><?php echo SwpmUtils::_('Add New'); ?></a>
+        </h1>
+        
+        <h2 class="nav-tab-wrapper swpm-members-nav-tab-wrapper"><!-- start nav menu tabs -->
+            <a class="nav-tab <?php echo ($selected == "") ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership"><?php echo SwpmUtils::_('Members') ?></a>
+            <a class="nav-tab <?php echo ($selected == "add") ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership&member_action=add"><?php echo SwpmUtils::_('Add Member') ?></a>
+            <?php
+            if ($selected == 'edit') {//Only show the "edit member" tab when a member profile is being edited from the admin side.
+                echo '<a class="nav-tab nav-tab-active" href="#">Edit Member</a>';
+            }            
+            
+            //Trigger hooks that allows an extension to add extra nav tabs in the members menu.
+            do_action ('swpm_members_menu_nav_tabs', $selected);
+            
+            $menu_tabs = apply_filters('swpm_members_additional_menu_tabs_array', array());
+            foreach ($menu_tabs as $member_action => $title){
+                ?>
+                <a class="nav-tab <?php echo ($selected == $member_action) ? 'nav-tab-active' : ''; ?>" href="admin.php?page=simple_wp_membership&member_action=<?php echo $member_action; ?>" ><?php SwpmUtils::e($title); ?></a>
+                <?php
+            }
+            
+            ?>
+        </h2><!-- end nav menu tabs -->
+        <?php
+        
+        do_action( 'swpm_members_menu_after_nav_tabs' );
+        
+        //Trigger hook so anyone listening for this particular action can handle the output.
+        do_action( 'swpm_members_menu_body_' . $action );
+        
+        //Allows an addon to completely override the body section of the members admin menu for a given action.
+        $output = apply_filters('swpm_members_menu_body_override', '', $action);
+        if (!empty($output)) {
+            //An addon has overriden the body of this page for the given action. So no need to do anything in core.
+            echo $output;
+            echo '</div>';//<!-- end of wrap -->
+            return;
+        }
+
+        //Switch case for the various different actions handled by the core plugin.
+        switch ($action) {
+            case 'members_list':
+                //Show the members listing
+                echo $this->show();
+                break;
+            case 'add':
+                //Process member profile add
+                $this->process_form_request();
+                break;                
+            case 'edit':
+                //Process member profile edit
+                $this->process_form_request();
+                break;             
+            default:
+                //Show the members listing page by default.
+                echo $this->show();
+                break;
+        }
+        
+        echo '</div>';//<!-- end of wrap -->
+    }
 }

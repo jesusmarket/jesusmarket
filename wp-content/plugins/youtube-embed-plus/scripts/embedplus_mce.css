@@ -105,3 +105,8 @@
 {
     display: none;
 }
+
+#wpadminbar #wp-admin-bar-ytprefs-bar-cache > .ab-item:before {
+    content: "\f311";
+    top: 2px;
+}

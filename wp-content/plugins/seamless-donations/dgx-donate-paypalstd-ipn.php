@@ -10,7 +10,7 @@
  */
 
 // Load WordPress
-include "../../../wp-config.php";
+require_once "../../../wp-config.php";
 
 // Load Seamless Donations Core
 require_once './inc/geography.php';
@@ -35,10 +35,6 @@ class Dgx_Donate_IPN_Handler {
 
 	public function __construct() {
 
-		dgx_donate_debug_log( '----------------------------------------' );
-		dgx_donate_debug_log( 'PROCESSING PAYPAL IPN TRANSACTION' );
-		dgx_donate_debug_log( "Seamless Donations Version: " . dgx_donate_get_version() );
-
 		// Grab all the post data
 		$post = file_get_contents( 'php://input' );
 		parse_str( $post, $data );
@@ -51,6 +47,10 @@ class Dgx_Donate_IPN_Handler {
 		$this->get_ids_from_post();
 
 		if ( ! empty( $this->session_id ) ) {
+			dgx_donate_debug_log( '----------------------------------------' );
+			dgx_donate_debug_log( 'PROCESSING PAYPAL IPN TRANSACTION' );
+			dgx_donate_debug_log( "Seamless Donations Version: " . dgx_donate_get_version() );
+
 			$response = $this->reply_to_paypal();
 
 			if ( "VERIFIED" == $response ) {
@@ -60,27 +60,40 @@ class Dgx_Donate_IPN_Handler {
 			} else {
 				$this->handle_unrecognized_ipn( $response );
 			}
+			do_action( 'seamless_donations_paypal_ipn_processing_complete', $this->session_id, $this->transaction_id );
+			dgx_donate_debug_log( 'IPN processing complete.' );
 		} else {
 			dgx_donate_debug_log( 'Null IPN (Empty session id).  Nothing to do.' );
 		}
-
-		do_action( 'seamless_donations_paypal_ipn_processing_complete', $this->session_id, $this->transaction_id );
-		dgx_donate_debug_log( 'IPN processing complete.' );
 	}
 
-	function configure_for_production_or_test( $tls_or_ssl = 'tls' ) {
+	function configure_for_production_or_test( $tls_or_ssl_or_curl = 'tls' ) {
 
 		if ( "SANDBOX" == get_option( 'dgx_donate_paypal_server' ) ) {
-			$this->chat_back_url = "tls://www.sandbox.paypal.com";
-			$this->host_header   = "Host: www.sandbox.paypal.com\r\n";
-			if ( $tls_or_ssl == 'ssl' ) {
-				$this->chat_back_url = "ssl://www.sandbox.paypal.com:443/";
+			$this->host_header = "Host: www.sandbox.paypal.com\r\n";
+			switch ( $tls_or_ssl_or_curl ) {
+				case 'tls':
+					$this->chat_back_url = "tls://www.sandbox.paypal.com";
+					break;
+				case 'ssl':
+					$this->chat_back_url = "ssl://www.sandbox.paypal.com:443/";
+					break;
+				case 'curl':
+					$this->chat_back_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
+					break;
 			}
 		} else {
-			$this->chat_back_url = "tls://www.paypal.com";
-			$this->host_header   = "Host: www.paypal.com\r\n";
-			if ( $tls_or_ssl == 'ssl' ) {
-				$this->chat_back_url = "ssl://www.paypal.com:443/";
+			$this->host_header = "Host: www.paypal.com\r\n";
+			switch ( $tls_or_ssl_or_curl ) {
+				case 'tls':
+					$this->chat_back_url = "tls://www.paypal.com";
+					break;
+				case 'ssl':
+					$this->chat_back_url = "ssl://www.paypal.com:443/";
+					break;
+				case 'curl':
+					$this->chat_back_url = "https://www.paypal.com/cgi-bin/webscr";
+					break;
 			}
 		}
 	}
@@ -104,12 +117,22 @@ class Dgx_Donate_IPN_Handler {
 
 		$response = '';
 
+		dgx_donate_debug_log( "IPN chatback attempt via TLS..." );
 		$fp = fsockopen( $this->chat_back_url, 443, $errno, $errstr, 30 );
-		if ( ! $fp ) {
-			$this->configure_for_production_or_test( 'ssl' );
-			$fp = stream_socket_client( $this->chat_back_url, $errno, $errstr, 30 );
+
+		$obsolete_legacy_ssl_mode = get_option( 'dgx_donate_obsolete_legacy_ssl_mode' );
+		// if the option isn't defined, returns false, if defined = '1'
+		// this option will run the SSL test, which probably should never be run
+		if ( $obsolete_legacy_ssl_mode == '1' ) {
+					if ( ! $fp ) {
+						dgx_donate_debug_log( "IPN chatback attempt via SSL..." );
+						$this->configure_for_production_or_test( 'ssl' );
+						$fp = stream_socket_client( $this->chat_back_url, $errno, $errstr, 30 );
+					}
 		}
+
 		if ( $fp ) {
+			dgx_donate_debug_log( "IPN chatback attempt completed. Checking response..." );
 			fputs( $fp, $header . $request );
 
 			$done = false;
@@ -122,11 +145,66 @@ class Dgx_Donate_IPN_Handler {
 				}
 			} while( ! $done );
 		} else {
-			dgx_donate_debug_log( "IPN failed: unable to establish network chatback connection to PayPal" );
-			dgx_donate_debug_log( "==> url = {$this->chat_back_url}, errno = $errno, errstr = $errstr" );
+			// let's try cURL as a final fallback
+			// based on sample PayPal code at https://github.com/paypal/ipn-code-samples/blob/master/paypal_ipn.php
+			dgx_donate_debug_log( "IPN chatback attempt via SSL failed, attempting cURL..." );
+			$this->configure_for_production_or_test( 'curl' );
+			if ( function_exists( 'curl_init' ) ) {
+				$ch = curl_init( $this->chat_back_url );
+				if ( $ch != false ) {
+					curl_setopt( $ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1 );
+					curl_setopt( $ch, CURLOPT_POST, 1 );
+					curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+					curl_setopt( $ch, CURLOPT_POSTFIELDS, $request );
+					curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 1 );
+					curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
+					curl_setopt( $ch, CURLOPT_FORBID_REUSE, 1 );
+					curl_setopt( $ch, CURLOPT_SSLVERSION, 6 ); //Integer NOT string TLS v1.2
+
+					// set TCP timeout to 30 seconds
+					curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 30 );
+					curl_setopt( $ch, CURLOPT_HTTPHEADER, array( 'Connection: Close' ) );
+
+					// CONFIG: Please download 'cacert.pem' from "http://curl.haxx.se/docs/caextract.html"
+					// and set the directory path of the certificate as shown below.
+					// Ensure the file is readable by the webserver.
+					// This is mandatory for some environments.
+					$cert = __DIR__ . "/ssl/cacert.pem";
+					dgx_donate_debug_log( "Loading certificate from $cert" );
+					curl_setopt( $ch, CURLOPT_CAINFO, $cert );
+
+					$response = curl_exec( $ch );
+					if ( curl_errno( $ch ) != 0 ) { // cURL error
+						dgx_donate_debug_log(
+							"IPN failed: unable to establish network chatback connection to PayPal via cURL" );
+						dgx_donate_debug_log( "IPN cURL error: " . curl_error( $ch ) );
+						$version = curl_version();
+						dgx_donate_debug_log( "cURL version: " . $version['version'] . " OpenSSL version: " .
+						                      $version['ssl_version'] );
+						// https://curl.haxx.se/docs/manpage.html#--tlsv12
+						// https://en.wikipedia.org/wiki/Comparison_of_TLS_implementations
+						dgx_donate_debug_log( "PayPal requires TLSv1.2, which requires cURL 7.34.0 and OpenSSL 1.0.1." );
+						dgx_donate_debug_log( "See https://en.wikipedia.org/wiki/Comparison_of_TLS_implementations" );
+						dgx_donate_debug_log( "for minimum versions for other implementations." );
+					} else {
+						// Split response headers and payload, a better way for strcmp
+						dgx_donate_debug_log( "IPN chatback attempt via cURL completed. Checking response..." );
+						$tokens   = explode( "\r\n\r\n", trim( $response ) );
+						$response = trim( end( $tokens ) );
+					}
+					curl_close( $ch );
+				}
+			} else {
+				dgx_donate_debug_log(
+					"Unable to complete chatback attempt. SSL incompatible. Consider enabling cURL library." );
+				dgx_donate_debug_log( "See https://en.wikipedia.org/wiki/Comparison_of_TLS_implementations" );
+				dgx_donate_debug_log( "for minimum versions for other implementations." );
+			}
 		}
+
 		fclose( $fp );
 
+		//dgx_donate_debug_log ( "url = {$this->chat_back_url}, errno = $errno, errstr = $errstr" );
 		return $response;
 	}
 
@@ -248,6 +326,7 @@ class Dgx_Donate_IPN_Handler {
 	}
 }
 
+dgx_donate_debug_log("dgx-donate-paypalstd-ipn.php called outside of constructor.");
 $dgx_donate_ipn_responder = new Dgx_Donate_IPN_Handler();
 
 /**

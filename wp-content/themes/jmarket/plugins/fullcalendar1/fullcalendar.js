@@ -1,5 +1,5 @@
 /*!
- * FullCalendar v2.2.1
+ * FullCalendar v2.2.3
  * Docs & License: http://arshaw.com/fullcalendar/
  * (c) 2013 Adam Shaw
  */
@@ -151,7 +151,7 @@ var rtlDefaults = {
 	}
 };
 ;;
-var fc = $.fullCalendar = { version: "2.2.1" };
+var fc = $.fullCalendar = { version: "2.2.3" };
 var fcViews = fc.views = {};
 $.fn.fullCalendar = function(options) {
 	var args = Array.prototype.slice.call(arguments, 1); // for a possible method call
@@ -1332,7 +1332,7 @@ function EventManager(options) { // assumed to be a calendar
 	function getSourcePrimitive(source) {
 		return (
 			(typeof source === 'object') ? // a normalized event source?
-				(source.origArray || source.url || source.events) : // get the primitive
+				(source.origArray || source.googleCalendarId || source.url || source.events) : // get the primitive
 				null
 		) ||
 		source; // the given argument *is* the primitive
@@ -1524,7 +1524,7 @@ function EventManager(options) { // assumed to be a calendar
 			if (end) {
 				end = t.moment(end);
 				if (!end.isValid()) {
-					return false;
+					end = null; // let defaults take over
 				}
 			}
 			allDay = input.allDay;
@@ -1569,6 +1569,9 @@ function EventManager(options) { // assumed to be a calendar
 				end = t.rezoneDate(end);
 			}
 		}
+		if (end && end <= start) { // end is exclusive. must be after start
+			end = null; // let defaults take over
+		}
 		event.allDay = allDay;
 		event.start = start;
 		event.end = end || null; // ensure null if falsy
@@ -1580,11 +1583,9 @@ function EventManager(options) { // assumed to be a calendar
 	// If the given event is a recurring event, break it down into an array of individual instances.
 	// If not a recurring event, return an array with the single original event.
 	// If given a falsy input (probably because of a failed buildEventFromInput call), returns an empty array.
-	function expandEvent(abstractEvent) {
+	// HACK: can override the recurring window by providing custom rangeStart/rangeEnd (for businessHours).
+	function expandEvent(abstractEvent, _rangeStart, _rangeEnd) {
 		var events = [];
-		var view;
-		var _rangeStart = rangeStart;
-		var _rangeEnd = rangeEnd;
 		var dowHash;
 		var dow;
 		var i;
@@ -1592,12 +1593,8 @@ function EventManager(options) { // assumed to be a calendar
 		var startTime, endTime;
 		var start, end;
 		var event;
-		// hack for when fetchEvents hasn't been called yet (calculating businessHours for example)
-		if (!_rangeStart || !_rangeEnd) {
-			view = t.getView();
-			_rangeStart = view.start;
-			_rangeEnd = view.end;
-		}
+		_rangeStart = _rangeStart || rangeStart;
+		_rangeEnd = _rangeEnd || rangeEnd;
 		if (abstractEvent) {
 			if (abstractEvent._recurring) {
 				// make a boolean hash as to whether the event occurs on each day-of-week
@@ -1791,7 +1788,7 @@ function EventManager(options) { // assumed to be a calendar
 	/* Business Hours
 	-----------------------------------------------------------------------------------------*/
 	t.getBusinessHoursEvents = getBusinessHoursEvents;
-	// Returns an array of events as to when the business hours occur in the current view.
+	// Returns an array of events as to when the business hours occur in the given view.
 	// Abuse of our event system :(
 	function getBusinessHoursEvents() {
 		var optionVal = options.businessHours;
@@ -1802,6 +1799,7 @@ function EventManager(options) { // assumed to be a calendar
 			dow: [ 1, 2, 3, 4, 5 ], // monday - friday
 			rendering: 'inverse-background'
 		};
+		var view = t.getView();
 		var eventInput;
 		if (optionVal) {
 			if (typeof optionVal === 'object') {
@@ -1814,7 +1812,11 @@ function EventManager(options) { // assumed to be a calendar
 			}
 		}
 		if (eventInput) {
-			return expandEvent(buildEventFromInput(eventInput));
+			return expandEvent(
+				buildEventFromInput(eventInput),
+				view.start,
+				view.end
+			);
 		}
 		return [];
 	}
@@ -2157,9 +2159,6 @@ function dayishDiff(a, b) {
 function isNativeDate(input) {
 	return  Object.prototype.toString.call(input) === '[object Date]' || input instanceof Date;
 }
-function dateCompare(a, b) { // works with Moments and native Dates
-	return a - b;
-}
 // Returns a boolean about whether the given input is a time string, like "06:40:00" or "06:00"
 function isTimeString(str) {
 	return /^\d+\:\d+(?:\:\d+\.?(?:\d{3})?)?$/.test(str);
@@ -2206,6 +2205,9 @@ function stripHtmlEntities(text) {
 }
 function capitaliseFirstLetter(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+function compareNumbers(a, b) { // for .sort()
+	return a - b;
 }
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for
@@ -3648,7 +3650,7 @@ $.extend(Grid.prototype, {
 			cellOver: function(cell, date) {
 				if (dragListener.origDate) { // click needs to have started on a cell
 					dayEl = _this.getCellDayEl(cell);
-					dates = [ date, dragListener.origDate ].sort(dateCompare);
+					dates = [ date, dragListener.origDate ].sort(compareNumbers); // works with Moments
 					start = dates[0];
 					end = dates[1].clone().add(_this.cellDuration);
 					if (isSelectable) {
@@ -6519,7 +6521,7 @@ function View(calendar) {
 				var segmentCellFirst = cellOffsetToCell(segmentCellOffsetFirst);
 				var segmentCellLast = cellOffsetToCell(segmentCellOffsetLast);
 				// view might be RTL, so order by leftmost column
-				var cols = [ segmentCellFirst.col, segmentCellLast.col ].sort();
+				var cols = [ segmentCellFirst.col, segmentCellLast.col ].sort(compareNumbers);
 				// Determine if segment's first/last cell is the beginning/end of the date range.
 				// We need to compare "day offset" because "cell offsets" are often ambiguous and
 				// can translate to multiple days, and an edge case reveals itself when we the

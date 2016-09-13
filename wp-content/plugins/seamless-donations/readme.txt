@@ -3,8 +3,8 @@ Contributors: dgewirtz
 Donate link: http://zatzlabs.com/project-donations/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts, church, worship, churches, crowdfunding, donation plugin, fundraiser, fundraising, giving, nonprofit, paypal, PayPal Donate, paypal donations, recurring, recurring donations, wordpress donation plugin, wordpress donations, wp donation
 Requires at least: 3.4
-Tested up to: 4.4
-Stable tag: 4.0.14
+Tested up to: 4.6
+Stable tag: 4.0.19
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ The Most Popular Donations Plugin for WordPress
 
 == Description ==
 
-**IMPORTANT: Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).**
+**IMPORTANT: Support has moved to the ZATZLabs site and is no longer provided on the WordPress.org forums. Please visit the new [Seamless Donations Community Forums](http://zatzlabs.com/forums/). If you need a timely reply from the developer, please [open a ticket](http://zatzlabs.com/submit-ticket/).**
 
 = Five Minutes to Your First Donation =
 
@@ -92,6 +92,8 @@ Support for the following currencies is built into Seamless Donations 4.0:
 * Spanish translation, courtesy David Chávez (as of 4.0.2)
 * French translation, courtesy Etienne Lombard (as of 4.0.2)
 * Portuguese translation, courtesy Daniel Sousa (as of 4.0.9)
+* Hebrew translation, courtesy user semistazic (as of 4.0.16)
+* Norwegian translation, courtesy of an anonymous user (as of 4.0.16)
 * HUGE thank you to users doing these translations!
 * [Assist with translations](https://wordpress.org/support/topic/translators-check-in-here-so-youre-not-duplicating-work)
 
@@ -123,7 +125,7 @@ Seamless Donations is on GitHub. Contributions to the project are welcomed, appr
 
 = Support Note =
 
-Many support questions can be answered by the [growing support FAQ on the plugin's home page](http://zatzlabs.com/seamless-donations/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
+Support has moved to the ZATZLabs site and is no longer provided on the WordPress.org forums. Please visit the new [Seamless Donations Community Forums](http://zatzlabs.com/forums/). If you need a timely reply from the developer, please [open a ticket](http://zatzlabs.com/submit-ticket/).
 
 = Mailing List =
 If you'd like to keep up with the latest updates to this plugin, please visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) and add yourself to the mailing list.
@@ -133,6 +135,8 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 This plugin was adopted in March 2015 by David Gewirtz. Ongoing support and updates have continued, as evidenced by the major 4.0 upgrade. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details. Special thanks to Allen Snook for originally creating the plugin and making adoption possible.
 
 == Installation ==
+
+**IMPORTANT: Support has moved to the ZATZLabs site and is no longer provided on the WordPress.org forums. Please visit the new [Seamless Donations Community Forums](http://zatzlabs.com/forums/). If you need a timely reply from the developer, please [open a ticket](http://zatzlabs.com/submit-ticket/).**
 
 1. Upload/install the Seamless Donations plugin
 2. Activate the plugin
@@ -153,6 +157,8 @@ https://www.youtube.com/watch?v=SWm6GivlJi0
 * **Check your data:** Great pains have been taken to be sure the data migrates correctly, but please, please, PLEASE double-check it.
 
 == Frequently Asked Questions ==
+
+**IMPORTANT: Support has moved to the ZATZLabs site and is no longer provided on the WordPress.org forums. Please visit the new [Seamless Donations Community Forums](http://zatzlabs.com/forums/). If you need a timely reply from the developer, please [open a ticket](http://zatzlabs.com/submit-ticket/).**
 
 = Does this work with US and non-US PayPal accounts? =
 
@@ -195,7 +201,41 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 
 == Changelog ==
 
-* **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
+**IMPORTANT: Support has moved to the ZATZLabs site and is no longer provided on the WordPress.org forums. Please visit the new [Seamless Donations Community Forums](http://zatzlabs.com/forums/). If you need a timely reply from the developer, please [open a ticket](http://zatzlabs.com/submit-ticket/).**
+
+= 4.0.19 =
+* Minor update to add new support information and notice
+
+= 4.0.18 =
+* Minor update to improve TLS compatibility with PayPal
+* Added an option (that should probably never be used) to turn on legacy SSL for PayPal transactions
+
+= 4.0.17 =
+* Added processing mode entry to log
+* Fixed spurious blank IPN log entries
+* Fixed bug that wrote incorrect IPN to log entries
+* Fixed nasty little bug introduced in 4.0.16 that substantially slowed processing by calling both IPN handlers on every page
+
+= 4.0.16 =
+* Required update for PayPal https IPN compatibility
+* Added https verification and notification code to PayPal section in preparation for PayPal security update
+* Added https-compliant IPN URL to PayPal settings section in preparation for PayPal security update
+* Added helpful note to Host Compatibility Options section
+
+= 4.0.15 =
+* Added Donations This Month widget
+* Added failover PayPal security option with cURL TLS support
+* Added new Host Compatibility Options section in settings
+* Added host compatibility option and mechanism to process form data via initiating page or post rather than external PHP file
+* Added host compatibility option and mechanism to bypass nonce validation for those hosts who break nonces on form submission
+* Added host compatibility option and mechanism to generate unique transaction IDs in JavaScript rather than at the host
+* Added nicer styled beta labels
+* Added versioning to transaction IDs
+* Added option to obscurify donor names shown in logs
+* Donor names in logs now default to obscurified names unless otherwise turned off
+* Modified YouTube tutorial video in main admin panel to resize responsively
+* Changed name of main Debug Mode section to Debug Options
+* Fixed a bug where UK Gift Aid selection was not being recorded. Unfortunately, the data wasn't actually written to any transaction logging due to a code typo, so there's no pre-existing gift aid data available for recovery.
 
 = 4.0.14 =
 * Update fixing PayPal chatback bug. See [Working around PayPal breakage: the joys of being middleware](http://zatzlabs.com/working-around-paypal-breakage-the-joys-of-being-middleware/).

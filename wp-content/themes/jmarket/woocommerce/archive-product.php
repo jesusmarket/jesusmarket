@@ -1,10 +1,4 @@
 <?php 
-/**
- * The Template for displaying product archives, including the main shop page which is a post type archive.
- * @author     WooThemes
- * @package 	WooCommerce/Templates
- * @version     2.1.8
- */
 get_header(); 
 $variable_post_id= get_option('woocommerce_shop_page_id');
 $pageOptions = imic_page_design($variable_post_id); //page design options

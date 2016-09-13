@@ -13,6 +13,7 @@ class recent_sermons extends WP_Widget {
 		if( $instance) {
 			 $title = esc_attr($instance['title']);
 			 $number = esc_attr($instance['number']);
+			 $category = esc_attr($instance['category']);
 			 $autoplay = isset($instance['autoplay'])?$instance['autoplay']:0;
 		} 
 	?>
@@ -23,6 +24,25 @@ class recent_sermons extends WP_Widget {
         <p>
             <label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Number of sermons to show', 'imic-framework-admin'); ?></label>
             <input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" />
+        </p> 
+        
+        <p>
+            <label for="<?php echo $this->get_field_id('category'); ?>"><?php _e('Select Category', 'imic-framework-admin'); ?></label>
+            <select class="spType_sermons_cat" id="<?php echo $this->get_field_id('category'); ?>" name="<?php echo $this->get_field_name('category'); ?>">
+            <option value=""><?php _e('All','imic-framework-admin'); ?></option>
+                <?php
+                $post_terms = get_terms('sermons-category');
+                if(!empty($post_terms)){
+                      foreach ($post_terms as $term) {
+                         
+                        $term_name = $term->name;
+                        $term_id = $term->slug;
+                        $activePost = ($term_id == $category)? 'selected' : '';
+                        echo '<option value="'. $term_id .'" '.$activePost.'>' . $term_name . '</p>';
+                    }
+                }
+                ?>
+            </select> 
         </p> 
         
          <p>
@@ -41,6 +61,7 @@ class recent_sermons extends WP_Widget {
 		  // Fields
 		  $instance['title'] = strip_tags($new_instance['title']);
 		  $instance['number'] = strip_tags($new_instance['number']);
+		  $instance['category'] = strip_tags($new_instance['category']);
 		  $instance['autoplay'] =isset($new_instance['autoplay'])?$new_instance['autoplay']:0;
 		  
 		 return $instance;
@@ -53,6 +74,7 @@ class recent_sermons extends WP_Widget {
 	   // these are the widget options
 	   $post_title = apply_filters('widget_title', $instance['title']);
 	   $number = apply_filters('widget_number', $instance['number']);
+       $category = apply_filters('widget-category', empty($instance['category']) ?'': $instance['category'], $instance, $this->id_base);
 	   $autoplay = isset($instance['autoplay'])?$instance['autoplay']:0;
 	   
 	   $numberPost = (!empty($number))? $number : 3 ;	
@@ -66,7 +88,7 @@ class recent_sermons extends WP_Widget {
 			echo $args['after_title'];
 			echo '</header>';
 		}
-$posts = query_posts(array('order'=>'DESC', 'post_type' => 'sermons', 'posts_per_page' => $numberPost, 'post_status' => 'publish'));
+$posts = query_posts(array('order'=>'DESC', 'post_type' => 'sermons', 'sermons-category' => $category, 'posts_per_page' => $numberPost, 'post_status' => 'publish'));
 		if(!empty($posts)){ 
 			echo '<section class="listing-cont">
 					<ul>';
@@ -161,7 +183,7 @@ $posts = query_posts(array('order'=>'DESC', 'post_type' => 'sermons', 'posts_per
 				              $liFirst .='<li class="item sermon featured-sermon">
 								<span class="date">'.get_the_time(get_option('date_format'),$post->ID).'</span>
 								<h4><a href="'.get_permalink($post->ID).'">'.$post->post_title.'</a></h4>
-								<div class="featured-sermon-video">' .'<img src="'.$featured_image_url.'" />' . '</div><p>'.
+								<div class="featured-sermon-video format-standard">' .'<a href="'.get_permalink($post->ID).'" class="media-box"><img src="'.$featured_image_url.'" />' . '</a></div><p>'.
 								  $post->post_content
 								.'</p><div class="sermon-actions">';
 								if (!empty($custom['imic_sermons_url'][0])) {

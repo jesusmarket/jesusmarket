@@ -1,5 +1,5 @@
 jQuery(document).ready(function($){
-    //alert('Hello World!');
+   
    jQuery("#shortcodedesc-comments").click(function(){
       jQuery("#shortcodedesctbl-comments").animate({
         height:'toggle'

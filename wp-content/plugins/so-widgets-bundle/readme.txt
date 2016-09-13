@@ -1,9 +1,9 @@
 === SiteOrigin Widgets Bundle ===
 Tags: bundle, widget, button, slider, image, carousel, price table, google maps, tinymce, social links
 Requires at least: 3.9
-Tested up to: 4.4.2
-Stable tag: 1.5.8
-Build time: 2016-03-05T10:52:59+02:00
+Tested up to: 4.6
+Stable tag: 1.6.5
+Build time: 2016-08-14T09:48:53+02:00
 License: GPLv3 or later
 Contributors: gpriday, braam-genis
 
@@ -50,6 +50,75 @@ The SiteOrigin Widgets Bundle is the perfect platform to build widgets for your 
 3. An example of the button widget.
 
 == Changelog ==
+
+= 1.6.5 - 15 August 2016 =
+* Fixed dialog z-index.
+* Added field required argument.
+* Properly trigger change for image search import.
+* Sanitize arg can now be a callback.
+* Improved multi checkbox field
+* Maps: Just call initialization function if maps API already loaded.
+
+= 1.6.4 - 21 July 2016 =
+* More settings and customizability for Headline widget.
+* Added FitText to Headline and Hero Image widgets.
+* Fixed Pixabay image importing.
+
+= 1.6.3 - 19 July 2016 =
+* Added image search functionality to media field.
+* Moved actions into their own file.
+* Allow widgets to provide their own LESS/HTML.
+* Added very simple code field.
+* Multiple widgets can have the same class. Allowing widget functionality to come from configuration.
+* Various tweaks for upcoming Widgets Builder plugin.
+
+= 1.6.2 - 11 July 2016 =
+* Fixed Firefox issue in post selector builder.
+* Properly escape all uses off add_query_arg.
+* Added filter after video
+
+= 1.6.1 - 24 June 2016 =
+* Social Links: Fixed auto-filling of network colors.
+* Social Links: Added 500px network.
+* Social Links: Added title tag to link tags.
+* Maps: Prevent JS error in when maps widget script is enqueued but widget isn't displayed.
+* Maps: Made API field more prominent as it's now required by the Google Maps API.
+* Added more general error checking.
+
+= 1.6 - 21 June 2016 =
+* Added builder field.
+* Added new multi checkboxes field.
+* Added Layout Slider widget.
+* Added taxonomy widget.
+* Added slider wrapper attributes and filter.
+* Fix for measurement field inside a repeater.
+* Modified base folder to work independently of Widgets Bundle.
+* Added custom icon families callback argument to icon field.
+* Properly handle attachments in post selector
+* Contact Form: Refactored form fields.
+* Hero Image: Added image type to Hero Image widget.
+* Button: Handle empty width.
+* Image: Added filter for SiteOrigin image attributes.
+* Image: Add dimensions to sizes dropdown.
+* Maps: Ensure maps widget works with API key.
+* Hero Image: Added setting to disable swipe on mobile Hero Image Widget.
+* Fixed title syntax in Image widget.
+* Video: Correctly get video file mime-types.
+* Video Widget: Allow specifying multiple self-hosted video sources to support various formats.
+
+= 1.5.11 - April 11 2016 =
+* Fixed features widget container shape setting.
+
+= 1.5.10 - April 5 2016 =
+* Added Icon widget.
+* Moved widget form arrays into separate functions to improve performance.
+* Cache widget style CSS if it can't be saved to filesystem.
+* Improved preview checking so preview style CSS isn't stored.
+* Contact Form: Improved instance hashing for compatibility with Yoast SEO.
+* Contact Form: Added description field and customisation.
+* Slider: Ensure correct styles are applied to slider images when a link is defined.
+* Features: Allow user to select size for uploaded icon image.
+* Price Table: Ensure feature icons always vertically centered, alongside feature text.
 
 = 1.5.9 - February 26 2016 =
 * Contact Form: Fixed hash checking for duplicate emails.

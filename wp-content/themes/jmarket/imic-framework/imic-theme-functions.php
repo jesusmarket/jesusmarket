@@ -297,6 +297,10 @@ if (!function_exists('imic_custom_styles')) {
 		if ($options['sidebar_position'] == 2) {
 			echo ' #content-col, #sidebar-col{float:right!important;}';
 		}
+		if (isset($options['content_wide_width'])&&$options['content_wide_width'] == 1)
+		{
+			echo '.content .container{width:100%;}';
+		}
 		if ($options['event_google_icon'] == 1) {
 			echo '.event-detail h4 a[href^="https://www.google"]:before, .events-grid .grid-content h3 a[href^="https://www.google"]:before, h3.timeline-title a[href^="https://www.google"]:before{display:inline-block;}';
 		} else {
@@ -361,9 +365,9 @@ if (!function_exists('imic_video_embed')) {
 if (!function_exists('imic_video_youtube')) {
     function imic_video_youtube($url, $width = 200, $height = 150,$autopaly) {
         if (stristr($url,'youtu.be/'))
-        { preg_match('/(https:|http:|)(\/\/www\.|\/\/|)(.*?)\/(.{11})/i', $url, $video_id); return '<iframe itemprop="video" src="//youtube.com/embed/' . $video_id[4] . '?wmode=transparent&autoplay='.$autopaly.'" width="' . $width . '" height="' . $height . '" ></iframe>'; }
+        { preg_match('/(https:|http:|)(\/\/www\.|\/\/|)(.*?)\/(.{11})/i', $url, $video_id); return '<iframe itemprop="video" src="https://youtube.com/embed/' . $video_id[4] . '?autoplay='.$autopaly.'" width="' . $width . '" height="' . $height . '" ></iframe>'; }
     else 
-        { preg_match('/(https:|http:|):(\/\/www\.|\/\/|)(.*?)\/(embed\/|watch\?v=|(.*?)&v=|v\/|e\/|.+\/|watch.*v=|)([a-z_A-Z0-9]{11})/i', $url, $video_id); return '<iframe itemprop="video" src="//youtube.com/embed/' . $video_id[6] . '?wmode=transparent&autoplay='.$autopaly.'" width="' . $width . '" height="' . $height . '" ></iframe>';
+        { preg_match('/(https:|http:|):(\/\/www\.|\/\/|)(.*?)\/(embed\/|watch\?v=|(.*?)&v=|v\/|e\/|.+\/|watch.*v=|)([a-z_A-Z0-9]{11})/i', $url, $video_id); return '<iframe itemprop="video" src="https://youtube.com/embed/' . $video_id[6] . '?autoplay='.$autopaly.'" width="' . $width . '" height="' . $height . '" ></iframe>';
 		}
     }
 }
@@ -372,9 +376,10 @@ if (!function_exists('imic_video_youtube')) {
 if (!function_exists('imic_video_vimeo')) {
    function imic_video_vimeo($url, $width = 200, $height = 150,$autopaly) {
         preg_match('/https?:\/\/vimeo.com\/(\d+)$/', $url, $video_id);
-        return '<iframe src="//player.vimeo.com/video/' . $video_id[1] . '?title=0&amp;byline=0&amp;autoplay='.$autopaly.'&amp;portrait=0" width="' . $width . '" height="' . $height . '" allowfullscreen></iframe>';
+        return '<iframe src="https://player.vimeo.com/video/' . $video_id[1] . '" width="' . $width . '" height="' . $height . '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
     }
 }
+
 /* Soundcloud Audio
 ====================================================== */
 //Get the SoundCloud URL
@@ -626,8 +631,8 @@ function afterSavePost()
 		$suvalue = date('Y-m-d',$suvalue);
 		}
 		$count_days = imic_dateDiff($sdate_ymd,$edate_ymd);
-		if($count_days>1) { $suvalue = $edate_ymd; }
-		update_post_meta($postId,'imic_event_frequency_end',$suvalue);
+		if($count_days>0) { $suvalue = $edate_ymd; }
+		update_post_meta($postId,'imic_event_frequency_end',$suvalue); 
 		#if user not check all day checkbox as well as empty start,end time than update time here.
 		if($all_day == 0 && empty($start_time))
 		{
@@ -1626,7 +1631,6 @@ $vk_share_alt = $imic_options['vk_share_alt'];
             		echo '<ul class="share-buttons share-buttons-gs share-buttons-squared">';
 				}
 			};
-                	echo '<li class="share-title"></li>';
 					if($imic_options['share_icon']['1'] == '1'){
                    		echo '<li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=' . $postpermalink . '&amp;t=' . $posttitle . '" target="_blank" title="' . $facebook_share_alt . '"><i class="fa fa-facebook"></i></a></li>';
 					}
@@ -1699,7 +1703,6 @@ function imic_event_grid() {
         ksort($new_events);
         if(!empty($new_events)){
 	foreach($new_events as $key =>$value) {
-		$target = '';
           if(preg_match('/^[0-9]+$/',$value)){
                 $frequency = get_post_meta($value, 'imic_event_frequency', true);
        	        $frequency_count = get_post_meta($value, 'imic_event_frequency_count', true);
@@ -1724,11 +1727,6 @@ function imic_event_grid() {
                                    $event_title=$google_data[0];
                                    $custom_event_url=$google_data[1];
 								   $options = get_option('imic_options');
-                                   $event_google_open_link = isset($options['event_google_open_link'])?$options['event_google_open_link']:0;
-								   if($event_google_open_link)
-								   {
-								     $target = 'target ="_blank"';
-								   }
                                    $satime =$key;
 								   /* event time date formate */
 								  $event_dt_out = imic_get_event_timeformate($key.'|'.strtotime($google_data[2]),
@@ -1740,7 +1738,7 @@ function imic_event_grid() {
                                 echo '<li class="item event-item">	
 				  <div class="event-date"> <span class="date">' . date_i18n('d', $key) . '</span> <span class="month">' .imic_global_month_name($key). '</span> </div>
 				  <div class="event-detail">
-                                      <h4><a href="'.$custom_event_url.'" '.$target.'>' . $event_title .'</a>'.imicRecurrenceIcon($value).'</h4>'; 
+                                      <h4><a href="'.$custom_event_url.'">' . $event_title .'</a>'.imicRecurrenceIcon($value).'</h4>'; 
             
                 echo '<span class="event-dayntime meta-data">' . $event_dt_out[1].',&nbsp;&nbsp;'.$event_dt_out[0] . '</span> </div>
 				  <div class="to-event-url">
@@ -2696,4 +2694,18 @@ if(!function_exists('imic_sermons_filter_shortcode'))
 	}
 	add_shortcode( 'imic-searchandfilter', 'imic_sermons_filter_shortcode' );
 }
+/* SIDEBAR SHORTCODES
+  =================================================*/
+function borntogive_sidebar($atts, $content = null) {
+    extract(shortcode_atts(array(
+        "id" => "",
+		"column" => 4
+     ), $atts));
+	 ob_start();
+dynamic_sidebar($id);
+$html = ob_get_contents();
+ob_end_clean();
+return $html;
+}
+add_shortcode('sidebar_megamenu', 'borntogive_sidebar');
 ?>

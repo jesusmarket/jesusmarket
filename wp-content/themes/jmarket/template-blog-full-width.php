@@ -47,7 +47,7 @@ get_header();
                         case 'video':
                             $imic_gallery_video_url = get_post_meta(get_the_ID(), 'imic_gallery_video_url', true);
                             if (!empty($imic_gallery_video_url)) {
-                                echo imic_video_embed($imic_gallery_video_url);
+                                echo '<div class="fw-video">'.imic_video_embed($imic_gallery_video_url).'</div>';
                             }
                             break;
                         case 'audio':

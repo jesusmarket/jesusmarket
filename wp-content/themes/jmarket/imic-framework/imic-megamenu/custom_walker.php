@@ -32,9 +32,11 @@ class imic_mega_menu_walker extends Walker_Nav_Menu {
         if (get_post_meta($item->ID, '_menu_is_mega', true) == 1) {
             $item_output = '';
             $menuposttype = get_post_meta($item->ID, '_menu_post_type', true);
+						$menu_sidebars = get_post_meta($item->ID, '_menu_sidebars', true);
             $menupost = get_post_meta($item->ID, '_menu_post', true);
             $menu_post_id_comma = get_post_meta($item->ID, '_menu_post_id_comma', true);
             $menushortcode = get_post_meta($item->ID, '_menu_shortcode', true);
+						$menushortcode = ($menushortcode!='')?$menushortcode:'[sidebar_megamenu id="'.$menu_sidebars.'"]';
             if (!empty($menuposttype) || !empty($menu_post_id_comma)) {
                 $item_output.='<div class="col-md-3"> <span class="megamenu-sub-title">' . $item->title . '</span>';
             } elseif (!empty($menushortcode)) {
@@ -85,6 +87,24 @@ class imic_mega_menu_walker extends Walker_Nav_Menu {
                     $item_output.='</ul>';
                 }
             }
+						if($menu_sidebars!='')
+							{
+								global $sidebars_widgets;
+								$count = count ($sidebars_widgets[$menu_sidebars]);
+								echo '<style>';
+								echo '.megamenu-container .widget {';
+								echo 'width:'.(100/$count-4).'%;';
+								echo 'float:left;';
+								echo '}';
+								echo '.megamenu-sub-title{';
+								echo 'display:none!important;';
+								echo '}';
+								echo '</style>';
+							}
+							else
+							{
+								
+							}
             if (!empty($menushortcode)) {
                 $item_output.= do_shortcode($menushortcode);
             }

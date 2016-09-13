@@ -54,7 +54,7 @@ if ( ! class_exists( 'ReduxFramework_select' ) ) {
                      */
                     $icons_file = apply_filters( "redux/{$this->parent->args['opt_name']}/field/font/icons/file", $icons_file );
                     if ( file_exists( $icons_file ) ) {
-                        require_once( $icons_file );
+                        require_once $icons_file;
                     }
                 }
 
@@ -62,7 +62,7 @@ if ( ! class_exists( 'ReduxFramework_select' ) ) {
             }
 
             if ( ! empty( $this->field['data'] ) && ( $this->field['data'] == "elusive-icons" || $this->field['data'] == "elusive-icon" || $this->field['data'] == "elusive" ) ) {
-                $this->field['class'] = " font-icons";
+                $this->field['class'] .= " font-icons";
             }
             //if
 
@@ -154,6 +154,10 @@ if ( ! class_exists( 'ReduxFramework_select' ) ) {
         public function enqueue() {
             wp_enqueue_style( 'select2-css' );
 
+            if (isset($this->field['sortable']) && $this->field['sortable']) {
+                wp_enqueue_script('jquery-ui-sortable');
+            }
+            
             wp_enqueue_script(
                 'redux-field-select-js',
                 ReduxFramework::$_url . 'inc/fields/select/field_select' . Redux_Functions::isMin() . '.js',

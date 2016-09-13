@@ -204,6 +204,20 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
                     </label>
                 </p>
                 <p class="field-custom description description-wide">
+                <label for="edit-menu-sidebars-<?php echo esc_attr($item_id); ?>">
+                <select name ="menu-sidebars[<?php echo esc_attr($item_id); ?>]" class="menu-sidebars edit-menu-item-custom" id="edit-menu-sidebars-<?php echo esc_attr($item_id); ?>" >
+                <?php
+								$sidebars = imic_get_all_sidebars();
+								echo '<option value ="">' . esc_html__('Select Sidebar', 'framework') . '</option>';
+								foreach ($sidebars as $key=>$value) {
+									$activePost = ($key == $item->menusidebars)? 'selected' : '';
+									echo '<option value="'.esc_attr($key).'"'.$activePost.'>'.esc_attr($value).'</option>';
+								}
+								?>
+                </select>
+                </label>
+                </p>
+                <p class="field-custom description description-wide">
                     <label for="edit-menu-post-<?php echo $item_id; ?>">
                         <?php _e('Enter Number of Post Ex-3','framework'); ?><input type="text" id="edit-menu-post-<?php echo $item_id; ?>" class="menu-post edit-menu-item-custom"   name="menu-post[<?php echo $item_id; ?>]" value="<?php echo ($item->menupost); ?>" /> 
                     </label>

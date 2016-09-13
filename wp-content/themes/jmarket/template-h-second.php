@@ -198,7 +198,7 @@ if (have_posts()&&$imic_imic_galleries==1):
                                 if(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 0){
 									$Lightbox_init = '<a href="'.esc_url($large_src_i[0]) .'" data-rel="prettyPhoto" class="media-box">';
 								}elseif(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 1){
-									$Lightbox_init = '<a href="'.esc_url($large_src_i[0]) .'" class="media-box magnific-image">';
+									$Lightbox_init = '<a href="'.esc_url($large_src_i[0]) .'" title="'.get_the_title().'" class="media-box magnific-image">';
 								}
 								echo $Lightbox_init;
                                 the_post_thumbnail($size_thumb);
@@ -213,17 +213,18 @@ if (have_posts()&&$imic_imic_galleries==1):
 									foreach ($image_data as $custom_gallery_images) {
 									$large_src = wp_get_attachment_image_src($custom_gallery_images, 'full');
 									$gallery_thumbnail = wp_get_attachment_image_src($custom_gallery_images, $size_thumb);
+									$gallery_title = get_the_title($custom_gallery_images);
 									echo'<li class="item">';
 									if(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 0){
-										$Lightbox_init = '<a href="' .esc_url($large_src[0]). '" data-rel="prettyPhoto[' . get_the_title() . ']">';
+										$Lightbox_init = '<a href="' .esc_url($large_src[0]). '"data-rel="prettyPhoto[' . get_the_title() . ']">';
 									}elseif(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 1){
-										$Lightbox_init = '<a href="'.esc_url($large_src[0]) .'" class="magnific-gallery-image">';
+										$Lightbox_init = '<a href="'.esc_url($large_src[0]) .'" title="'.esc_attr($gallery_title).'" class="magnific-gallery-image">';
 									}
 									echo $Lightbox_init;
 									if($i === 0){
-										  echo '<img src="'.$gallery_thumbnail[0].'" alt="">';
+										  echo '<img src="'.$gallery_thumbnail[0].'" alt="' .esc_attr($gallery_title). '" >';
 									} else {
-										  echo '<img class="lazy" data-src="'.$gallery_thumbnail[0].'" alt="">';
+										  echo '<img class="lazy" data-src="'.$gallery_thumbnail[0].'" alt="' .esc_attr($gallery_title). '" >';
 									}
 									echo'</a></li>';
 									$i++;
@@ -245,7 +246,7 @@ if (have_posts()&&$imic_imic_galleries==1):
                                    if(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 0){
 										$Lightbox_init = '<a href="' . $custom['imic_gallery_video_url'][0] . '" data-rel="prettyPhoto" class="media-box">';
 									}elseif(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 1){
-										$Lightbox_init = '<a href="' . $custom['imic_gallery_video_url'][0] . '" class="media-box magnific-video">';
+										$Lightbox_init = '<a href="' . $custom['imic_gallery_video_url'][0] . '" title="'.get_the_title().'" class="media-box magnific-video">';
 									}
 									echo $Lightbox_init;
                                     the_post_thumbnail($size_thumb);
@@ -257,7 +258,7 @@ if (have_posts()&&$imic_imic_galleries==1):
                                 if(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 0){
 									$Lightbox_init = '<a href="'.esc_url($large_src_i[0]) .'" data-rel="prettyPhoto" class="media-box">';
 								}elseif(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 1){
-									$Lightbox_init = '<a href="'.esc_url($large_src_i[0]) .'" class="media-box magnific-image">';
+									$Lightbox_init = '<a href="'.esc_url($large_src_i[0]) .'" title="'.get_the_title().'" class="media-box magnific-image">';
 								}
 								echo $Lightbox_init;
                                 the_post_thumbnail($size_thumb);

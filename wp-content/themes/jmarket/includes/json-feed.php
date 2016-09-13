@@ -32,7 +32,7 @@ if ($events):
 		$event_color = ($cat_data['catBG']!='')?$cat_data['catBG']:$imic_options['event_default_color']; }
 		$frequency_count = '';
 			$frequency_count = get_post_meta($value,'imic_event_frequency_count',true);
-			if(($frequency>0)&&($imic_options['recurring_event_color']!='')) { $color = $imic_options['recurring_event_color']; $frequency_count = $frequency_count; } else { $frequency_count = 0; $color = $event_color; }
+			if($frequency>0) { $color = ($event_color!='')?$event_color:$imic_options['recurring_event_color']; $frequency_count = $frequency_count; } else { $frequency_count = 0; $color = $event_color; }
 		$date_converted=date('Y-m-d',$key);
         $custom_event_url =imic_query_arg($date_converted,$value);
 		$start_unix_time = get_post_meta($value,'imic_event_start_tm',true);
@@ -65,8 +65,8 @@ if ($events):
          
      // - json items -
         $jsonevents[] = array(
-            'title' => html_entity_decode(get_the_title($value),ENT_QUOTES,ini_get("default_charset")),
-			 //'title' => get_the_title($value),
+            //'title' => html_entity_decode(get_the_title($value),ENT_QUOTES,ini_get("default_charset")),
+			'title' => get_the_title($value),
             'allDay' => ($st_all_day!=1)?false:true, // <- true by default with FullCalendar
             'start' => $stime,
             'end' => $etime,

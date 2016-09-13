@@ -4,7 +4,7 @@ echo '<link type="text/css" rel="stylesheet" href="' . SIMPLE_WP_MEMBERSHIP_URL 
 ?>
 
 <div class="wrap">
-    <h2><?php echo SwpmUtils::_('Simple WP Membership::Add-ons') ?></h2>
+    <h1><?php echo SwpmUtils::_('Simple WP Membership::Add-ons') ?></h1>
 
     <div id="poststuff"><div id="post-body">
 
@@ -113,6 +113,31 @@ echo '<link type="text/css" rel="stylesheet" href="' . SIMPLE_WP_MEMBERSHIP_URL 
                 'page_url' => 'https://simple-membership-plugin.com/simple-membership-addon-show-member-info/',
             );
             array_push($addons_data, $addon_13);
+            
+            $addon_14 = array(
+                'name' => 'Google First Click Free',
+                'thumbnail' => SIMPLE_WP_MEMBERSHIP_URL . '/images/addons/google-first-click-free-addon.png',
+                'description' => 'Allows you to integrate with the Google First Click Free feature.',
+                'page_url' => 'https://simple-membership-plugin.com/simple-membership-google-first-click-free-integration-addon',
+            );
+            array_push($addons_data, $addon_14);
+            
+            $addon_15 = array(
+                'name' => 'Custom Post Protection',
+                'thumbnail' => SIMPLE_WP_MEMBERSHIP_URL . '/images/addons/custom-post-type-protection-enhanced.png',
+                'description' => 'Offers a better solution for protecting custom post type posts.',
+                'page_url' => 'https://simple-membership-plugin.com/simple-membership-addon-better-custom-post-type-protection/',
+            );
+            array_push($addons_data, $addon_15);
+            
+            $addon_16 = array(
+                'name' => 'Member Data Exporter',
+                'thumbnail' => SIMPLE_WP_MEMBERSHIP_URL . '/images/addons/swpm-data-exporter-addon.png',
+                'description' => 'Allows you to export all the members profile data and payments data to a CSV file.',
+                'page_url' => 'https://simple-membership-plugin.com/simple-membership-member-data-exporter-addon/',
+            );
+            array_push($addons_data, $addon_16);
+            
             
             /*** Show the addons list ***/
             foreach ($addons_data as $addon) {

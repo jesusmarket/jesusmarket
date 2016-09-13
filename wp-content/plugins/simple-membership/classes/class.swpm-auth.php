@@ -36,7 +36,21 @@ class SwpmAuth {
         $swpm_password = empty($pass) ? filter_input(INPUT_POST, 'swpm_password') : $pass;
         $swpm_user_name = empty($user) ? apply_filters('swpm_user_name', filter_input(INPUT_POST, 'swpm_user_name')) : $user;
                 
-        if (!empty($swpm_user_name) && !empty($swpm_password)) {            
+        if (!empty($swpm_user_name) && !empty($swpm_password)) {
+            //SWPM member login request.
+            
+            //First, lets make sure this user is not already logged into the site as an "Admin" user. We don't want to override that admin login session.
+            if (current_user_can('administrator')) {
+                //This user is logged in as ADMIN then trying to do another login as a member. Stop the login request processing (we don't want to override your admin login session).
+                $error_msg = '';
+                $error_msg .= '<p>'.SwpmUtils::_('Warning! Simple Membership plugin cannot process this login request to prevent you from getting logged out of WP Admin accidentally.').'</p>';
+                $error_msg .= '<p>'.SwpmUtils::_('You are logged into the site as an ADMIN user in this browser. First, logout from WP Admin then you will be able to log in as a member.').'</p>';
+                $error_msg .= '<p>'.SwpmUtils::_('Alternatively, you can use a different browser (where you are not logged-in as ADMIN) to test the membership login.').'</p>';
+                $error_msg .= '<p>'.SwpmUtils::_('Your normal visitors or members will never see this message. This message is ONLY for ADMIN user.').'</p>';
+                wp_die($error_msg);
+            }
+            
+            //Lets process the request. Check username and password
             $user = sanitize_user($swpm_user_name);
             $pass = trim($swpm_password);
             SwpmLog::log_auth_debug("Authenticate request - Username: " . $swpm_user_name, true);
@@ -75,19 +89,31 @@ class SwpmAuth {
         if (empty($this->userData)) {
             return false;
         }
+        global $wpdb;
         $enable_expired_login = SwpmSettings::get_instance()->get_value('enable-expired-account-login', '');
 
+        //Update the last accessed date and IP address for this login attempt. $wpdb->update(table, data, where, format, where format)
+        $last_accessed_date = current_time('mysql');
+        $last_accessed_ip = SwpmUtils::get_user_ip_address();
+        $wpdb->update($wpdb->prefix . 'swpm_members_tbl',
+                array('last_accessed' => $last_accessed_date, 'last_accessed_from_ip' => $last_accessed_ip),
+                array('member_id' => $this->userData->member_id),
+                array('%s', '%s'),
+                array('%d')
+         );
+        
+        //Check the member's account status.
         $can_login = true;
-        if ($this->userData->account_state == 'inactive') {
+        if ($this->userData->account_state == 'inactive' && empty($enable_expired_login)) {
             $this->lastStatusMsg = SwpmUtils::_('Account is inactive.');
-            $can_login = false;
-        } else if ($this->userData->account_state == 'pending') {
-            $this->lastStatusMsg = SwpmUtils::_('Account is pending.');
             $can_login = false;
         } else if (($this->userData->account_state == 'expired') && empty($enable_expired_login)) {
             $this->lastStatusMsg = SwpmUtils::_('Account has expired.');
             $can_login = false;
-        }
+        } else if ($this->userData->account_state == 'pending') {
+            $this->lastStatusMsg = SwpmUtils::_('Account is pending.');
+            $can_login = false;
+        } 
 
         if (!$can_login) {
             $this->isLoggedIn = false;
@@ -97,10 +123,7 @@ class SwpmAuth {
 
         if (SwpmUtils::is_subscription_expired($this->userData)) {
             if ($this->userData->account_state == 'active') {
-                global $wpdb;
-                $wpdb->update(
-                        $wpdb->prefix . 'swpm_members_tbl', array('account_state' => 'expired'), array('member_id' => $this->userData->member_id), array('%s'), array('%d')
-                );
+                $wpdb->update($wpdb->prefix . 'swpm_members_tbl', array('account_state' => 'expired'), array('member_id' => $this->userData->member_id), array('%s'), array('%d'));
             }
             if (empty($enable_expired_login)) {
                 $this->lastStatusMsg = SwpmUtils::_('Account has expired.');
@@ -294,11 +317,15 @@ class SwpmAuth {
     }
 
     public function is_expired_account() {
-        // should be called after logging in.
         if (!$this->is_logged_in()) {
             return null;
         }
-        return $this->get('account_state') === 'expired';
+        $account_status = $this->get('account_state');
+        if($account_status == 'expired' || $account_status == 'inactive'){
+            //Expired or Inactive accounts are both considered to be expired.
+            return true;
+        }
+        return false;
     }
 
 }

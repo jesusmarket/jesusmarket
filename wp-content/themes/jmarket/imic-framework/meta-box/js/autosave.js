@@ -1,6 +1,7 @@
 jQuery( function( $ )
 {
 	'use strict';
+
 	$( document ).ajaxSend( function( e, xhr, s )
 	{
 		if ( typeof s.data !== 'undefined' &&  -1 !== s.data.indexOf( 'action=autosave' ) )

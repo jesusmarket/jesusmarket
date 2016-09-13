@@ -45,7 +45,7 @@ class Tabs_Widget extends SiteOrigin_Widget {
 						),
 
 						'tab_nav_content' => array(
-							'type' => 'textarea',
+							'type' => 'tinymce',
 							'label' => __('Tab Content', 'imic-framework'),
 						),
 

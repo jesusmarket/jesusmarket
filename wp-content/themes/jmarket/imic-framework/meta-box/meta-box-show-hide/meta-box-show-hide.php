@@ -1,61 +1,73 @@
 <?php
-/*
-Plugin Name: Meta Box Show Hide
-Plugin URI: http://www.deluxeblogtips.com/meta-box
-Description: Easily show/hide meta boxes by page template, taxonomy (including category, post format) using Javascript.
-Version: 0.1.0
-Author: Rilwis
-Author URI: http://www.deluxeblogtips.com
-License: GPL2+
-*/
+/**
+ * Plugin Name: Meta Box Show Hide
+ * Plugin URI: https://metabox.io/plugins/meta-box-show-hide/
+ * Description: Easily show/hide meta boxes by various conditions using JavaScript.
+ * Version: 1.0.2
+ * Author: Rilwis
+ * Author URI: http://www.deluxeblogtips.com
+ * License: GPL2+
+ */
+
 defined( 'ABSPATH' ) || exit;
-if ( ! class_exists( __CLASS__ ) )
+
+if ( ! class_exists( 'MB_Show_Hide' ) )
 {
 	/**
 	 * This class controls toggling meta boxes via JS
 	 * All meta boxes are included, but the job of showing/hiding them are handled via JS
 	 */
-	class RWMB_Show_Hide
+	class MB_Show_Hide
 	{
 		/**
 		 * Add hooks when class is loaded
-		 *
-		 * @return void
 		 */
-		static public function load()
+		public function __construct()
 		{
-			add_action( 'rwmb_before', array( __CLASS__, 'js_data' ) );
-			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+			add_action( 'rwmb_before', array( $this, 'js_data' ) );
+			add_action( 'rwmb_enqueue_scripts', array( $this, 'enqueue' ) );
 		}
+
 		/**
 		 * Output data for Javascript in data-show, data-hide attributes
-		 * Data is output as a div.rwmb-show-hide inside the meta box
+		 * Data is output as a .mb-show-hide inside the meta box
 		 * JS will read this data and process
 		 *
 		 * @param RW_Meta_Box $obj The meta box object
-		 *
-		 * @return void
 		 */
-		static function js_data( $obj )
+		public function js_data( RW_Meta_Box $obj )
 		{
 			$meta_box = $obj->meta_box;
-			$show  = $hide = '';
-			if ( ! empty( $meta_box['show'] ) )
-				$show = ' data-show="' . esc_attr( json_encode( $meta_box['show'] ) ) . '"';
-			if ( ! empty( $meta_box['hide'] ) )
-				$hide = ' data-exclude="' . esc_attr( json_encode( $meta_box['hide'] ) ) . '"';
-			if ( $show || $hide )
-				echo '<div class="rwmb-show-hide"' . $show . $hide . '></div>';
+			$keys     = array( 'show', 'hide' );
+			$data     = '';
+
+			foreach ( $keys as $e )
+			{
+				if ( ! empty( $meta_box[$e] ) )
+				{
+					$data .= ' data-' . $e . '="' . esc_attr( json_encode( $meta_box[$e] ) ) . '"';
+				}
+			}
+
+			if ( $data )
+			{
+				// Use <script> tag to prevent browser render, thus improves performance.
+				echo '<script type="text/html" class="mb-show-hide"' . $data . '></script>';
+			}
 		}
+
 		/**
 		 * Enqueue plugin scripts
-		 *
-		 * @return void
 		 */
-		static function enqueue_scripts()
+		public function enqueue()
 		{
-			wp_enqueue_script( 'rwmb-show-hide', RWMB_URL. 'meta-box-show-hide/show-hide.js', array( 'jquery' ), '0.1.0', true );
+			list( , $url ) = RWMB_Loader::get_path( dirname( __FILE__ ) );
+			wp_enqueue_script( 'mb-show-hide', $url . 'show-hide.js', array( 'jquery' ), '1.0.2', true );
 		}
 	}
-	RWMB_Show_Hide::load();
+
+	if ( is_admin() )
+	{
+		new MB_Show_Hide;
+	}
 }

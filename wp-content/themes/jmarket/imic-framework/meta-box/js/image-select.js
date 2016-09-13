@@ -1,6 +1,7 @@
 jQuery( function ( $ )
 {
 	'use strict';
+
 	$( 'body' ).on( 'change', '.rwmb-image-select input', function ()
 	{
 		var $this = $( this ),

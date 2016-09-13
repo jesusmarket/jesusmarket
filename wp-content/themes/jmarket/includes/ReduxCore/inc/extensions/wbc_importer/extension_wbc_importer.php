@@ -29,11 +29,10 @@ if ( !class_exists( 'ReduxFramework_extension_wbc_importer' ) ) {
 			/************************************************************************
 			* Import slider(s) for the current demo being imported
 			*************************************************************************/
-			/*if ( class_exists( 'RevSlider' ) ) {
+			if ( class_exists( 'RevSlider' ) ) {
 				//If it's demo3 or demo5
 				$wbc_sliders_array = array(
-					'demo3' => 'someslidername.zip', //Set slider zip name
-					'demo5' => 'anotherslider.zip', //Set slider zip name
+					'demo1' => 'newslider2014.zip', //Set slider zip name
 				);
 				if ( isset( $demo_active_import[$current_key]['directory'] ) && !empty( $demo_active_import[$current_key]['directory'] ) && array_key_exists( $demo_active_import[$current_key]['directory'], $wbc_sliders_array ) ) {
 					$wbc_slider_import = $wbc_sliders_array[$demo_active_import[$current_key]['directory']];
@@ -42,7 +41,7 @@ if ( !class_exists( 'ReduxFramework_extension_wbc_importer' ) ) {
 						$slider->importSliderFromPost( true, true, $demo_directory_path.$wbc_slider_import );
 					}
 				}
-			}*/
+			}
 			/************************************************************************
 			* Setting Menus
 			*************************************************************************/
@@ -76,6 +75,12 @@ if ( !class_exists( 'ReduxFramework_extension_wbc_importer' ) ) {
 			if ( isset( $page->ID ) ) {
 				update_option( 'page_on_front', $page->ID );
 				update_option( 'show_on_front', 'page' );
+				
+				//Update Widgets Switch to On
+				$all_widgets_on = 'a:34:{s:6:"button";b:1;s:10:"google-map";b:1;s:5:"image";b:1;s:6:"slider";b:1;s:13:"post-carousel";b:1;s:6:"editor";b:1;s:12:"alert-widget";b:1;s:14:"counter-widget";b:1;s:21:"featured-block-widget";b:1;s:19:"gallery-grid-widget";b:1;s:4:"icon";b:1;s:15:"carousel-widget";b:1;s:17:"posts-list-widget";b:1;s:18:"progressbar-widget";b:1;s:19:"sermons-list-widget";b:1;s:21:"sermons-albums-widget";b:1;s:17:"staff-grid-widget";b:1;s:13:"spacer-widget";b:1;s:11:"tabs-widget";b:1;s:8:"taxonomy";b:1;s:13:"toggle-widget";b:1;s:11:"testimonial";b:1;s:30:"upcoming-events-listing-widget";b:1;s:5:"video";b:1;s:14:"simple-masonry";b:1;s:20:"social-media-buttons";b:1;s:11:"price-table";b:1;s:13:"layout-slider";b:1;s:10:"image-grid";b:1;s:4:"hero";b:1;s:8:"headline";b:1;s:8:"features";b:1;s:7:"contact";b:1;s:3:"cta";b:1;}';
+				$all_widgets_on = unserialize($all_widgets_on);
+				update_option('siteorigin_widgets_active', $all_widgets_on);
+				
 			}
 		}
 		if ( isset( $demo_active_import[$current_key]['directory'] ) && !empty( $demo_active_import[$current_key]['directory'] ) && array_key_exists( $demo_active_import[$current_key]['directory'], $wbc_blog_pages ) ) {

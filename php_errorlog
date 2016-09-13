@@ -1,0 +1,18 @@
+[09-Sep-2016 21:29:01 UTC] PHP Warning:  Illegal string offset 'url' in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/imic-framework/imic-theme-functions.php on line 80
+[10-Sep-2016 00:29:02 Europe/Bucharest] PHP Warning:  Invalid argument supplied for foreach() in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/footer.php on line 33
+[09-Sep-2016 21:29:03 UTC] PHP Warning:  Illegal string offset 'url' in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/imic-framework/imic-theme-functions.php on line 80
+[10-Sep-2016 00:29:03 Europe/Bucharest] PHP Warning:  Invalid argument supplied for foreach() in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/footer.php on line 33
+[09-Sep-2016 21:29:13 UTC] PHP Warning:  Illegal string offset 'url' in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/imic-framework/imic-theme-functions.php on line 80
+[10-Sep-2016 00:29:14 Europe/Bucharest] PHP Warning:  Invalid argument supplied for foreach() in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/footer.php on line 33
+[09-Sep-2016 21:29:25 UTC] PHP Warning:  Illegal string offset 'url' in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/imic-framework/imic-theme-functions.php on line 80
+[09-Sep-2016 21:29:32 UTC] PHP Warning:  Illegal string offset 'url' in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/imic-framework/imic-theme-functions.php on line 104
+[09-Sep-2016 21:29:33 UTC] PHP Warning:  Illegal string offset 'url' in /home/emdim/public_html/stage/jmarket/wp-content/themes/jmarket/imic-framework/imic-theme-functions.php on line 104
+[09-Sep-2016 21:30:23 UTC] PHP Warning:  fopen(/home/emdim/public_html/stage/jmarket/wp-content/plugins/remove-comments-are-closed/ps_remove_comments_are_closed.php): failed to open stream: No such file or directory in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 4648
+[09-Sep-2016 21:30:23 UTC] PHP Warning:  fread() expects parameter 1 to be resource, boolean given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 4651
+[09-Sep-2016 21:30:23 UTC] PHP Warning:  fclose() expects parameter 1 to be resource, boolean given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 4654
+[13-Sep-2016 20:06:00 Europe/Bucharest] PHP Warning:  date() expects parameter 2 to be long, string given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 112
+[13-Sep-2016 20:06:00 Europe/Bucharest] PHP Warning:  date() expects parameter 2 to be long, string given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 114
+[13-Sep-2016 20:06:00 Europe/Bucharest] PHP Warning:  date() expects parameter 2 to be long, string given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 117
+[13-Sep-2016 20:06:02 Europe/Bucharest] PHP Warning:  date() expects parameter 2 to be long, string given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 112
+[13-Sep-2016 20:06:02 Europe/Bucharest] PHP Warning:  date() expects parameter 2 to be long, string given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 114
+[13-Sep-2016 20:06:02 Europe/Bucharest] PHP Warning:  date() expects parameter 2 to be long, string given in /home/emdim/public_html/stage/jmarket/wp-includes/functions.php on line 117

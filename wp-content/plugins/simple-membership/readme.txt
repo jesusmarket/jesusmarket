@@ -1,10 +1,10 @@
 === Simple Membership ===
 Contributors: smp7, wp.insider, amijanina
 Donate link: https://simple-membership-plugin.com/
-Tags: member, members, members only, membership, memberships, register, WordPress membership plugin, content, content protection, paypal, restrict, restrict access, Restrict content, admin, access control, subscription, teaser, protection, profile, login, login page, bbpress,
+Tags: member, members, members only, membership, memberships, register, WordPress membership plugin, content, content protection, paypal, restrict, restrict access, Restrict content, admin, access control, subscription, teaser, protection, profile, login, login page, bbpress, stripe
 Requires at least: 3.3
-Tested up to: 4.4
-Stable tag: 3.2.0
+Tested up to: 4.6
+Stable tag: 3.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +29,8 @@ You can configure it to have free and/or paid memberships on your site. Paid mem
 
 Both one time and recurring/subscription payments are supported.
 
+You can also accept one time membership payment via Stripe payment gateway.
+
 = Membership Payments Log = 
 All the payments from your members are recorded in the plugin. You can view them anytime by visiting the payments menu from the admin dashboard.
 
@@ -52,6 +54,7 @@ You can create a free forum user account and ask your questions.
 
 * Works with any WordPress theme.
 * Ability to protect photo galleries.
+* Ability to protect attachment pages.
 * Show teaser content to convert visitors into members.
 * Comments on your protected posts will also be protected automatically.
 * There is an option to enable debug logging so you can troubleshoot membership payment related issues easily (if any).
@@ -68,6 +71,7 @@ You can create a free forum user account and ask your questions.
 * Customize the password reset email for members.
 * Use Google reCAPTCHA on your member registration form.
 * The login and registration widgets will be responsive if you are using a responsive theme.
+* Ability to restrict the commenting feature on your site to your members only.
 * Front-end member registration page.
 * Front-end member profiles.
 * Front-end member login page.
@@ -100,6 +104,9 @@ The following language translations are already available:
 * Indonesian
 * Hebrew
 * Catalan
+* Hungarian
+* Bosnian (Bosnia and Herzegovina)
+* Slovak
 
 You can translate the plugin using the language [translation documentation](https://simple-membership-plugin.com/translate-simple-membership-plugin/).
 
@@ -120,6 +127,84 @@ Please visit the memberhsip plugin page to view screenshots:
 https://simple-membership-plugin.com/
 
 == Changelog ==
+
+= 3.3.2 =
+- You can now view a member's last accessed date and time value by editing the member's profile from the admin dashboard.
+- The "Registration Successful" message can now be customized using the custom messages addon.
+- The edit profile template file can now also be overridden using the swpm_load_template_files filter.
+- Updated the Dutch language translation file.
+- Added Estonian language translation file.
+- Updated the Stripe payment gateway library to the latest version.
+
+= 3.3.1 =
+- Added an option in the advanced settings menu to use the timezone value specified in your WordPress General Settings interface.
+- WordPress 4.6 compatibility.
+
+= 3.3.0 =
+- Updated the Hungarian language file.
+- Improved input sanitization.
+
+= 3.2.9 =
+- Lowered the priority of "the_content" filter processing (this should be helpful for compatibility with some of the content builder type plugins).
+- Added Slovak language translation file. The translation was submitted by Marek Kucak.
+- XSS vulnerability fix for page request parameter.
+
+= 3.2.8 =
+- Added Stripe Buy Now option for membership payment.
+  Stripe payment usage documentation: https://simple-membership-plugin.com/create-stripe-buy-now-button-for-membership-payment/
+- Added a notice in the admin interface to notify you when you keep the sandbox payment mode enabled.
+- Added a check in the authentication system to stop login request processing if the user is already logged into the site as ADMIN.
+- The payment button shortcode will now check to make sure you entered a valid button ID in the shortcode.
+- Fixed a couple of minor debug notice warnings.
+- Bugfix: Admin Dashboard Access Permission setting not saving correctly.
+
+= 3.2.7 =
+- Added a new option in the plugin settings so you can specify other WP user role (example: editor) to be able to use/see the plugin's admin interface.
+- Added a "user profile delete" option in the admin profile edit interface of the plugin. Admins can use it to delete a user record while in the member edit interface.
+- Added a new option so the member registration complete email notification can be sent to multiple site admins.
+- Added Bosnian language translation file. The translation was submitted by Rejhan Puskar.
+- Updated the Japanese language file.
+- Updated the Dutch language file. Thanks to R.H.J. Roelofsen.
+
+= 3.2.6 =
+- Added Hungarian language translation file. The translation was submitted by Laura Szitar.
+- Improved the members menu navigation menu so the tabs are always visible (even when you go to the add or edit members screen).
+- Added 2 new action hooks (They are triggered when subscription is cancelled and when a recurring payment is received).
+- Improved the membership levels navigation menu tabs.
+- The "Edit Member" interface now shows the member ID of the currently editing member.
+
+= 3.2.5 =
+- Added a new feature to enable redirection to the last page after login (where they clicked the login link). 
+This new option is available in the after login redirection addon.
+https://wordpress.org/plugins/simple-membership-after-login-redirection/
+
+= 3.2.4 =
+- Fixed a bug with attachment protection showing an error message.
+
+= 3.2.3 =
+- Added a new option so you can configure a membership account renewal page in the plugin.
+- The account expiry message will include the renewal page link (if you configure the renewal page).
+- Removed login link from the comment protection message. You can customize the comment protection message using the custom message addon.
+- Updated the Russian language file. Thanks to @dimabuko for updating the language file.
+- Updated the Portuguese language file. Thanks to @Juan for updating the language file.
+- Added a new addon for better custom post type protection.
+- Made an improvement to the wp user delete function.
+- More tag protection check improvements.
+- Account with "inactive" status can also log into the site if the "Allows expired login" feature is enabled.
+- Updated the PayPal IPN validation code so it is compatible with the upcoming PayPal changes.
+
+= 3.2.2 =
+- New feature to only allow the members of the site to be able to post a comment.
+- Moved the "Allow Account Deletion" option to the Advanced Settings tab of the plugin.
+- Moved the "Auto Delete Pending Account" option to the Advanced Settings tab of the plugin.
+- WordPress 4.5 compatibility.
+
+= 3.2.1 =
+- Added a new filter (swpm_transactions_menu_items_per_page) that can be used to customize the number of items that is listed in the transactions menu.
+- Added more sorting option in the transactions table.
+- Added sanitization for the sort inputs in the member transactions table.
+- Fixed an issue with the auto delete pending account settings.
+- Changed admin heading structure from h2 to h1.
 
 = 3.2.0 =
 - Added Catalan language translation file. The translation was submitted by Josep Ramon.
@@ -506,7 +591,7 @@ http://wordpress.org/plugins/simple-membership-after-login-redirection/
 - First commit to WordPress repository.
 
 == Upgrade Notice ==
-If you are using the form builder adddon, then that addon will need to be upgraded to v1.1 also.
+If you are using the form builder addon, then that addon will need to be upgraded to v1.1 also.
 
 == Arbitrary section ==
 None

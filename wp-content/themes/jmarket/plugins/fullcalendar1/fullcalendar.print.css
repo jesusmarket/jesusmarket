@@ -1,5 +1,5 @@
 /*!
- * FullCalendar v2.2.1 Print Stylesheet
+ * FullCalendar v2.2.3 Print Stylesheet
  * Docs & License: http://arshaw.com/fullcalendar/
  * (c) 2013 Adam Shaw
  */
@@ -13,11 +13,11 @@
 }
 /* Global Event Restyling
 --------------------------------------------------------------------------------------------------*/
-/*.fc-event {
+.fc-event {
 	background: #fff !important;
 	color: #000 !important;
 	page-break-inside: avoid;
-}*/
+}
 .fc-event .fc-resizer {
 	display: none;
 }
@@ -152,5 +152,5 @@ tbody,
 --------------------------------------------------------------------------------------------------*/
 .fc-button-group,
 .fc button {
-	/*display: none; /* don't display any button-related controls */
+	display: none; /* don't display any button-related controls */
 }

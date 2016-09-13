@@ -203,4 +203,65 @@ class SwpmMiscUtils {
         $msg_body = str_replace($tags, $vals, $msg_body);
         return $msg_body;
     }
+    
+    public static function get_login_link() {
+        $login_url = SwpmSettings::get_instance()->get_value('login-page-url');
+        $joinus_url = SwpmSettings::get_instance()->get_value('join-us-page-url');
+        if (empty($login_url) || empty($joinus_url)) {
+            return '<span style="color:red;">Simple Membership is not configured correctly. The login page or the join us page URL is missing in the settings configuration. '
+                    . 'Please contact <a href="mailto:' . get_option('admin_email') . '">Admin</a>';
+        }
+        
+        //Create the login/protection message
+        $filtered_login_url = apply_filters('swpm_get_login_link_url', $login_url);//Addons can override the login URL value using this filter.
+        $login_msg = '';
+        $login_msg .= SwpmUtils::_('Please') . ' <a class="swpm-login-link" href="' . $filtered_login_url . '">' . SwpmUtils::_('Login') . '</a>. ';
+        $login_msg .= SwpmUtils::_('Not a Member?') . ' <a href="' . $joinus_url . '">' . SwpmUtils::_('Join Us') . '</a>';
+        
+        return $login_msg;
+    }
+
+    public static function get_renewal_link() {
+        $renewal = SwpmSettings::get_instance()->get_value('renewal-page-url');
+        if (empty($renewal)) {
+            //No renewal page is configured so don't show any renewal page link. It is okay to have no renewal page configured.
+            return '';
+        }
+        return SwpmUtils::_('Please') . ' <a class="swpm-renewal-link" href="' . $renewal . '">' . SwpmUtils::_('renew') . '</a> ' . SwpmUtils::_(' your account to gain access to this content.');
+    }
+    
+    public static function compare_url($url1, $url2){
+        $url1 = trailingslashit(strtolower($url1));
+        $url2 = trailingslashit(strtolower($url2));        
+        if ($url1 == $url2) {return true;}        
+        
+        $url1 = parse_url($url1);
+        $url2 = parse_url($url2); 
+        
+        $components = array('scheme','host','port','path');
+        
+        foreach ($components as $key=>$value){
+            if (!isset($url1[$value])&& !isset($url2[$value])) {continue;}
+            
+            if (!isset($url2[$value])) {return false;}
+            if (!isset($url1[$value])) {return false;}            
+            
+            if ($url1[$value] != $url2[$value]) {return false;}
+        }
+
+        if (!isset($url1['query'])&& !isset($url2['query'])) {return true;}
+
+        if (!isset($url2['query'])) {return false;}
+        if (!isset($url1['query'])) {return false;}            
+            
+        return strpos($url1['query'], $url2['query']) || strpos($url2['query'], $url1['query']);                
+    }
+    
+    public static function is_swpm_admin_page(){
+        if (isset($_GET['page']) && (stripos($_GET['page'], 'simple_wp_membership') !== false)) {
+            //This is an admin page of the SWPM plugin
+            return true;
+        } 
+        return false;
+    }
 }

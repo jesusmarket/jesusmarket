@@ -1,15 +1,13 @@
 <?php
-//add Jquery to settings page
-add_action( 'admin_menu', 'my_admin_plugin' );
-function my_admin_plugin() {
+if ( ! defined( 'ABSPATH' ) ) exit;
+add_action( 'admin_menu', 'vi_my_admin_plugin' );
+function vi_my_admin_plugin() {
     wp_register_script( 'my_plugin_script', plugins_url('/script.js', __FILE__), array('jquery'));
     wp_enqueue_script( 'my_plugin_script' );
 }
-// ---End -- add Jquery to settings page
 
-// default values
-function fbcomment_init(){
-	register_setting( 'fbcomment_option', 'fbcomment' );
+function vi_fbcomment_init(){
+	register_setting( 'vi_fbcomment_option', 'fbcomment' );
 	$new_fboptn = array(
 		'fbml' => 'on',
 		'opengraph' => 'off',
@@ -32,11 +30,10 @@ function fbcomment_init(){
 		'postshideWpComments' => 'off',
 		'pageshideWpComments' => 'off',
 		'selected_types' => 'selected_types',
-		'lang' => 'en_Us',
- 		'custompostytpe' =>''
+		'lang' => 'en_Us'
 	);
 
-	// if old fboptn exist, update to array
+
 	foreach( $new_fboptn as $key => $value ) {
 		if( $existing = get_option( 'fbcomment_' . $key ) ) {
 			 $new_fboptn[$key] = $existing;
@@ -45,41 +42,39 @@ function fbcomment_init(){
 	}
 	add_option( 'fbcomment', $new_fboptn );
 }
-add_action('admin_init', 'fbcomment_init' );
+add_action('admin_init', 'vi_fbcomment_init' );
 
-// Add sub menu [FB Comments] page to the Settings menu. 
-function show_fbcomment_option() {
-	add_options_page( __( 'FB Comments', 'facebook-comment-by-vivacity' ), __( 'FB Comments', 'facebook-comment-by-vivacity' ), 'manage_options', 'fbcomment', 'fbcomment_option');
+
+function vi_show_fbcomment_option() {
+	add_options_page( __( 'FB Comments', 'facebook-comment-by-vivacity' ), __( 'FB Comments', 'facebook-comment-by-vivacity' ), 'manage_options', 'fbcomment', 'vi_fbcomment_option');
 }
-add_action('admin_menu', 'show_fbcomment_option');
+add_action('admin_menu', 'vi_show_fbcomment_option');
 
-// Error message
-function fbcomments_msg(){
+ 
+function vi_fbcomments_msg(){
  $fboptn = get_option('fbcomment');
-// print_r($fboptn);
+
    	if ($fboptn['appID'] == "") {
 	$fb_adminUrl = get_admin_url()."options-general.php?page=". __( "fbcomment", "facebook-comment-by-vivacity" );
       echo '<div class="error">
-            <p>'. __( "Please Enter Your Facebook App ID. Required for Fb comments.", "facebook-comment-by-vivacity" ).' <a href="'.$fb_adminUrl.'">'. __( "Click here", "facebook-comment-by-vivacity" ).'</a></p>
+            <p>'. __( "Please Enter Your Facebook App ID. Required for Fb comments.", "facebook-comment-by-vivacity" ).' <a class="fcv_a" href="'.$fb_adminUrl.'">'. __( "Click here", "facebook-comment-by-vivacity" ).'</a></p>
             </div>';
    }  
 }
-add_action('admin_notices', 'fbcomments_msg');
+add_action('admin_notices', 'vi_fbcomments_msg');
 
- // Admin Settings
-
-function fbcomment_option() {
+function vi_fbcomment_option() {
 	?>
 <link href="<?php echo plugins_url( 'css/style.css' , __FILE__ ); ?>" rel="stylesheet" type="text/css">
- <div class="wrap">
-   <div class="top">
-  <h3> <?php _e( "FB Comments Plugin", "facebook-comment-by-vivacity" ) ?> <small><?php _e("by","facebook-comment-by-vivacity") ?> <a href="http://www.vivacityinfotech.com" target="_blank">Vivacity Infotech Pvt. Ltd.</a>
+
+   <div class="fcv_top">
+  <h3> <?php _e( "FB Comments Plugin", "facebook-comment-by-vivacity" ) ?> <small><?php _e("by","facebook-comment-by-vivacity") ?> <a class="fcv_a" href="http://www.vivacityinfotech.com" target="_blank">Vivacity Infotech Pvt. Ltd.</a>
   </h3>
     </div> <!-- ------End of top-----------  -->
-  	<div class="inner_wrap">
-	 <div class="left">
+  	<div class="fcv_inner_wrap">
+	 <div class="fcv_left">
 	<form method="post" action="options.php" id="options">
-			<?php settings_fields('fbcomment_option'); ?>
+			<?php settings_fields('vi_fbcomment_option'); ?>
 			<?php $fboptn = get_option('fbcomment'); 
 if (!isset($fboptn['fbml'])) {$fboptn['fbml'] = "";}
 if (!isset($fboptn['fbns'])) {$fboptn['fbns'] = "";}
@@ -97,11 +92,8 @@ if (!isset($fboptn['selected_types'])) {$fboptn['selected_types'] = "";}
 if (!isset($fboptn['postshideWpComments'])) {$fboptn['postshideWpComments'] = "";}
 if (!isset($fboptn['pageshideWpComments'])) {$fboptn['pageshideWpComments'] = "";}
 if (!isset($fboptn['lang'])) {$fboptn['lang'] = "en_Us";}
-if (!isset($fboptn['pagesid'])) {$fboptn['pagesid'] = 00;}
-if (!isset($fboptn['custompostytpe'])) {$fboptn['custompostytpe'] = "";}
-?>		
-<!-- get domain name -->
-<?php  $domainname = get_option('siteurl');
+if (!is_numeric($fboptn['pagesid'])) {$fboptn['pagesid'] = 00;}
+$domainname = get_option('siteurl');
 $domainname = str_replace('http://', '', $domainname);
 $domainname = str_replace('www.', '', $domainname);?>
 <!-- end get domain name -->
@@ -114,8 +106,8 @@ $domainname = str_replace('www.', '', $domainname);?>
 	<table class="form-table admintbl">
 	  <tr>
 	   <th>
-      <strong><a href="https://developers.facebook.com/apps" target="_blank"><?php _e("Create an App","facebook-comment-by-vivacity") ?></a></strong><br>
-      <small><?php _e("To get App Id click on","facebook-comment-by-vivacity") ?> " <a href="https://developers.facebook.com/apps" target="_blank"> <?php _e("Create an App","facebook-comment-by-vivacity") ?></a>".</small>
+      <strong><a class="fcv_a" href="https://developers.facebook.com/apps" target="_blank"><?php _e("Create an App","facebook-comment-by-vivacity") ?></a></strong><br>
+      <small><?php _e("To get App Id click on","facebook-comment-by-vivacity") ?> " <a class="fcv_a" href="https://developers.facebook.com/apps" target="_blank"> <?php _e("Create an App","facebook-comment-by-vivacity") ?></a>".</small>
       </th>
 	   <td><small><?php _e("Enter App Id into below textbox.","facebook-comment-by-vivacity") ?></small><br>
 	       <input id="appID" type="text" name="fbcomment[appID]" value="<?php echo $fboptn['appID']; ?>" />
@@ -130,20 +122,22 @@ $domainname = str_replace('www.', '', $domainname);?>
 	<table class="form-table admintbl">
 		<tr>
 		  <th><small><?php _e("To edit your App ID click on below link:","facebook-comment-by-vivacity") ?></small><br>
-		  <strong><a href="https://developers.facebook.com/apps<?php if ($fboptn['appID'] != "") { echo "/".$fboptn['appID']."/summary"; } ?>" target="_blank"><?php _e("Your App Setup","facebook-comment-by-vivacity") ?></a></strong></th>
+		  <strong><a class="fcv_a" href="https://developers.facebook.com/apps<?php if ($fboptn['appID'] != "") { echo "/".$fboptn['appID']."/summary"; } ?>" target="_blank"><?php _e("Your App Setup","facebook-comment-by-vivacity") ?></a></strong></th>
 		  <td><small><?php _e("choose your App and click","facebook-comment-by-vivacity") ?> <strong>  <?php _e("Edit Settings","facebook-comment-by-vivacity") ?></strong>. <?php _e("Please Enter","facebook-comment-by-vivacity") ?> <strong><?php echo $domainname; ?></strong> <?php _e('in both "App Domains" and "Site URL"',"facebook-comment-by-vivacity") ?></small></td>
 		</tr>
 		<tr>
 		 <th>
-		 <a href="https://developers.facebook.com/apps" target="_blank"><?php _e("Create a New App","facebook-comment-by-vivacity") ?></a>     
+		 <a class="fcv_a" href="https://developers.facebook.com/apps" target="_blank"><?php _e("Create a New App","facebook-comment-by-vivacity") ?></a>     
 		 </th>
 		 <td><small><?php _e("If you want to set up a new App Id click","facebook-comment-by-vivacity") ?> <strong><?php _e("Create a New App","facebook-comment-by-vivacity") ?></strong> </small>
 		 </td>
 		</tr>
-	</table> <!-- -----End Facebook App Setting----- -->
+	</table> 
 	</div>
+ 
+	
 <?php } ?>	
-	<h3 class="title" id="mainsettings"><?php _e("Main Settings","facebook-comment-by-vivacity") ?></h3> <!-- -----Main Settings -->
+	<h3 class="title" id="mainsettings"><?php _e("Main Settings","facebook-comment-by-vivacity") ?></h3>  
 	<div  id="mainsettingstbl" class="togglediv">
 	<table class="form-table admintbl">
 <?php if ($fboptn['appID']!="") { ?>
@@ -172,49 +166,14 @@ $domainname = str_replace('www.', '', $domainname);?>
 	<h3 id="displaysettings" class="title"><?php _e("Display Settings","facebook-comment-by-vivacity") ?></h3> <!-- ---Display Settings -->
 	<div id="displaysettingstbl" class="togglediv">
 	 <table class="form-table admintbl">
-<?php $args = array(
-   'public'   => true,
-   '_builtin' => false
-);
-$output = 'names'; // names or objects, note names is the default
-$operator = 'and'; // 'and' or 'or'
-$post_types = get_post_types( $args, $output, $operator ); 
-if (!empty($post_types)) 
-{
- ?>
-		<tr><th><label for="posts"><?php _e( 'Exclude Post Type', 'facebook-comment-by-vivacity' ); ?></label></th>
-		<td> <?php
-
- $k=0;
- 
-   foreach ( $post_types as $post_type ) {
-$con='';
-$con.='<input type="checkbox"';
-if (!empty($fboptn['custompostytpe'])) 
-{
-if (in_array($post_type, $fboptn['custompostytpe'])) {
- $con.='checked="checked"';
-	}
-}
-$con.='name="fbcomment[custompostytpe][]" value="'.$post_type.'" />'.$post_type.'<br>';
-  echo $con;  
-$k++;
-}
-
-?>  </td>
-		</tr>
-		<?php } ?>
 		<tr><th><label for="posts"><?php _e( 'Posts', 'facebook-comment-by-vivacity' ); ?></label></th>
 		<td><input id="posts" name="fbcomment[posts]" type="checkbox" value="on" <?php checked('on', $fboptn['posts']); ?> /> </td>
 		</tr>
 		<tr><th><label for="pages"><?php _e( 'Pages', 'facebook-comment-by-vivacity' ); ?></label></th>
 		<td><input id="pages" name="fbcomment[pages]" type="checkbox" value="on" <?php checked('on', $fboptn['pages']); ?> />
- 	
+			<span><input id="pageid" name="fbcomment[pagesid]" type="text"  value="<?php  echo $fboptn['pagesid']; ?>"  /> 
+			<small><?php _e( "Enter page id's where you dont want to show FB comments (Ex:-73,37)." ); ?></small> </span>		
 		</td>
-		</tr>
-<tr><th><label for="posts"><?php _e( 'Exclude page and post id', 'facebook-comment-by-vivacity' ); ?></label></th>
-		<td><span><input id="pageid" name="fbcomment[pagesid]" type="text"  value="<?php  echo $fboptn['pagesid']; ?>"  /> 
-			<small><?php _e( "Enter page id's where you dont want to show FB comments (Ex:-73,37)." ); ?></small> </span>		</td>
 		</tr>
 		<tr><th><label for="homepage"><?php _e( 'Home', 'facebook-comment-by-vivacity' ); ?></label></th>
 		<td><input id="home" name="fbcomment[homepage]" type="checkbox" value="on" <?php checked('on', $fboptn['homepage']); ?> />
@@ -255,11 +214,11 @@ $k++;
 	<h3 id="moderation" class="title"><?php _e( 'Moderation Settings', 'facebook-comment-by-vivacity' ); ?></h3>   <!-- ------ Moderation--------- --> 
 	<div id="moderationtbl" class="togglediv">
    <table class="form-table admintbl">
-	<tr><th><a href="https://developers.facebook.com/tools/comments<?php if ($fboptn['appID'] != "") { echo "?id=".$fboptn['appID']."&view=queue"; } ?>" target="_blank"><?php _e( 'Moderation Area', 'facebook-comment-by-vivacity' ); ?></a></th>
+	<tr><th><a class="fcv_a" href="https://developers.facebook.com/tools/comments<?php if ($fboptn['appID'] != "") { echo "?id=".$fboptn['appID']."&view=queue"; } ?>" target="_blank"><?php _e( 'Moderation Area', 'facebook-comment-by-vivacity' ); ?></a></th>
 					<td><small><?php _e( 'If you are a moderator, you will see notifications within facebook.com. If you don\'t want to have moderator status, click on "Moderation Area" and use this link to left.', 'facebook-comment-by-vivacity' ); ?></small></td>
 	</tr>
 		<tr><th><label for="appID"><?php _e( 'Moderators', 'facebook-comment-by-vivacity' ); ?></label></th>
-		<td><input id="mods" type="text" name="fbcomment[mods]" value="<?php echo $fboptn['mods']; ?>" size="50" /><br><small><?php _e( 'All admins to the App ID can moderate comments,By default. To add moderators, enter each Facebook User ID by a comma without spaces. To find your Facebook User ID', 'facebook-comment-by-vivacity' ); ?>,<a href="https://developers.facebook.com/tools/explorer/?method=GET&path=me" target="blank"><?php _e( 'click here', 'facebook-comment-by-vivacity' ); ?></a> <?php _e( 'where you will see your own. To view someone else\'s, replace "me" with their username in the input provided', 'facebook-comment-by-vivacity' ); ?></small></td>
+		<td><input id="mods" type="text" name="fbcomment[mods]" value="<?php echo $fboptn['mods']; ?>" size="50" /><br><small><?php _e( 'All admins to the App ID can moderate comments,By default. To add moderators, enter each Facebook User ID by a comma without spaces. To find your Facebook User ID', 'facebook-comment-by-vivacity' ); ?>,<a class="fcv_a" href="https://developers.facebook.com/tools/explorer/?method=GET&path=me" target="blank"><?php _e( 'click here', 'facebook-comment-by-vivacity' ); ?></a> <?php _e( 'where you will see your own. To view someone else\'s, replace "me" with their username in the input provided', 'facebook-comment-by-vivacity' ); ?></small></td>
 		</tr>
   </table>
   </div>  <!-- ------End Moderation--------- --> 
@@ -441,15 +400,15 @@ $k++;
   </table>
   </div>  <!-- ------End Language--------- --> 
 	
-		<div class="submitform">
+		<div class="fcv_submitform">
 			<input type="submit" class="button1" value="<?php _e('Save Changes') ?>" />
 		</div>
 </form>	
 <!-- ---End of facebook App Id settings---- -->
 	 </div> <!-- --------End of left div--------- -->
- <div class="right">
+ <div class="fcv_right">
 	<center>
-	<div class="bottom">
+	<div class="fcv_bottom">
 		    <h3 id="shortcodedesc-comments" class="title"><?php _e( 'Shortcode For Templates', 'facebook-comment-by-vivacity' ); ?></h3>
      <div id="shortcodedesctbl-comments" class="togglediv">  
 			<table class="right-tbl">
@@ -481,17 +440,17 @@ $k++;
 <?php _e( 'has following plugins for you', 'facebook-comment-by-vivacity' ); ?> :
 </h3>
 <ul class="">
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-twitter-feeds/">WP Twitter Feeds</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-fb-share-like-button/">WP Facebook Like Button</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-facebook-fanbox-widget/">WP Facebook FanBox</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-google-analytics-scripts/">WP Google Analytics Scripts</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-xml-sitemap/">WP XML Sitemap</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-facebook-auto-publish/">WP Facebook Auto Publish</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-twitter-autopost/">WP Twitter Autopost</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-responsive-jquery-slider/">WP Responsive Jquery Slider</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-google-plus-one-button/">WP Google Plus One Button</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-qr-code-generator/">WP QR Code Generator</a></li>
-<li><a target="_blank" href="http://wordpress.org/plugins/wp-inquiry-form/">WP Inquiry Form</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-twitter-feeds/">WP Twitter Feeds</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-fb-share-like-button/">WP Facebook Like Button</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-facebook-fanbox-widget/">WP Facebook FanBox</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-google-analytics-scripts/">WP Google Analytics Scripts</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-xml-sitemap/">WP XML Sitemap</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-facebook-auto-publish/">WP Facebook Auto Publish</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-twitter-autopost/">WP Twitter Autopost</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-responsive-jquery-slider/">WP Responsive Jquery Slider</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-google-plus-one-button/">WP Google Plus One Button</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-qr-code-generator/">WP QR Code Generator</a></li>
+<li><a class="fcv_a" target="_blank" href="http://wordpress.org/plugins/wp-inquiry-form/">WP Inquiry Form</a></li>
 </ul>
   </div> 
 </div>		
@@ -499,7 +458,7 @@ $k++;
 		    <h3 id="donatehere-comments" class="title"><?php _e( 'Donate Here', 'facebook-comment-by-vivacity' ); ?></h3>
      <div id="donateheretbl-comments" class="togglediv">  
      <p><?php _e( 'If you want to donate , please click on below image.', 'facebook-comment-by-vivacity' ); ?></p>
-	<a href="http://bit.ly/1icl56K" target="_blank"><img class="donate" src="<?php echo plugins_url( 'assets/paypal.gif' , __FILE__ ); ?>" width="150" height="50" title="<?php _e( 'Donate Here', 'facebook-comment-by-vivacity' ); ?>"></a>		
+	<a class="fcv_a" href="http://vivacityinfotech.net/paypal-donation/" target="_blank"><img class="donate" src="<?php echo plugins_url( 'assets/paypal.gif' , __FILE__ ); ?>" width="150" height="50" title="<?php _e( 'Donate Here', 'facebook-comment-by-vivacity' ); ?>"></a>		
   </div> 
 </div>	
 <div class="bottom">
@@ -518,12 +477,12 @@ has expertise in :
 <li>ISV Solutions</li>
 <li>Consulting Services</li>
 <li>
-<a target="_blank" href="http://www.lemonpix.com/">
+<a class="fcv_a" target="_blank" href="http://www.lemonpix.com/">
 <span class="colortext">Web Hosting</span>
 </a>
 </li>
  <h3>
- <strong><a target="_blank" href="http://vivacityinfotech.net/contact-us/" >Contact Us Here</a></strong>
+ <strong><a class="fcv_a" target="_blank" href="http://vivacityinfotech.net/contact-us/" >Contact Us Here</a></strong>
  </h3>
 </ul>
   </div> 
@@ -531,5 +490,5 @@ has expertise in :
 	</center>
  </div><!-- --------End of right div--------- -->
 </div> <!-- --------End of inner_wrap--------- -->
-</div> <!-- ---------End of wrap-------- -->
+
 <?php } ?>

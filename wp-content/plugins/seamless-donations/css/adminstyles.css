@@ -116,3 +116,37 @@
 .seamless-donations-dashicon {
     font-size: 64px;
 }
+
+.seamless-donations-warning-box {
+    width: 880px;
+    padding: 5px;
+    background-color: pink;
+    border-color: red;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.seamless-donations-success-box {
+    width: 880px;
+    padding: 5px;
+    background-color: lightgreen;
+    border-color: darkgreen;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.seamless-donations-video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px; height: 0; overflow: hidden;
+}
+
+.seamless-donations-video-container iframe,
+.seamless-donations-video-container object,
+.seamless-donations-video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}

@@ -5,11 +5,15 @@
 get_header();
 $variable_post_id =  get_the_ID();
 $number= get_post_meta(get_the_ID(),'imic_staff_to_show_on',true);
+$excerpt_length= get_post_meta(get_the_ID(),'imic_staff_excerpt_length',true);
+if($excerpt_length == ''){
+	$excerpt_length = 30;
+}
 $order= get_post_meta(get_the_ID(),'imic_staff_select_orderby',true);
 $staff_category = get_post_meta(get_the_ID(),'imic_advanced_staff_taxonomy',true);
-						if(!empty($staff_category)){
-						$staff_categories = get_term_by('id',$staff_category,'staff-category');
-						$staff_category = $staff_categories->slug; }
+if(!empty($staff_category)){
+$staff_categories = get_term_by('id',$staff_category,'staff-category');
+$staff_category = $staff_categories->slug; }
 $pageOptions = imic_page_design(); //page design options 
 imic_sidebar_position_module();
 ?>
@@ -56,18 +60,22 @@ imic_sidebar_position_module();
                         echo $job;
                         $staff_icons = get_post_meta(get_the_ID(), 'imic_social_icon_list', false);
                         echo imic_social_staff_icon();
-                        $description = imic_excerpt();
-							echo '<div class="page-content">';
-                        	if (!empty($description)) {
-                            echo $description;
+                        $description = imic_excerpt($excerpt_length);
+							if($excerpt_length != 0){
+								echo '<div class="page-content">';
+								if (!empty($description)) {
+								echo $description;
+								}
+								echo '</div>';
 							}
-							echo '</div>';
-							$staff_read_more_text = $imic_options['staff_read_more_text'];
-							if ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '0') {
-								echo '<p><a href="' . get_permalink() . '" class="btn btn-default">' . $staff_read_more_text . '</a></p>';
-							} elseif ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '1') {
-								echo '<p><a href="' . get_permalink() . '">' . $staff_read_more_text . '</a></p>';
-                        }
+							if($excerpt_length != 0){
+								$staff_read_more_text = $imic_options['staff_read_more_text'];
+								if ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '0') {
+									echo '<p><a href="' . get_permalink() . '" class="btn btn-default">' . $staff_read_more_text . '</a></p>';
+								} elseif ($imic_options['switch_staff_read_more'] == 1 && $imic_options['staff_read_more'] == '1') {
+									echo '<p><a href="' . get_permalink() . '">' . $staff_read_more_text . '</a></p>';
+								}
+							}
                         echo'</div></div>
                             </div>
                         </div>';

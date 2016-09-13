@@ -22,6 +22,8 @@ function swpm_handle_subsc_signup_stand_alone($ipn_data, $subsc_ref, $unique_ref
                 if ($query_db) {
                     $swpm_id = $query_db->member_id;
                     swpm_debug_log_subsc("Found a match in the member database using unique reference. Member ID: " . $swpm_id, true);
+                } else {
+                    swpm_debug_log_subsc("Did not find a match for an existing member profile for the given reference. This must me a new payment from a new member.", true);
                 }
             } else {
                 swpm_debug_log_subsc("Unique reference is missing in the notification so we have to assume that this is not a payment for an existing member.", true);
@@ -88,8 +90,8 @@ function swpm_handle_subsc_signup_stand_alone($ipn_data, $subsc_ref, $unique_ref
         $data['address_street'] = $ipn_data['address_street'];
         $data['address_city'] = $ipn_data['address_city'];
         $data['address_state'] = $ipn_data['address_state'];
-        $data['address_zipcode'] = $ipn_data['address_zip'];
-        $data['country'] = $ipn_data['address_country'];
+        $data['address_zipcode'] = isset($ipn_data['address_zip'])? $ipn_data['address_zip'] : '';
+        $data['country'] = isset($ipn_data['address_country'])? $ipn_data['address_country'] : '';
         $data['member_since'] = $data['subscription_starts'] = $data['last_accessed'] = date("Y-m-d");
         $data['account_state'] = $default_account_status;
         $reg_code = uniqid();
@@ -162,6 +164,10 @@ function swpm_handle_subsc_cancel_stand_alone($ipn_data, $refund = false) {
         $updatedb = $wpdb->prepare("UPDATE $members_table_name SET account_state=%s WHERE member_id=%s", $account_state, $member_id);
         $resultset = $wpdb->query($updatedb);
         swpm_debug_log_subsc("Subscription cancellation received! Member account deactivated. Member ID: " . $member_id, true);
+        
+        $ipn_data['member_id'] = $member_id;
+        do_action('swpm_subscription_payment_cancelled', $ipn_data);//Hook for recurring payment received
+        
     } else {
         swpm_debug_log_subsc("No member found for the given subscriber ID: " . $subscr_id, false);
         return;
@@ -184,6 +190,9 @@ function swpm_update_member_subscription_start_date_if_applicable($ipn_data) {
         $current_primary_level = $query_db->membership_level;
         swpm_debug_log_subsc("Found a record in the member table. The Member ID of the account to check is: " . $swpm_id . " Membership Level: " . $current_primary_level, true);
 
+        $ipn_data['member_id'] = $swpm_id;
+        do_action('swpm_recurring_payment_received', $ipn_data);//Hook for recurring payment received
+        
         $subscription_starts = (date("Y-m-d"));
 
         $updatedb = $wpdb->prepare("UPDATE $members_table_name SET account_state=%s,subscription_starts=%s WHERE member_id=%d", $account_state, $subscription_starts, $swpm_id);

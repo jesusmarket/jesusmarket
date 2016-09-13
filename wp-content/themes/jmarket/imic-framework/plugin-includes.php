@@ -8,7 +8,7 @@
  *
  * @package    TGM-Plugin-Activation
  * @subpackage Example
- * @version    2.4.0
+ * @version    2.6.1
  * @author     Thomas Griffin <thomasgriffinmedia.com>
  * @author     Gary Jones <gamajo.com>
  * @copyright  Copyright (c) 2014, Thomas Griffin
@@ -18,7 +18,7 @@
 /**
  * Include the TGM_Plugin_Activation class.
  */
-require_once dirname( __FILE__ ) . '/class-tgm-plugin-activation.php';
+require_once dirname( __FILE__ ) . '/tgm/class-tgm-plugin-activation.php';
 add_action( 'tgmpa_register', 'my_theme_register_required_plugins' );
 /**
  * Register the required plugins for this theme.
@@ -45,7 +45,7 @@ function my_theme_register_required_plugins() {
             'slug'               => 'Payment-Imithemes', // The plugin slug (typically the folder name).
             'source'             => IMIC_FILEPATH . '/includes'. '/plugins/Payment-Imithemes.zip', // The plugin source.
             'required'           => false, // If false, the plugin is only 'recommended' instead of required.
-            'version'            => '1.2.0', // E.g. 1.0.0. If set, the active plugin must be this version or higher.
+            'version'            => '1.2.4', // E.g. 1.0.0. If set, the active plugin must be this version or higher.
             'force_activation'   => false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
             'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
             'external_url'       => '', // If set, overrides default API URL and points to an external URL.
@@ -65,7 +65,7 @@ function my_theme_register_required_plugins() {
             'slug'               => 'revslider', // The plugin slug (typically the folder name).
             'source'             => IMIC_FILEPATH . '/includes'. '/plugins/revslider.zip', // The plugin source.
             'required'           => true, // If false, the plugin is only 'recommended' instead of required.
-            'version'            => '5.1', // E.g. 1.0.0. If set, the active plugin must be this version or higher.
+            'version'            => '5.2.6', // E.g. 1.0.0. If set, the active plugin must be this version or higher.
             'force_activation'   => false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch.
             'force_deactivation' => false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins.
             'external_url'       => '', // If set, overrides default API URL and points to an external URL.
@@ -77,43 +77,43 @@ function my_theme_register_required_plugins() {
 			'required' 	=> false,
 		),
 		array(
-			'name' => __('SMK Sidebar Generator', 'framework'),
-			'slug' => 'smk-sidebar-generator',
+			'name' => esc_html__('Pojo Sidebars', 'borntogive'),
+			'slug' => 'pojo-sidebars',
 			'required' 	=> false,
 		),
              array(
 			'name' => __('WooCommerce - excelling eCommerce', 'framework'),
-		        'slug' => 'woocommerce',
+			'slug' => 'woocommerce',
 			'required' 	=> false,
 		),
 		array(
-			'name' => __('Seamless Donations', 'framework'),
-		        'slug' => 'seamless-donations',
+			'name' => __('Give - WordPress Donation Plugin', 'framework'),
+		  	'slug' => 'give',
 			'required' 	=> false,
 		),
 		array(
 			'name' => __('Social Media Icon Widget', 'framework'),
-		        'slug' => 'social-media-icons-widget',
+		   	'slug' => 'social-media-icons-widget',
 			'required' 	=> false,
 		),
 		array(
 			'name' => __('Facebook Open Graph, Google+ and Twitter Card Tags', 'framework'),
-		        'slug' => 'wonderm00ns-simple-facebook-open-graph-tags',
+			'slug' => 'wonderm00ns-simple-facebook-open-graph-tags',
 			'required' 	=> false,
 		),
 		array(
 			'name' => __('Page Builder by SiteOrigin', 'framework'),
-		        'slug' => 'siteorigin-panels',
+		 	'slug' => 'siteorigin-panels',
 			'required' 	=> true,
 		),
 		array(
 			'name' => __('SiteOrigin Widgets Bundle', 'framework'),
-		        'slug' => 'so-widgets-bundle',
+			'slug' => 'so-widgets-bundle',
 			'required' 	=> true,
 		),
 		array(
 			'name' => __('Black Studio TinyMCE Widget', 'framework'),
-		        'slug' => 'black-studio-tinymce-widget',
+		  	'slug' => 'black-studio-tinymce-widget',
 			'required' 	=> true,
 		)
             

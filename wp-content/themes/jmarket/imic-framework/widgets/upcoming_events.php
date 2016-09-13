@@ -16,7 +16,7 @@ class upcoming_events extends WP_Widget {
 		} else {
 			 $title = '';
 			 $number = '';
-                         $category='';
+             $category='';
 		}
 	?>
         <p>
@@ -67,7 +67,7 @@ class upcoming_events extends WP_Widget {
 	   // these are the widget options
 	   $post_title = apply_filters('widget_title', $instance['title']);
 	   $number = apply_filters('widget_number', $instance['number']);
-           $category = apply_filters('widget-category', empty($instance['category']) ?'': $instance['category'], $instance, $this->id_base);
+       $category = apply_filters('widget-category', empty($instance['category']) ?'': $instance['category'], $instance, $this->id_base);
 	   $numberEvent = (!empty($number))? $number : 3 ;
 	   $EventHeading = (!empty($post_title))? $post_title : __('Upcoming Events','imic-framework-admin') ;
 	   $today = date('Y-m-d');

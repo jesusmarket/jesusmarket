@@ -3,7 +3,11 @@
     <input name="action" type="hidden" value="edituser" />
     <?php wp_nonce_field( 'edit-swpmuser', '_wpnonce_edit-swpmuser' ) ?>
     <h3><?php echo  SwpmUtils::_('Edit Member') ?></h3>
-    <p><?php echo  SwpmUtils::_('Edit existing member details.'); ?></p>
+    <p>
+        <?php echo  SwpmUtils::_('Edit existing member details.'); ?>
+        <?php echo  SwpmUtils::_(' You are currenty editing member with member ID: '); ?>
+        <?php echo esc_attr($member_id); ?>
+    </p>
     <table class="form-table">
         <tr class="form-field form-required">
             <th scope="row"><label for="user_name"><?php echo  SwpmUtils::_('Username'); ?> <span class="description"><?php echo  SwpmUtils::_('(required)'); ?></span></label></th>
@@ -56,17 +60,33 @@
         <tr>
 		<th scope="row"><label for="subscr_id"><?php echo  SwpmUtils::_('Subscriber ID/Reference') ?> </label></th>
 		<td><input class="regular-text" name="subscr_id" type="text" id="subscr_id" value="<?php echo esc_attr($subscr_id); ?>" /></td>
-	</tr>        
+	</tr>
+        <tr>
+		<th scope="row"><label for="last_accessed"><?php echo SwpmUtils::_('Last Accessed Date') ?> </label></th>
+		<td>
+                    <?php echo esc_attr($last_accessed); ?>
+                    <p class="description indicator-hint"><?php echo SwpmUtils::_('This value gets updated when this member logs into your site.') ?></p>
+                </td>
+	</tr>         
         <tr>
 		<th scope="row"><label for="last_accessed_from_ip"><?php echo  SwpmUtils::_('Last Accessed From IP') ?> </label></th>
-		<td><?php echo esc_attr($last_accessed_from_ip); ?></td>
-	</tr> 
+		<td>
+                    <?php echo esc_attr($last_accessed_from_ip); ?>
+                    <p class="description indicator-hint"><?php echo SwpmUtils::_('This value gets updated when this member logs into your site.') ?></p>
+                </td>
+	</tr>       
         
     </table>
     
-    <?php include('admin_member_form_common_js.php');?>
-    <?php echo  apply_filters('swpm_admin_custom_fields', '',$membership_level);?>
+    <?php include('admin_member_form_common_js.php'); ?>
+    <?php echo apply_filters('swpm_admin_custom_fields', '',$membership_level); ?>
     <?php submit_button( SwpmUtils::_('Edit User '), 'primary', 'editswpmuser', true, array( 'id' => 'createswpmusersub' ) ); ?>
+    <?php
+    $member_delete_url = "?page=simple_wp_membership&member_action=delete&member_id=".$member_id;
+    echo '<div class="swpm-admin-delete-user-profile-link">';
+    echo '<a style="color:red;font-weight:bold;" href="'.$member_delete_url.'" onclick="return confirm(\'Are you sure you want to delete this user profile?\')">'.SwpmUtils::_('Delete User Profile').'</a>';
+    echo '</div>';
+    ?>
 </form>
 </div>
 <script>

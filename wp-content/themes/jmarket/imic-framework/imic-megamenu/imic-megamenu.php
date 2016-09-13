@@ -33,6 +33,7 @@ class imic_mega_menu {
     function imic_mega_menu_add_custom_nav_fields($menu_item) {
         $menu_item->ismega = get_post_meta($menu_item->ID, '_menu_is_mega', true);
         $menu_item->menuposttype = get_post_meta($menu_item->ID, '_menu_post_type', true);
+				$menu_item->menusidebars = get_post_meta($menu_item->ID, '_menu_sidebars', true);
         $menu_item->menupost = get_post_meta($menu_item->ID, '_menu_post', true);
         $menu_item->menupostidcomma = get_post_meta($menu_item->ID, '_menu_post_id_comma', true);
         $menu_item->menushortcode = get_post_meta($menu_item->ID, '_menu_shortcode', true);
@@ -58,6 +59,12 @@ class imic_mega_menu {
         if (isset($_REQUEST['menu-post-type'][$menu_item_db_id]) && empty($_REQUEST['menu-post-type'][$menu_item_db_id])) {
             update_post_meta($menu_item_db_id, '_menu_post_type', '');
         }
+				if (isset($_REQUEST['menu-sidebars'][$menu_item_db_id]) && !empty($_REQUEST['menu-sidebars'][$menu_item_db_id])) {	
+					update_post_meta($menu_item_db_id, '_menu_sidebars', $_REQUEST['menu-sidebars'][$menu_item_db_id]);	
+				} 	
+				if (isset($_REQUEST['menu-sidebars'][$menu_item_db_id]) && empty($_REQUEST['menu-sidebars'][$menu_item_db_id])) {	
+					update_post_meta($menu_item_db_id, '_menu_sidebars', '');	
+				}
         if (isset($_REQUEST['menu-post'][$menu_item_db_id]) && !empty($_REQUEST['menu-post'][$menu_item_db_id])) {
             update_post_meta($menu_item_db_id, '_menu_post', $_REQUEST['menu-post'][$menu_item_db_id]);
         }

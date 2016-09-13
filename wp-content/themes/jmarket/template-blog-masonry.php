@@ -63,7 +63,7 @@ imic_sidebar_position_module();
 								if(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 0){
 									$Lightbox_init = '<a href="'. $src[0] .'" data-rel="prettyPhoto" class="media-box">';
 								}elseif(isset($imic_options['switch_lightbox']) && $imic_options['switch_lightbox']== 1){
-									$Lightbox_init = '<a href="'. $src[0] .'" class="media-box magnific-image">';
+									$Lightbox_init = '<a href="'. $src[0] .'" title="'.get_the_title().'" class="media-box magnific-image">';
 								}
 								echo $Lightbox_init;
 								the_post_thumbnail('full');

@@ -5,6 +5,7 @@ include_once('class.swpm-utils.php');
 include_once('class.swpm-utils-member.php');
 include_once('class.swpm-utils-template.php');
 include_once('class.swpm-init-time-tasks.php');
+include_once('class.swpm-comment-form-related.php');
 include_once('class.swpm-settings.php');
 include_once('class.swpm-protection.php');
 include_once('class.swpm-permission.php');
@@ -35,15 +36,14 @@ class SimpleWpMembership {
         add_action('admin_menu', array(&$this, 'menu'));
         add_action('init', array(&$this, 'init_hook'));
 
-        add_filter('the_content', array(&$this, 'filter_content'), 11, 1);
+        add_filter('the_content', array(&$this, 'filter_content'), 20, 1);
         add_filter('widget_text', 'do_shortcode');
         add_filter('show_admin_bar', array(&$this, 'hide_adminbar'));
         add_filter('comment_text', array(&$this, 'filter_comment'));
+        add_filter('comment_form_defaults', array('SwpmCommentFormRelated', 'customize_comment_fields'));
         add_filter('wp_get_attachment_url', array(&$this, 'filter_attachment_url'), 10, 2);
         add_filter('wp_get_attachment_metadata', array(&$this, 'filter_attachment'), 10, 2);
         add_filter('attachment_fields_to_save', array(&$this, 'save_attachment_extra'), 10, 2);
-        // the_content_more_link filter adds empty line. we have an alternative implementation of more tag protection.
-        //add_filter('the_content_more_link', array(&$this, 'filter_moretag'), 10, 2);
 
         //TODO - refactor these shortcodes into the shortcodes handler class
         add_shortcode("swpm_registration_form", array(&$this, 'registration_form'));
@@ -53,8 +53,9 @@ class SimpleWpMembership {
 
         new SwpmShortcodesHandler(); //Tackle the shortcode definitions and implementation.
 
+        add_action('wp_head', array(&$this,'wp_head_callback'));
         add_action('save_post', array(&$this, 'save_postdata'));
-        add_action('admin_notices', array(&$this, 'notices'));
+        add_action('admin_notices', array(&$this, 'do_admin_notices'));
         add_action('wp_enqueue_scripts', array(&$this, 'front_library'));
         add_action('load-toplevel_page_simple_wp_membership', array(&$this, 'admin_library'));
         add_action('load-wp-membership_page_simple_wp_membership_levels', array(&$this, 'admin_library'));
@@ -62,7 +63,7 @@ class SimpleWpMembership {
         add_action('wp_logout', array(&$this, 'wp_logout'));
         add_action('wp_authenticate', array(&$this, 'wp_login'), 1, 2);
         add_action('swpm_logout', array(&$this, 'swpm_logout'));
-
+        
         //AJAX hooks
         add_action('wp_ajax_swpm_validate_email', 'SwpmAjax::validate_email_ajax');
         add_action('wp_ajax_nopriv_swpm_validate_email', 'SwpmAjax::validate_email_ajax');
@@ -73,6 +74,17 @@ class SimpleWpMembership {
         add_action('admin_init', array(&$this, 'admin_init_hook'));
         add_action('plugins_loaded', array(&$this, "plugins_loaded"));
         add_action('password_reset', array(&$this, 'wp_password_reset_hook'), 10, 2);
+
+    }
+    
+    public function wp_head_callback(){
+        //This function is triggered by the wp_head action hook
+        
+        //Check if members only commenting is allowed then customize the form accordingly
+        SwpmCommentFormRelated::customize_comment_form();
+        
+        //Other wp_head related tasks go here.
+        
     }
 
     function wp_password_reset_hook($user, $pass) {
@@ -99,10 +111,11 @@ class SimpleWpMembership {
         if (has_post_thumbnail($post_id)) {
             return $content;
         }
-        if ($acl->can_i_read_post($post_id)) {
+        
+        $post = get_post($post_id);
+        if ($acl->can_i_read_post($post)) {
             return $content;
         }
-
 
         if (isset($content['file'])) {
             $content['file'] = 'restricted-icon.png';
@@ -119,7 +132,7 @@ class SimpleWpMembership {
                 $content['sizes']['medium']['file'] = 'restricted-icon.png';
                 $content['sizes']['medium']['mime-type'] = 'image/png';
             }
-            if ($content['sizes']['post-thumbnail']) {
+            if (isset($content['sizes']['post-thumbnail'])) {
                 $content['sizes']['post-thumbnail']['file'] = 'restricted-icon.png';
                 $content['sizes']['post-thumbnail']['mime-type'] = 'image/png';
             }
@@ -136,7 +149,8 @@ class SimpleWpMembership {
             return $content;
         }
 
-        if ($acl->can_i_read_post($post_id)) {
+        $post = get_post($post_id);
+        if ($acl->can_i_read_post($post)) {
             return $content;
         }
 
@@ -188,7 +202,7 @@ class SimpleWpMembership {
             }
         }
         $user = wp_signon(array('user_login' => $user, 'user_password' => $pass, 'remember' => $rememberme), is_ssl());
-        if (is_a($user, 'WP_User')) {
+        if ( $user instanceof WP_User ){
             wp_set_current_user($user->ID, $user->user_login);
         }
         do_action('swpm_after_login');
@@ -271,16 +285,15 @@ class SimpleWpMembership {
             if (!empty($out)) {
                 return $out;
             }
-            $user_data = (array) $auth->userData;
-            $user_data['membership_level_alias'] = $auth->get('alias');
             ob_start();
-            extract($user_data, EXTR_SKIP);
-            include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/edit.php');
+            //Load the edit profile template
+            SwpmUtilsTemplate::swpm_load_template('edit.php', false);
             return ob_get_clean();
         }
         return SwpmUtils::_('You are not logged in.');
     }
 
+    /* If any message/notice was set during the execution then this function will output that message */
     public function notices() {
         $message = SwpmTransfer::get_instance()->get('status');
         $succeeded = false;
@@ -308,6 +321,33 @@ class SimpleWpMembership {
         return $succeeded;
     }
 
+    /* 
+     * This function is hooked to WordPress's admin_notices action hook 
+     * It is used to show any plugin specific notices/warnings in the admin interface
+     */
+    public function do_admin_notices(){
+        $this->notices();//Show any execution specific notices in the admin interface.
+        
+        //Show any other general warnings/notices to the admin.
+        if(SwpmMiscUtils::is_swpm_admin_page()){
+            //we are in an admin page for SWPM plugin.
+            
+            $msg = '';
+            //Show notice if running in sandbox mode.
+            $settings = SwpmSettings::get_instance();
+            $sandbox_enabled = $settings->get_value('enable-sandbox-testing');
+            if($sandbox_enabled){
+                $msg .= '<p>'.SwpmUtils::_('You have the sandbox payment mode enabled in plugin settings. Make sure to turn off the sandbox mode when you want to do live transactions.').'</p>';
+            }
+            
+            if(!empty($msg)){//Show warning messages if any.
+                echo '<div id="message" class="error">';
+                echo $msg;
+                echo '</div>';
+            }
+        }
+    }
+    
     public function meta_box() {
         if (function_exists('add_meta_box')) {
             $post_types = get_post_types();
@@ -322,7 +362,7 @@ class SimpleWpMembership {
 
     public function show_old_custom_box() {
         echo '<div class="dbx-b-ox-wrapper">' . "\n";
-        echo '<fieldset id="eMember_fieldsetid" class="dbx-box">' . "\n";
+        echo '<fieldset id="swpm_fieldsetid" class="dbx-box">' . "\n";
         echo '<div class="dbx-h-andle-wrapper"><h3 class="dbx-handle">' .
         __('Simple Membership Protection options', 'swpm') . "</h3></div>";
         echo '<div class="dbx-c-ontent-wrapper"><div class="dbx-content">';
@@ -419,7 +459,7 @@ class SimpleWpMembership {
     
         $acl = SwpmAccessControl::get_instance();
         global $comment;
-        return $acl->filter_comment($comment->comment_post_ID, $content);
+        return $acl->filter_comment($comment, $content);
     }
 
     public function filter_content($content) {
@@ -429,17 +469,7 @@ class SimpleWpMembership {
         }
         $acl = SwpmAccessControl::get_instance();
         global $post;
-        return $acl->filter_post($post->ID, $content);
-    }
-
-    public function filter_moretag($more_link, $more_link_text = "More") {
-        $moretag = SwpmSettings::get_instance()->get_value('enable-moretag');
-        if (empty($moretag)) {
-            return $more_link;
-        }
-        $acl = SwpmAccessControl::get_instance();
-        global $post;
-        return $acl->filter_post_with_moretag($post->ID, $more_link, $more_link_text);
+        return $acl->filter_post($post, $content);
     }
 
     public function init_hook() {
@@ -484,92 +514,45 @@ class SimpleWpMembership {
     public function menu() {
         $menu_parent_slug = 'simple_wp_membership';
 
-        add_menu_page(__("WP Membership", 'swpm'), __("WP Membership", 'swpm'), 'manage_options', $menu_parent_slug, array(&$this, "admin_members"), 'dashicons-id');
-        add_submenu_page($menu_parent_slug, __("Members", 'swpm'), __('Members', 'swpm'), 'manage_options', 'simple_wp_membership', array(&$this, "admin_members"));
-        add_submenu_page($menu_parent_slug, __("Membership Levels", 'swpm'), __("Membership Levels", 'swpm'), 'manage_options', 'simple_wp_membership_levels', array(&$this, "admin_membership_levels"));
-        add_submenu_page($menu_parent_slug, __("Settings", 'swpm'), __("Settings", 'swpm'), 'manage_options', 'simple_wp_membership_settings', array(&$this, "admin_settings"));
-        add_submenu_page($menu_parent_slug, __("Payments", 'swpm'), __("Payments", 'swpm'), 'manage_options', 'simple_wp_membership_payments', array(&$this, "payments_menu"));
-        add_submenu_page($menu_parent_slug, __("Add-ons", 'swpm'), __("Add-ons", 'swpm'), 'manage_options', 'simple_wp_membership_addons', array(&$this, "add_ons_menu"));
+        add_menu_page(__("WP Membership", 'swpm'), __("WP Membership", 'swpm'), SWPM_MANAGEMENT_PERMISSION, $menu_parent_slug, array(&$this, "admin_members_menu"), 'dashicons-id');
+        add_submenu_page($menu_parent_slug, __("Members", 'swpm'), __('Members', 'swpm'), SWPM_MANAGEMENT_PERMISSION, 'simple_wp_membership', array(&$this, "admin_members_menu"));
+        add_submenu_page($menu_parent_slug, __("Membership Levels", 'swpm'), __("Membership Levels", 'swpm'), SWPM_MANAGEMENT_PERMISSION, 'simple_wp_membership_levels', array(&$this, "admin_membership_levels_menu"));
+        add_submenu_page($menu_parent_slug, __("Settings", 'swpm'), __("Settings", 'swpm'), SWPM_MANAGEMENT_PERMISSION, 'simple_wp_membership_settings', array(&$this, "admin_settings_menu"));
+        add_submenu_page($menu_parent_slug, __("Payments", 'swpm'), __("Payments", 'swpm'), SWPM_MANAGEMENT_PERMISSION, 'simple_wp_membership_payments', array(&$this, "admin_payments_menu"));
+        add_submenu_page($menu_parent_slug, __("Add-ons", 'swpm'), __("Add-ons", 'swpm'), SWPM_MANAGEMENT_PERMISSION, 'simple_wp_membership_addons', array(&$this, "admin_add_ons_menu"));
 
         do_action('swpm_after_main_admin_menu', $menu_parent_slug);
 
         $this->meta_box();
     }
 
-    public function admin_membership_levels() {
-        include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/class.swpm-membership-levels.php');
-        $levels = new SwpmMembershipLevels();
-        $level_action = filter_input(INPUT_GET, 'level_action');
-        $action2 = filter_input(INPUT_GET, 'action2');
-        $action = $level_action ? $level_action : ($action2 ? $action2 : "");
-        switch ($action) {
-            case 'add':
-            case 'edit':
-                $levels->process_form_request();
-                break;
-            case 'manage':
-                $levels->manage();
-                break;
-            case 'category_list':
-                $levels->manage_categroy();
-                break;
-            case 'delete':
-                $levels->delete();
-            default:
-                $levels->show();
-                break;
-        }
-    }
-
-    public function admin_members() {
+    /* Render the members menu in admin dashboard */
+    public function admin_members_menu() {
         include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/class.swpm-members.php');
         $members = new SwpmMembers();
-        $action = filter_input(INPUT_GET, 'member_action');
-        $action = empty($action) ? filter_input(INPUT_POST, 'action') : $action;
-        $output = '';       
-        switch ($action) {
-            case 'add':
-            case 'edit':
-                $members->process_form_request();
-                break;
-            default:
-                $output = apply_filters('swpm_admin_member_menu_details_hook', '', $action);
-                if (empty($output)) {
-                    $output = $members->show();
-                }
-                $selected = $action;
-                include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_members.php');
-                break;
-        }
+        $members->handle_main_members_admin_menu();
+    }
+    
+    /* Render the membership levels menu in admin dashboard */
+    public function admin_membership_levels_menu() {
+        include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/class.swpm-membership-levels.php');
+        $levels = new SwpmMembershipLevels();
+        $levels->handle_main_membership_level_admin_menu();
     }
 
-    public function admin_settings() {
-        $current_tab = SwpmSettings::get_instance()->current_tab;
-        switch ($current_tab) {
-            case 6:
-                include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_addon_settings.php');
-                break;
-            case 4:
-                $link_for = filter_input(INPUT_POST, 'swpm_link_for', FILTER_SANITIZE_STRING);
-                $member_id = filter_input(INPUT_POST, 'member_id', FILTER_SANITIZE_NUMBER_INT);
-                $send_email = filter_input(INPUT_POST, 'swpm_reminder_email', FILTER_SANITIZE_NUMBER_INT);
-                $links = SwpmUtils::get_registration_link($link_for, $send_email, $member_id);
-                include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_tools_settings.php');
-                break;
-            case 2:
-                include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/payments/admin_payment_settings.php');
-                break;
-            default:
-                include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_settings.php');
-                break;
-        }
+    /* Render the settings menu in admin dashboard */
+    public function admin_settings_menu() {
+        $settings = SwpmSettings::get_instance();
+        $settings->handle_main_settings_admin_menu();
     }
 
-    public function payments_menu() {
-        include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/payments/admin_payments_page.php');
+    public function admin_payments_menu() {
+        include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/admin-includes/class.swpm-payments-admin-menu.php');
+        $payments_admin = new SwpmPaymentsAdminMenu();
+        $payments_admin->handle_main_payments_admin_menu();
     }
 
-    public function add_ons_menu() {
+    public function admin_add_ons_menu() {
         include(SIMPLE_WP_MEMBERSHIP_PATH . 'views/admin_add_ons_page.php');
     }
 

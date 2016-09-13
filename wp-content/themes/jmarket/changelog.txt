@@ -427,3 +427,64 @@ December 24, 2015 - Version 2.6.4
 	FIXED! Recurring events showing date of first occurrence of the recurring event on event detailed page.
 	FIXED! Multi-Day Event Posts Wrong End Date
 	UPDATED! Search and Filters for sermons now use custom built function for more accurate results
+
+February 20, 2016 - Version 2.6.5
+	FIXED! Featured event widget thumbnail is now linked to event page
+	FIXED! Align left and align right classes formatting issue on small screens
+	FIXED! Woo commerce cart widget formatting issue
+	FIXED! Template blog full width template video post format full width issue
+	UPDATED! Revolution slider to latest version
+	UPDATED! Icons shortcake to latest version of font awesome icons
+	FIXED! Template home not showing latest posts when no category is selected in category filter
+	UPDATED! Woo commerce templates to latest version
+
+April 24, 2016 - Version 2.6.6
+	FIXED! Event title problem in json-feed.php
+	UPDATED! Currency options for payment options of PayPal
+	FIXED! A bug in imic-theme-functions.php
+	FIXED! Some styling bugs
+	FIXED! Gallery post title in Magnific Popup Optio
+	UPDATED! Revolution Slider plugin to latest version
+	NEW! Option to choose widget in the megamenu
+	UPDATED! Meta Box plugin to latest version
+	FIXED! Gallery slider showing all images in lightbox pagination
+	FIXED! Gallery format not showing image title in lightbox
+	FIXED! Youtube/ Vimeo videos in sermons crashing IE11 browser
+
+May 21, 2016 - Version 2.6.7
+	UPDATED! Revolution Slider to latest version
+	UPDATED! Font Awesome icons to latest version
+	FIXED! category filter on gallery filter widget showing category slug instead of name
+	FIXED! Unusual height of upcoming events block on Home page template
+	FIXED! Staff shortcode shows wrong column number in the content editor which was confusing
+
+July 05, 2016 - Version 2.7
+	UPDATED! Revolution Slider to latest version
+	UPDATED! Texture fields in tabs, tangles page builder widget to editor tinymce
+	UPDATED! Recent Sermon Widget to have featured image linked to single sermon post
+	UPDATED! Payment imithemes plugin
+	FIXED! Recurring event color field overriding color set for event categories
+	FIXED! If no content is for staff posts then read more button option should be disabled
+	UPDATED! Staff shortcode and page template staff to have option to set no. of words limit for the staff posts content
+	NEW! Option for sermons category in recent sermons widget
+	NEW! Email icon options for Header/Footer social icons
+	FIXED! get current user info in payment imithemes plugin
+	NEW! Option to enter custom URL for event register button
+	FIXED! Some styling Bugs
+	UPDATED! TGM Class
+
+July 08, 2016 - Version 2.7.1
+	FIXED! Header Topbar showing skype icon by default
+
+August 24, 2016 - Version 2.7.2
+	FIXED! Event ticket printing css was not working
+	UPDATED! Redux Framework
+	UPDATED! Metabox plugin
+	UPDATED! Metabox show/hide plugin
+	UPDATED! Metabox Group plugin
+	UPDATED! Mediaelement js plugin
+	FIXED! Google event link target blank theme option snot working for every link
+	UPDATED! FullCalendar js plugin
+	UPDATED! Magnetic Popup js plugin
+	UPDATED! Deprecated WP function get_currentuserinfo
+	UPDATED! Payments imithemes plugin

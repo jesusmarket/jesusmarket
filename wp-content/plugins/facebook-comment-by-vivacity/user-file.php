@@ -1,18 +1,16 @@
 <?php
-
-add_action('wp_head', 'fbopengraph');
-add_action('wp_footer', 'fbmlsetting');
-add_filter ('the_content', 'commentscode');
-add_filter('language_attributes', 'fbcomment_schema');
-//add_filter('widget_text', 'do_shortcode');
-add_shortcode('vivafbcomment', 'commentshortcode');
+if ( ! defined( 'ABSPATH' ) ) exit;
+add_action('wp_head', 'vi_fbopengraph');
+add_action('wp_footer', 'vi_fbmlsetting');
+add_filter ('the_content', 'vi_commentscode');
+add_filter('language_attributes', 'vi_fbcomment_schema');
+add_shortcode('vivafbcomment', 'vi_commentshortcode');
 
 global $fboptn;
 
-// ---code from facebook comment code generator
-function fbmlsetting() {
+
+function vi_fbmlsetting() {
 	$fboptn = get_option('fbcomment');
-	
 	
 if (!isset($fboptn['fbml'])) {$fboptn['fbml'] = "";}
 if ($fboptn['fbml'] == 'on') {
@@ -27,11 +25,9 @@ if ($fboptn['fbml'] == 'on') {
 }(document, 'script', 'facebook-jssdk'));</script>
 <?php	}
 } 
-// ---End code from facebook comment code generator
 
 
-// ----Code for Adding XFBML 
-function fbcomment_schema($attr) {
+function vi_fbcomment_schema($attr) {
  	$fboptn = get_option('fbcomment');
 if (!isset($fboptn['fbns'])) {$fboptn['fbns'] = "";}
 if (!isset($fboptn['opengraph'])) {$fboptn['opengraph'] = "";}
@@ -42,7 +38,7 @@ if (!isset($fboptn['opengraph'])) {$fboptn['opengraph'] = "";}
 
  
 // ----Code for Adding Open Graph meta
- function fbopengraph() {
+ function vi_fbopengraph() {
 	$fboptn = get_option('fbcomment'); ?>
 <meta property="fb:app_id" content="<?php echo $fboptn['appID']; ?>"/>
 <meta property="fb:admins" content="<?php echo $fboptn['mods']; ?>"/>
@@ -51,9 +47,6 @@ if (!isset($fboptn['opengraph'])) {$fboptn['opengraph'] = "";}
 <?php
 }
 
-
-
-
 // ----Code for hideWpComments
 $fboptn = get_option('fbcomment');
 
@@ -61,71 +54,46 @@ if (!isset($fboptn['postshideWpComments'])) {$fboptn['postshideWpComments'] = "o
 if (!isset($fboptn['pageshideWpComments'])) {$fboptn['pageshideWpComments'] = "off";}
 
 if ($fboptn['postshideWpComments'] == 'on' ) {
-   function posts_enqueueHideWpCommentsCss() 
+   function vi_posts_enqueueHideWpCommentsCss() 
      {
-         wp_register_style('posts-front-css', plugins_url('css/fb-comments-hidewpcomments-posts.css',__FILE__));
+        wp_register_style('posts-front-css', plugins_url('css/fb-comments-hidewpcomments-posts.css',__FILE__));
         wp_enqueue_style('posts-front-css');
      }				
-    add_action('init', 'posts_enqueueHideWpCommentsCss');
+    add_action('init', 'vi_posts_enqueueHideWpCommentsCss');
    }
 
 
 if ( $fboptn['pageshideWpComments'] == 'on' ) {
 
-function pages_enqueueHideWpCommentsCss() 
+function vi_pages_enqueueHideWpCommentsCss() 
 {
-         wp_register_style('pages-front-css', plugins_url('css/fb-comments-hidewpcomments-pages.css',__FILE__));
-         wp_enqueue_style('pages-front-css');
- }				
-add_action('init', 'pages_enqueueHideWpCommentsCss');
+   wp_register_style('pages-front-css', plugins_url('css/fb-comments-hidewpcomments-pages.css',__FILE__));
+   wp_enqueue_style('pages-front-css');
+}				
+add_action('init', 'vi_pages_enqueueHideWpCommentsCss');
 }
 
 
 if (!isset($fboptn['hideWpComments'])) {$fboptn['hideWpComments'] = "";}
-	# Enqueue correct stylesheet if user wants to hide the WordPress commenting form
+
 	if ($fboptn['hideWpComments'] == "on" ) {
-		function fbComments_enqueueHideWpCommentsCss() {
+		function vi_fbComments_enqueueHideWpCommentsCss() {
 			
          wp_register_style('front-css', plugins_url('css/fb-comments-hidewpcomments.css',__FILE__));
          wp_enqueue_style('front-css');
 		}
-		add_action('init', 'fbComments_enqueueHideWpCommentsCss');
+		add_action('init', 'vi_fbComments_enqueueHideWpCommentsCss');
 }
 
-// ----End Code for hideWpComments
 
-// Comments 
-function commentscode($content) {
+function vi_commentscode($content) {
 $fboptn = get_option('fbcomment');
 $pages = $fboptn['pagesid'];
- $postid = get_the_ID();  
-$post_type_name = get_post_type( get_the_ID() );
- 
- $admin_post_type = isset($fboptn['custompostytpe']);
- $total_admin_post_type = count(isset($fboptn['custompostytpe']));
- 
-  for($k=0;$k<= $total_admin_post_type;$k++)
- 	{
- if ( ! isset($fboptn['custompostytpe'][$k])) {
-   $fboptn['custompostytpe'][$k] = null;
-}
- 	 if($fboptn['custompostytpe'][$k] == $post_type_name)
- 	 {
- 	 		return $content;
- 	 	}					
- 	}
- $get_exclude_id = explode(',', $pages); 
-	 $get_total_id = count($get_exclude_id);
- 
-  for($j=0;$j<= $get_total_id;$j++)
- 				{	
- if ( ! isset($get_exclude_id[$j])) {
-   $get_exclude_id[$j] = null;
-}
-					 if($postid ==   $get_exclude_id[$j] )  {
- 						return $content;
- 						}
- 				}
+$totalpages = explode(",",$pages);
+ $allpage=get_all_page_ids();
+
+ $allpage=array_diff($allpage,$totalpages);
+
 if (!isset($fboptn['html5'])) {$fboptn['html5'] = "off";}
 if (!isset($fboptn['pluginsite'])) {$fboptn['pluginsite'] = "off";}
 if (!isset($fboptn['posts'])) {$fboptn['posts'] = "off";}
@@ -133,9 +101,8 @@ if (!isset($fboptn['pages'])) {$fboptn['pages'] = "off";}
 if (!isset($fboptn['homepage'])) {$fboptn['homepage'] = "off";}
 if (!isset($fboptn['count'])) {$fboptn['count'] = "off";}
 if (!isset($fboptn['countmsg'])) {$fboptn['countmsg'] = "0";}
-	if (
-	   (is_single() && $fboptn['posts'] == 'on') ||
-     ($fboptn['pages'] == 'on') ||
+	if ((is_single() && $fboptn['posts'] == 'on') ||
+       (is_page($allpage) && $fboptn['pages'] == 'on') ||
        ((is_home() || is_front_page()) && $fboptn['homepage'] == 'on')) {
 if($fboptn['appID'] != "") {
 		if ($fboptn['count'] == 'on') {
@@ -180,7 +147,7 @@ else {
 
 
 // -------Add facebook shortcode------
-function commentshortcode($fbsrt) {
+function vi_commentshortcode($fbsrt) {
     extract(shortcode_atts(array(
 		"fbsrtcode" => get_option('fbcomment'),
 		"url" => get_permalink(),
@@ -199,7 +166,7 @@ function commentshortcode($fbsrt) {
 			$commenttitle = "<h3>";
 			$commenttitle .= $fbcomment['title']."</h3>";
 		}
-		$contentshortcode = "<!-- Facebook Comments for WordPress: http://peadig.com/wordpress-plugins/facebook-comments/ -->".$commenttitle.$commentcount;
+		$contentshortcode = $commenttitle.$commentcount;
 
       	if ($fbsrtcode['html5'] == 'on') {
 			$contentshortcode .=	"<div class=\"fb-comments\" data-href=\"".$url."\" data-num-posts=\"".$fbsrtcode['num']."\" data-width=\"".$fbsrtcode['width']."\" data-colorscheme=\"".$fbsrtcode['scheme']."\"></div>";

@@ -29,6 +29,8 @@ if($transaction_id!='') {
 } }
 $registration_status = get_post_meta(get_the_ID(),'imic_event_registration_status',true);
 $event_registration_fee = get_post_meta(get_the_ID(),'imic_event_registration_fee',true);
+$custom_registration_url = get_post_meta(get_the_ID(),'imic_custom_event_registration',true);
+$custom_registration_url_target = get_post_meta(get_the_ID(),'imic_custom_event_registration_target',true);
 $pageOptions = imic_page_design(); //page design options ?>
 <div <?php post_class('container'); ?> id="post-<?php the_ID(); ?>">
     <div class="row">
@@ -212,12 +214,22 @@ $pageOptions = imic_page_design(); //page design options ?>
             if(!empty($imic_event_address)){
             echo '<a href="http://maps.google.com/?q='.$imic_event_address.'" class="btn btn-default" data-placement="bottom" data-toggle="tooltip" data-original-title="'.__('Event Address','framework').'" rel="tooltip" target="_blank"><i class="fa fa-map-marker"></i></a>';   
             }
-			if((is_plugin_active('Payment-Imithemes/causes.php'))&&($registration_status==1)) {
-			if(is_user_logged_in()) {
-			echo '<a href="#" id="donate-popup" class="btn btn-primary donate-paypal" data-toggle="modal" data-target="#PaymentModal">'.__('Register','framework').'</a>'; }
-			else {
-				echo '<a href="#" id="login-register" class="btn btn-primary donate-paypal" data-toggle="modal" data-target="#PaymentModal">'.__('Register','framework').'</a>';
-			} }
+			if($custom_registration_url_target == 1){
+				$crut = ' target="_blank"';
+			} else {
+				$crut = '';
+			}
+			if($custom_registration_url != ''){
+				echo '<a href="'.$custom_registration_url.'" class="btn btn-primary donate-paypal custom-event-registration-url" '.$crut.'>'.__('Register','framework').'</a>';
+			} else {
+				if((is_plugin_active('Payment-Imithemes/causes.php'))&&($registration_status==1)) {
+					if(is_user_logged_in()) {
+						echo '<a href="#" id="donate-popup" class="btn btn-primary donate-paypal" data-toggle="modal" data-target="#PaymentModal">'.__('Register','framework').'</a>'; }
+					else {
+						echo '<a href="#" id="login-register" class="btn btn-primary donate-paypal" data-toggle="modal" data-target="#PaymentModal">'.__('Register','framework').'</a>';
+					}
+				}
+			}
             ?>
             </nav>
             <h2 class="post-title"><?php the_title(); ?>

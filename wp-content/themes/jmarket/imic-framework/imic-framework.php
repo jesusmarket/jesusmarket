@@ -10,8 +10,8 @@ require_once(ImicFrameworkPath . '/imic-theme-functions.php');
 ================================================== */
 require_once(ImicFrameworkPath . '/meta-box/meta-box.php');
 require_once(ImicFrameworkPath . '/meta-box/inc/field.php');
-require_once(ImicFrameworkPath . '/meta-box/meta-box-group/meta-box-group.php');
-require_once(ImicFrameworkPath . '/meta-box/meta-box-group/group.php');
+//require_once(ImicFrameworkPath . '/meta-box/meta-box-group/meta-box-group.php');
+//require_once(ImicFrameworkPath . '/meta-box/meta-box-group/group.php');
 require_once(ImicFrameworkPath . '/meta-box/meta-box-show-hide/meta-box-show-hide.php');
 require_once(ImicFrameworkPath . '/meta-boxes.php');
 /* SHORTCODES
@@ -66,7 +66,6 @@ $theme_info = wp_get_theme();
         wp_register_style('imic_colors', IMIC_THEME_PATH . '/colors/' . $imic_options['theme_color_scheme'], array(), $theme_info->get( 'Version' ), 'all');
         wp_register_style('imic_fullcalendar_css', IMIC_THEME_PATH . '/plugins/fullcalendar/fullcalendar.min.css', array(), $theme_info->get( 'Version' ), 'all');
         wp_register_style('imic_fullcalendar_print', IMIC_THEME_PATH . '/plugins/fullcalendar/fullcalendar.print.css', array(), $theme_info->get( 'Version' ), 'print');
-        wp_register_style('imic_bootstraprtl_css', IMIC_THEME_PATH . '/css/bootstrap-rtl.min.css', array(), $theme_info->get( 'Version' ), 'all');
         wp_register_style('imic_rtl_css', IMIC_THEME_PATH . '/css/rtl.css', array(), $theme_info->get( 'Version' ), 'all');
         //**Enqueue STYLESHEETPATH**//
         wp_enqueue_style('imic_bootstrap');
@@ -85,7 +84,6 @@ $theme_info = wp_get_theme();
             wp_enqueue_style('imic_colors');
         }
         if ($imic_options['enable_rtl'] == 1) {
-        	wp_enqueue_style('imic_bootstraprtl_css');
         	wp_enqueue_style('imic_rtl_css');
 		}
         //**End Enqueue STYLESHEETPATH**//

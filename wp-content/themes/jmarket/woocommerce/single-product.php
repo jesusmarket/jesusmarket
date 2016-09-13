@@ -1,10 +1,4 @@
 <?php
-/**
- * The Template for displaying all single products.
- * @author 		WooThemes
- * @package 	WooCommerce/Templates
- * @version     2.1.8
- */
 get_header();
 $pageOptions = imic_page_design(); //page design options
 imic_sidebar_position_module();

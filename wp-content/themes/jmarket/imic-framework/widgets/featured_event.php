@@ -90,15 +90,15 @@ class featured_event extends WP_Widget {
             }
             if($right_time!='') {
             //Featured Event Image
-            if (has_post_thumbnail($event)) :
-                echo get_the_post_thumbnail($event, 'full', array('class' => "featured-event-image"));
-            endif;
             $featuredEvent = get_post($event);
+			$date_converted=date('Y-m-d',$right_time );
+        	$custom_event_url =imic_query_arg($date_converted,$event);
+            if (has_post_thumbnail($event)) :
+                echo '<div class="format-standard"><a href="'.$custom_event_url.'" class="media-box">'.get_the_post_thumbnail($event, 'full', array('class' => "featured-event-image")).'</a></div>';
+            endif;
             ?>
             <div class="featured-event-container">
             <label class="label label-danger"><?php _e('Upcoming','imic-framework-admin'); ?></label> <!-- Replace class label-danger to label-default for passed events -->
-            <?php $date_converted=date('Y-m-d',$right_time );
-        $custom_event_url =imic_query_arg($date_converted,$event); ?>
             <div class="featured-event-time">
                 <span class="date"><?php echo date('d',$right_time); ?></span>
                 <span class="month"><?php echo date_i18n('M, y',$right_time); ?></span>

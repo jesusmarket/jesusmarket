@@ -208,27 +208,16 @@ $meta_boxes[] = array(
 		array(
 			'name'  => __('Contact Number', 'framework'),
 			'id'    => $prefix."event_contact",
-			'desc'  =>  __('Enter event\'s contact number.', 'framework'),
+			'desc'  =>  __('Enter event\'s contact number. This is a static value which you might want to show on single event page.', 'framework'),
 			'type'  => 'text',
 		), 
 		array(
-            'name' => __('Guest Registration', 'framework'),
-            'id' => $prefix . 'event_registration_required',
-            'desc' => __("Select Enabled to active Guest Registration.", 'framework'),
-            'type' => 'select',
-            'options' => array(
-		'0' => __('Disable', 'framework'),
-				'1' => __('Enable','framework'),
-            ),
-			'std' => 0,
-        ), 
-		array(
             'name' => __('Event Registration', 'framework'),
             'id' => $prefix . 'event_registration_status',
-            'desc' => __("Select Enabled to active Event Registration.", 'framework'),
+            'desc' => __("Select Enable to activate Event Registration.", 'framework'),
             'type' => 'select',
             'options' => array(
-		'0' => __('Disable', 'framework'),
+				'0' => __('Disable', 'framework'),
 				'1' => __('Enable','framework'),
             ),
 			'std' => 0,
@@ -236,9 +225,33 @@ $meta_boxes[] = array(
 		array(
 			'name'  => __('Event Registration Fee', 'framework'),
 			'id'    => $prefix."event_registration_fee",
-			'desc'  =>  __('Enter event\'s registration fee(This field will work only when native-church-plugin activated.)', 'framework'),
+			'desc'  =>  __('Enter event\'s registration fee(This field will work only when imithemes payment plugin is active and above option Event Registration is enabled.)', 'framework'),
 			'type'  => 'text',
-		),      
+		),
+		array(
+            'name' => __('Guest Registration', 'framework'),
+            'id' => $prefix . 'event_registration_required',
+            'desc' => __("Select Enable to activate Guest Registration(When enabled it will not be mandatory for users to register on your website to be able to register for an event) Works only when above option Event Registration is enabled.", 'framework'),
+            'type' => 'select',
+            'options' => array(
+				'0' => __('Disable', 'framework'),
+				'1' => __('Enable','framework'),
+            ),
+			'std' => 0,
+        ), 
+		array(
+			'name' => __( 'Custom Registration Button URL', 'framework' ),
+			'id' => $prefix.'custom_event_registration',
+			'desc' => __("For example EventBrite Event page URL of yours. This URL will be used for the registration button on single event page when the above option Event Registration is enabled", 'framework'),
+			'type' => 'text'
+		),
+		array(
+			'name' => __( 'Open custom URL in new Tab/Window', 'framework' ),
+			'id' => $prefix.'custom_event_registration_target',
+			'type' => 'checkbox',
+			// Value can be 0 or 1
+			'std' => 1,
+		),
     )
 );
 /*** Event Recurrence Meta box ***/   
@@ -334,20 +347,20 @@ $meta_boxes[] = array(
        	array(
 			'name'  => __('Attendees', 'framework'),
 			'id'    => $prefix."event_attendees",
-			'desc'  =>  __('Enter number of attendees.', 'framework'),
+			'desc'  =>  __('Enter number of attendees. This is a static value which you might want to show on single event page.', 'framework'),
 			'type'  => 'text',
 		),
         //Staff Members
 		array(
 			'name'  => __('Staff Members', 'framework'),
 			'id'    => $prefix."event_staff_members",
-			'desc'  =>  __('Enter number of staff members.', 'framework'),
+			'desc'  =>  __('Enter number of staff members. This is a static value which you might want to show on single event page.', 'framework'),
 			'type'  => 'text',
 		),
 		array(
 			'name'  => __('Email Address', 'framework'),
 			'id'    => $prefix."event_email",
-			'desc'  =>  __('Enter Email for Event.', 'framework'),
+			'desc'  =>  __('Enter Email for Event. This email address is where theme will send event registrants info and can be used by event page visitors to contact directly', 'framework'),
 			'type'  => 'text',
 		),
     )
@@ -362,7 +375,7 @@ $meta_boxes[] = array(
        	array(
 			'name'  => __('Featured Event', 'framework'),
 			'id'    => $prefix."event_featured",
-			'desc'  =>  __('Select for featured event .', 'framework'),
+			'desc'  =>  __('Select for featured event. If this is set to Yes then this event will be available as an option to select for Featured Event Widget at Appearance > Widgets', 'framework'),
 			'type'  => 'select',
                        'options' => array(
                        '0' => __('No', 'framework'),
@@ -1682,6 +1695,13 @@ $meta_boxes[] = array(
                 'ID' => __('ID', 'framework'),
                 'menu_order' => __('Menu Order', 'framework'),
             ),
+        ),
+        array(
+            'name' => __('Length of Excerpt to show', 'framework'),
+            'id' => $prefix . 'staff_excerpt_length',
+            'desc' => __("Enter the number of words you would like to show from the staff posts content/excerpt. Enter 0 to completely hide the excerpt and read more button", 'framework'),
+            'type' => 'text',
+            'std' => ''
         ),
        )
 );

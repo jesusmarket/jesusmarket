@@ -1,68 +1,105 @@
 <?php
-// Prevent loading this file directly
-defined( 'ABSPATH' ) || exit;
-if ( ! class_exists( 'RWMB_Fieldset_Text_Field' ) )
+
+/**
+ * Fieldset text class.
+ */
+class RWMB_Fieldset_Text_Field extends RWMB_Text_Field
 {
-	class RWMB_Fieldset_Text_Field extends RWMB_Field
+	/**
+	 * Get field HTML
+	 *
+	 * @param mixed $meta
+	 * @param array $field
+	 *
+	 * @return string
+	 */
+	static function html( $meta, $field )
 	{
-		/**
-		 * Get field HTML
-		 *
-		 * @param mixed $meta
-		 * @param array $field
-		 *
-		 * @return string
-		 */
-		static function html( $meta, $field )
+		$html = array();
+		$tpl  = '<label>%s %s</label>';
+
+		foreach ( $field['options'] as $key => $label )
 		{
-			if ( 1 == count( $meta ) && '' == trim( $meta[0] ) )
-				$meta = '';
-			$html   = array();
-			$before = '<fieldset><legend>' . $field['desc'] . '</legend>';
-			$after  = '</fieldset>';
-			$tpl = '<label>%s <input type="text" class="rwmb-fieldset-text" name="%s[%s][%d]" placeholder="%s" value="%s" /></label>';
-			for ( $n = 0; $n < $field['rows']; $n ++ )
+			$value                       = isset( $meta[$key] ) ? $meta[$key] : '';
+			$field['attributes']['name'] = $field['field_name'] . "[{$key}]";
+			$html[]                      = sprintf( $tpl, $label, parent::html( $value, $field ) );
+		}
+
+		$out = '<fieldset><legend>' . $field['desc'] . '</legend>' . implode( ' ', $html ) . '</fieldset>';
+
+		return $out;
+	}
+
+	/**
+	 * Do not show field description.
+	 * @param array $field
+	 * @return string
+	 */
+	public static function element_description( $field )
+	{
+		return '';
+	}
+
+	/**
+	 * Normalize parameters for field
+	 *
+	 * @param array $field
+	 *
+	 * @return array
+	 */
+	static function normalize( $field )
+	{
+		$field                       = parent::normalize( $field );
+		$field['multiple']           = false;
+		$field['attributes']['id']   = false;
+		$field['attributes']['type'] = 'text';
+		return $field;
+	}
+
+	/**
+	 * Format value for the helper functions.
+	 * @param array        $field Field parameter
+	 * @param string|array $value The field meta value
+	 * @return string
+	 */
+	public static function format_value( $field, $value )
+	{
+		$output = '<table><thead><tr>';
+		foreach ( $field['options'] as $label )
+		{
+			$output .= "<th>$label</th>";
+		}
+		$output .= '<tr>';
+
+		if ( ! $field['clone'] )
+		{
+			$output .= self::format_single_value( $field, $value );
+		}
+		else
+		{
+			foreach ( $value as $subvalue )
 			{
-				foreach ( $field['options'] as $k => $v )
-				{
-					$fid = $field['id'];
-					if ( is_array( $meta ) && ! empty( $meta ) )
-						$html[] = sprintf( $tpl, $k, $fid, $v, $n, $k, $meta[$v][$n] );
-					else
-						$html[] = sprintf( $tpl, $k, $fid, $v, $n, $k, '' );
-				}
-				$html[] = '<br>';
+				$output .= self::format_single_value( $field, $subvalue );
 			}
-			$out = $before . implode( ' ', $html ) . $after;
-			return $out;
 		}
-		/**
-		 * Get meta value
-		 *
-		 * @param $post_id
-		 * @param $saved
-		 * @param $field
-		 *
-		 * @return array
-		 */
-		static function meta( $post_id, $saved, $field )
+		$output .= '</tbody></table>';
+		return $output;
+	}
+
+	/**
+	 * Format a single value for the helper functions.
+	 * @param array $field Field parameter
+	 * @param array $value The value
+	 * @return string
+	 */
+	public static function format_single_value( $field, $value )
+	{
+		$output = '<tr>';
+		foreach ( $value as $subvalue )
 		{
-			$meta = get_post_meta( $post_id, $field['id'] );
-			if ( is_array( $meta ) && ! empty( $meta ) )
-				$meta = $meta[0];
-			return $meta;
+			$output .= "<td>$subvalue</td>";
 		}
-		/**
-		 * Save meta value
-		 *
-		 * @param $new
-		 * @param $old
-		 * @param $post_id
-		 * @param $field
-		 */
-		static function save( $new, $old, $post_id, $field )
-		{
-			update_post_meta( $post_id, $field['id'], $new, $old );
-		}
+		$output .= '</tr>';
+		return $output;
 	}
 }

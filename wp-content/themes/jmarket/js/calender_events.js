@@ -7,7 +7,7 @@ jQuery(document).ready(function() {
     var y = d.getFullYear();
 	var this_month = y+'-'+n;
 	//alert(n);
-    jQuery('.events-listing-header').before('<div id="loading-image" style="display: block;float: left;margin: -27px 507px;"><img src="' + calenderEvents.homeurl + '/images/loader.gif" alt="Loading..." /></div>');
+    jQuery('.calendar').prepend('<div id="loading-image"><img id="loading-image-img" src="' + calenderEvents.homeurl + '/images/loader-new.gif" alt="Loading..." /></div>');
 	if (calenderEvents.calheadview == 1) {
 		HeadLeft = "title";
 		HeadCenter = "";
@@ -52,7 +52,6 @@ jQuery(document).ready(function() {
 			day: calenderEvents.day
 			},
 		eventLimit: Limit, // for all non-agenda views
-		height: 'auto',
 		defaultView: calenderEvents.view,
         googleCalendarApiKey: calenderEvents.googlekey,
 			eventSources: [

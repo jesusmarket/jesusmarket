@@ -6,6 +6,31 @@ abstract class SwpmUtils {
         return defined('DOING_AJAX') && DOING_AJAX;
     }
 
+    /*
+     * This function handles various initial setup tasks that need to be executed very early on (before other functions of the plugin is called).
+     */
+    public static function do_misc_initial_plugin_setup_tasks(){
+        
+        //Management role/permission setup
+        $admin_dashboard_permission = SwpmSettings::get_instance()->get_value('admin-dashboard-access-permission');
+        if (empty($admin_dashboard_permission)) {
+            //By default only admins can manage/see admin dashboard
+            define("SWPM_MANAGEMENT_PERMISSION", "manage_options");
+        } else {
+            define("SWPM_MANAGEMENT_PERMISSION", $admin_dashboard_permission);
+        }
+        
+        //Set timezone preference (if enabled in settings)
+        $use_wp_timezone = SwpmSettings::get_instance()->get_value('use-wordpress-timezone');
+        if (!empty($use_wp_timezone)){//Set the wp timezone
+            $wp_timezone_string = get_option('timezone_string');
+            if(!empty($wp_timezone_string)){
+                date_default_timezone_set($wp_timezone_string);
+            }
+        }
+        
+    }
+    
     public static function subscription_type_dropdown($selected) {
         return '<option ' . (($selected == SwpmMembershipLevel::NO_EXPIRY) ? 'selected="selected"' : "") . ' value="' . SwpmMembershipLevel::NO_EXPIRY . '">No Expiry</option>' .
                 '<option ' . (($selected == SwpmMembershipLevel::DAYS) ? 'selected="selected"' : "") . ' value="' . SwpmMembershipLevel::DAYS . '">Day(s)</option>' .
@@ -284,6 +309,10 @@ abstract class SwpmUtils {
     }
 
     public static function is_admin() {
+        //This function returns true if the current user has WordPress admin management permission (not to be mistaken with SWPM admin permission.
+        
+        //This function is NOT like the WordPress's is_admin() function which determins if we are on the admin end of the site.
+        //TODO - rename this function to something like is_admin_user()
         return current_user_can('manage_options');
     }
 
@@ -432,5 +461,14 @@ abstract class SwpmUtils {
 
         return apply_filters('swpm_get_user_ip_address', $user_ip);
     }
+    
+    public static function is_first_click_free(&$content){        
+        $is_first_click = false;        
+        $args = array($is_first_click, $content );
+        $filtered = apply_filters('swpm_first_click_free', $args);
+        list($is_first_click, $content) = $filtered;
+        return $is_first_click;       
+    }
 
+    
 }

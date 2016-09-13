@@ -94,7 +94,6 @@ function get_future_event($m,$term='')
                                  if(!empty($new_events))
 								 {
 									foreach($new_events as $key=>$value) {
-								    $target = '';
 									if(preg_match('/^[0-9]+$/',$value))
 									{
 									  $eventStartTime =  strtotime(get_post_meta($value, 'imic_event_start_tm', true));
@@ -127,11 +126,6 @@ function get_future_event($m,$term='')
 										 $event_title=$google_data[0];
 									   $custom_event_url=$google_data[1];
 									    $options = get_option('imic_options');
-                                   $event_google_open_link = isset($options['event_google_open_link'])?$options['event_google_open_link']:0;
-								   if($event_google_open_link)
-								   {
-								     $target = 'target ="_blank"';
-								   }
 									   $eventTime =$key;
 									   if($eventTime!='') { $eventTime = date_i18n( get_option( 'time_format' ),$key); }
 									 $eventEndTime =$google_data[2];
@@ -158,7 +152,7 @@ function get_future_event($m,$term='')
 					   <?php echo $event_dt_out[1].',&nbsp;&nbsp;'.$event_dt_out[0] ?>
                      </span> </div>
                       <div class="to-event-url">
-                        <div><a href="<?php echo $custom_event_url.'" '.$target ?> class="btn btn-default btn-sm"><?php _e('Details','framework'); ?></a></div>
+                        <div><a href="<?php echo $custom_event_url; ?>" class="btn btn-default btn-sm"><?php _e('Details','framework'); ?></a></div>
                       </div>
                     </li> 
                                   <?php }

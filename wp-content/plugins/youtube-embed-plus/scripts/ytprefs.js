@@ -57,6 +57,20 @@
                         catch (err) {
                         }
 
+                        try {
+                            var $ifm = $(event.target.getIframe());
+                            if ($ifm.hasClass('epyt-lbif') && $ifm.closest('.lity-content').length)
+                            {
+//                                var thumbplay = $container.find('.epyt-pagebutton').first().data('thumbplay');
+//                                if (thumbplay !== '0' && thumbplay !== 0)
+                                event.target.playVideo();
+                            }
+                        }
+                        catch (err2)
+                        {
+                        }
+
+
                         setTimeout(function ()
                         {
                             try
@@ -70,7 +84,6 @@
                             }
                         }, 1700);
                     },
-                    
                     onPlayerStateChange: function (event)
                     {
                         var ifm = event.target.getIframe();
@@ -89,6 +102,10 @@
                         }
 
                         var $gallery = $(ifm).closest('.epyt-gallery');
+                        if (!$gallery.length)
+                        {
+                            $gallery = $('#' + $(ifm).data('epytgalleryid'));
+                        }
                         if ($gallery.length)
                         {
                             var autonext = $gallery.find('.epyt-pagebutton').first().data('autonext') == '1';
@@ -100,13 +117,37 @@
                                     $currvid = $gallery.find('.epyt-gallery-thumb').first();
                                 }
                                 var $nextvid = $currvid.find(' ~ .epyt-gallery-thumb').first();
+                                var $lityopen = $('div.lity-wrap[data-lity-close]');
                                 if ($nextvid.length)
                                 {
-                                    $nextvid.click();
+                                    if ($lityopen.length)
+                                    {
+                                        _EPADashboard_.lb.close();
+                                        setTimeout(function () {
+                                            $nextvid.click();
+                                        }, 1000);
+
+                                    }
+                                    else
+                                    {
+                                        $nextvid.click();
+                                    }
                                 }
                                 else
                                 {
-                                    $gallery.find('.epyt-pagebutton.epyt-next[data-pagetoken!=""][data-pagetoken]').first().click();
+                                    if ($lityopen.length)
+                                    {
+                                        _EPADashboard_.lb.close();
+                                        setTimeout(function () {
+                                            $gallery.find('.epyt-pagebutton.epyt-next[data-pagetoken!=""][data-pagetoken]').first().click();
+                                        }, 1000);
+
+                                    }
+                                    else
+                                    {
+                                        $gallery.find('.epyt-pagebutton.epyt-next[data-pagetoken!=""][data-pagetoken]').first().click();
+                                    }
+
                                 }
                             }
                         }
@@ -120,7 +161,7 @@
                     {
                         if (typeof this.epytsetupdone === 'undefined')
                         {
-                            _EPADashboard_.setupevents(this.id);
+                            return _EPADashboard_.setupevents(this.id);
                         }
                     },
                     setupevents: function (iframeid)
@@ -130,7 +171,7 @@
                         {
                             var thisvid = document.getElementById(iframeid);
                             thisvid.epytsetupdone = true;
-                            new YT.Player(iframeid, {
+                            return new YT.Player(iframeid, {
                                 events: {
                                     "onReady": _EPADashboard_.onPlayerReady,
                                     "onStateChange": _EPADashboard_.onPlayerStateChange
@@ -140,20 +181,27 @@
                     },
                     jp: function (q)
                     {
-                        //debug
+                        // debug
                     },
                     apiInit: function () {
-                        _EPADashboard_.initStarted = true;
                         setTimeout(function ()
                         {
-                            var __allytifr = document.querySelectorAll(_EPYT_.evselector);
-                            for (var i = 0; i < __allytifr.length; i++)
+                            if (typeof (YT) !== 'undefined')
                             {
-                                if (!__allytifr[i].hasAttribute("id"))
+                                _EPADashboard_.initStarted = true;
+                                var __allytifr = document.querySelectorAll(_EPYT_.evselector);
+                                for (var i = 0; i < __allytifr.length; i++)
                                 {
-                                    __allytifr[i].id = "_dytid_" + Math.round(Math.random() * 8999 + 1000);
+                                    if (!__allytifr[i].hasAttribute("id"))
+                                    {
+                                        __allytifr[i].id = "_dytid_" + Math.round(Math.random() * 8999 + 1000);
+                                    }
+                                    _EPADashboard_.setupevents(__allytifr[i].id);
                                 }
-                                _EPADashboard_.setupevents(__allytifr[i].id);
+
+
+
+
                             }
                         }, 300);
                     },
@@ -188,6 +236,8 @@
                             range.selectNode(ele);
                             window.getSelection().addRange(range);
                         }
+                    },
+                    lb: typeof (lity) !== 'undefined' ? lity() : function () {
                     }
 
                 };
@@ -224,10 +274,16 @@
         $('.epyt-gallery').each(function () {
             var $container = $(this);
             var $iframe = $(this).find('iframe').first();
-            var initSrc = $iframe.data('ep-gallerysrc');
+            var contentlbid = 'content' + $iframe.attr('id');
+            $container.find('.lity-hide').attr('id', contentlbid);
+            var initSrc = $iframe.attr('src');
+            if (!initSrc)
+            {
+                initSrc = $iframe.data('ep-src');
+            }
             var firstId = $(this).find('.epyt-gallery-list .epyt-gallery-thumb').first().data('videoid');
-            initSrc = initSrc.replace('GALLERYVIDEOID', firstId);
-            $iframe.attr('src', initSrc);
+            initSrc = initSrc.replace(firstId, 'GALLERYVIDEOID');
+            $iframe.data('ep-gallerysrc', initSrc);
 
 
             var $listgallery = $container.find('.epyt-gallery-list');
@@ -256,21 +312,50 @@
                 var vid = $(this).data('videoid');
                 $container.data('currvid', vid);
                 var vidSrc = $iframe.data('ep-gallerysrc').replace('GALLERYVIDEOID', vid);
-                if (vidSrc.indexOf('autoplay') > 0)
+
+                var thumbplay = $container.find('.epyt-pagebutton').first().data('thumbplay');
+                if (thumbplay !== '0' && thumbplay !== 0)
                 {
-                    vidSrc = vidSrc.replace('autoplay=0', 'autoplay=1');
+                    if (vidSrc.indexOf('autoplay') > 0)
+                    {
+                        vidSrc = vidSrc.replace('autoplay=0', 'autoplay=1');
+                    }
+                    else
+                    {
+                        vidSrc += '&autoplay=1';
+                    }
+                }
+
+
+                if ($container.hasClass('epyt-lb'))
+                {
+                    _EPADashboard_.lb('#' + contentlbid);
+
+                    vidSrc = vidSrc.replace('autoplay=1', 'autoplay=0');
+                    $iframe.attr('src', vidSrc);
+                    var player = _EPADashboard_.setupevents($iframe.attr('id'));
+
+                    $('.lity-close').focus();
+
                 }
                 else
                 {
-                    vidSrc += '&autoplay=1';
+                    $('html, body').animate({
+                        scrollTop: $iframe.offset().top - parseInt(_EPYT_.gallery_scrolloffset)
+                    }, 500, function () {
+                        $iframe.attr('src', vidSrc);
+                        _EPADashboard_.setupevents($iframe.attr('id'));
+                    });
+
                 }
 
-                $('html, body').animate({
-                    scrollTop: $iframe.offset().top - parseInt(_EPYT_.gallery_scrolloffset)
-                }, 500, function () {
-                    $iframe.attr('src', vidSrc);
-                    _EPADashboard_.setupevents($iframe.attr('id'));
-                });
+            }).on('keydown', '.epyt-gallery-list .epyt-gallery-thumb, .epyt-pagebutton', function (e) {
+                var code = e.which;
+                if ((code === 13) || (code === 32)) {
+                    e.preventDefault();
+                    $(this).click();
+
+                }
             });
 
             $container.on('mouseenter', '.epyt-gallery-list .epyt-gallery-thumb', function () {
@@ -308,7 +393,8 @@
                         showPaging: $(this).data('showpaging'),
                         autonext: $(this).data('autonext'),
                         style: $(this).data('style'),
-                        thumbcrop: $(this).data('thumbcrop')
+                        thumbcrop: $(this).data('thumbcrop'),
+                        thumbplay: $(this).data('thumbplay')
                     }
                 };
                 if ($(this).data('showdsc'))
@@ -328,12 +414,12 @@
                         $(this).text($container.data('currpage'));
                     });
                     $container.find('.epyt-gallery-thumb[data-videoid="' + $container.data('currvid') + '"]').addClass('epyt-current-video');
-                    
+
                     if ($container.find('.epyt-pagebutton').first().data('autonext') == '1')
                     {
                         $container.find('.epyt-gallery-thumb').first().click();
                     }
-                    
+
                 })
                         .fail(function () {
                             alert('Sorry, there was an error loading the next page.');

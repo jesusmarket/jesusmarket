@@ -19,7 +19,7 @@ define( 'MAILCHIMP_MAILMUNCH_HOME_URL', "http://app.mailmunch.co" );
 define( 'MAILCHIMP_MAILMUNCH_SLUG', "mailchimp-mailmunch" );
 define( 'MAILCHIMP_MAILMUNCH_PREFIX', 'mc_mm' );
 define( 'MAILCHIMP_MAILMUNCH_PLUGIN_DIRECTORY', 'mailchimp-forms-by-mailmunch' );
-define( 'MAILCHIMP_MAILMUNCH_VERSION', '2.1.4' );
+define( 'MAILCHIMP_MAILMUNCH_VERSION', '2.1.5' );
 
 /**
  * The core plugin class.

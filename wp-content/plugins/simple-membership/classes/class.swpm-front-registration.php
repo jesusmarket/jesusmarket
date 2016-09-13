@@ -13,11 +13,14 @@ class SwpmFrontRegistration extends SwpmRegistration {
     }
 
     public function regigstration_ui($level) {
-        $form = apply_filters('swpm_registration_form_override', '', $level);
+        
+        //Trigger the filter to override the registration form (the form builder addon uses this filter)
+        $form = apply_filters('swpm_registration_form_override', '', $level);//The $level value could be empty also so the code handling the filter need to check for it.
         if (!empty($form)) {
+            //An addon has overridden the registration form. So use that one.
             return $form;
         }
-
+        
         $settings_configs = SwpmSettings::get_instance();
         $joinuspage_url = $settings_configs->get_value('join-us-page-url');
         $membership_level = '';
@@ -31,31 +34,34 @@ class SwpmFrontRegistration extends SwpmRegistration {
             } else {
                 $membership_level = $member->membership_level;
             }
-        } else if (!empty($level)) {
+        } else if (!empty($level)) { 
+            //Membership level is specified in the shortcode (level specific registration form).
             $member = SwpmTransfer::$default_fields;
             $membership_level = absint($level);
         }
+        
+        //Check if free membership registration is disalbed on the site
         if (empty($membership_level)) {
             $joinuspage_link = '<a href="' . $joinuspage_url . '">Join us</a>';
-            echo '<p>';
-            SwpmUtils::e('Free membership is disabled on this site. Please make a payment from the ' . $joinuspage_link . ' page to pay for a premium membership.');
-            echo '</p><p>';
-            SwpmUtils::e('You will receive a unique link via email after the payment. You will be able to use that link to complete the premium membership registration.');
-            echo '</p>';
-            return;
+            $free_rego_disabled_msg = '<p>';
+            $free_rego_disabled_msg .= SwpmUtils::_('Free membership is disabled on this site. Please make a payment from the ' . $joinuspage_link . ' page to pay for a premium membership.');
+            $free_rego_disabled_msg .= '</p><p>';
+            $free_rego_disabled_msg .= SwpmUtils::_('You will receive a unique link via email after the payment. You will be able to use that link to complete the premium membership registration.');
+            $free_rego_disabled_msg .= '</p>';
+            return $free_rego_disabled_msg;
         }
 
-
+        //Handle the registration form in core plugin
         $mebership_info = SwpmPermission::get_instance($membership_level);
         $membership_level = $mebership_info->get('id');
         if (empty($membership_level)) {
-            return "Membership Level Not Found.";
+            return "Error! Failed to retrieve membership level ID from the membership info object.";
         }
         $level_identifier = md5($membership_level);
         $membership_level_alias = $mebership_info->get('alias');
         $swpm_registration_submit = filter_input(INPUT_POST, 'swpm_registration_submit');
         if (!empty($swpm_registration_submit)) {
-            $member = $_POST;
+            $member = array_map( 'sanitize_text_field', $_POST );
         }
         ob_start();
         extract((array) $member, EXTR_SKIP);
@@ -78,6 +84,7 @@ class SwpmFrontRegistration extends SwpmRegistration {
 
             $login_page_url = SwpmSettings::get_instance()->get_value('login-page-url');
             $after_rego_msg = '<div class="swpm-registration-success-msg">' . SwpmUtils::_('Registration Successful. ') . SwpmUtils::_('Please') . ' <a href="' . $login_page_url . '">' . SwpmUtils::_('Login') . '</a></div>';
+            $after_rego_msg = apply_filters ('swpm_registration_success_msg', $after_rego_msg);
             $message = array('succeeded' => true, 'message' => $after_rego_msg);
             SwpmTransfer::get_instance()->set('status', $message);
             return;

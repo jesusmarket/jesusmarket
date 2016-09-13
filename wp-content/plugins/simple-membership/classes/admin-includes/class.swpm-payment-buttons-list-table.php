@@ -1,6 +1,8 @@
 <?php
 
-include_once(SIMPLE_WP_MEMBERSHIP_PATH . 'classes/common/class.swpm-list-table.php');
+if (!class_exists('WP_List_Table')){
+    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
 
 class SwpmPaymentButtonsListTable extends WP_List_Table {
 
@@ -16,7 +18,7 @@ class SwpmPaymentButtonsListTable extends WP_List_Table {
             'ajax' => false //does this table support ajax?
         ));
 
-        $this->per_page = 30;
+        $this->per_page = 50;
     }
 
     function column_default($item, $column_name) {
@@ -28,6 +30,10 @@ class SwpmPaymentButtonsListTable extends WP_List_Table {
                 break;
             case 'membership_level':
                 return get_post_meta($item['ID'], 'membership_level_id', true);
+                break;
+            case 'button_type':
+                $button_type = get_post_meta($item['ID'], 'button_type', true);
+                return $button_type;
                 break;
             case 'button_shortcode':
                 $level_id = get_post_meta($item['ID'], 'membership_level_id', true);
@@ -69,15 +75,17 @@ class SwpmPaymentButtonsListTable extends WP_List_Table {
             'ID' => SwpmUtils::_('Payment Button ID'),
             'title' => SwpmUtils::_('Payment Button Title'),
             'membership_level' => SwpmUtils::_('Membership Level ID'),
+            'button_type' => SwpmUtils::_('Button Type'),
             'button_shortcode' => SwpmUtils::_('Button Shortcode'),
         );
         return $columns;
     }
 
     function get_sortable_columns() {
-        $sortable_columns = array(
-            'ID' => array('ID', false), //true means its already sorted
-        );
+        $sortable_columns = array();
+//        $sortable_columns = array(
+//            'ID' => array('ID', false), //true means its already sorted
+//        );
         return $sortable_columns;
     }
 
@@ -89,14 +97,18 @@ class SwpmPaymentButtonsListTable extends WP_List_Table {
     }
 
     function process_bulk_action() {
-        //Detect when a bulk action is being triggered... //print_r($_REQUEST);
+        //Detect when a bulk action is being triggered...
         if ('delete' === $this->current_action()) {
-            $records_to_delete = $_REQUEST['paymentbutton'];
+            $records_to_delete = array_map( 'sanitize_text_field', $_REQUEST['paymentbutton'] );
             if (empty($records_to_delete)) {
                 echo '<div id="message" class="updated fade"><p>Error! You need to select multiple records to perform a bulk action!</p></div>';
                 return;
             }
-            foreach ($records_to_delete as $record_id) {                
+
+            foreach ($records_to_delete as $record_id) {
+                if(!is_numeric($record_id)){
+                    wp_die('Error! ID must be a numeric number.');
+                }
                 wp_delete_post( $record_id );
             }
             echo '<div id="message" class="updated fade"><p>Selected records deleted successfully!</p></div>';
@@ -106,7 +118,10 @@ class SwpmPaymentButtonsListTable extends WP_List_Table {
     function process_delete_action() {
 
         if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'delete_payment_btn') { //Delete link was clicked for a row in list table
-            $record_id = strip_tags($_REQUEST['button_id']);
+            $record_id = sanitize_text_field($_REQUEST['button_id']);
+            if(!is_numeric($record_id)){
+                wp_die('Error! ID must be a numeric number.');
+            }
             wp_delete_post( $record_id );
             $success_msg = '<div id="message" class="updated"><p>';
             $success_msg .= SwpmUtils::_('The selected entry was deleted!');
