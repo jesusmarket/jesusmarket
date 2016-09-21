@@ -4,7 +4,7 @@ class SanityTests:
 
     site_urls = ["http://jesusmarket.org",
                  "http://jesusmarket.org/live/",
-                 "http://jesusmarket.org/arhiva-video/",
+                 "http://jesusmarket.org/inregistrari/",
                  "http://jesusmarket.org/?sermons-category=visul-nu-e-de-vanzare",
                  "http://jesusmarket.org/?sermons-category=calatoria-vietii-tale",
                  "http://jesusmarket.org/?sermons-category=sa-fie-lumina",
