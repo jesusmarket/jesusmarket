@@ -16,7 +16,7 @@
         ?>
         <div id="comments" class="clearfix">
             <?php if (!empty($comments_by_type['comment'])) : // if there are normal comments  ?>
-                <h3><i class="fa fa-comment"></i> <?php comments_number(__('No Comments', 'framework'), __('Comment(1)', 'framework'), __('Comments(%)', 'framework')); ?></h3>
+                <h3><i class="fa fa-comment"></i> <?php comments_number(__('No Comments', 'framework'), __('Mesaj(1)', 'framework'), __('Mesaje(%)', 'framework')); ?></h3>
                 <ol class="comments">
                     <?php wp_list_comments('type=comment&avatar_size=51&callback=imic_comment'); ?>
                 </ol>
@@ -45,7 +45,7 @@ if (comments_open()) :
     <div id="respond-wrap" class="clearfix">
            <section class="post-comment-form">
            <div id="respond" class="clearfix">
-                <h3><i class="fa fa-share"></i> <?php comment_form_title(__('Post a comment', 'framework'), __('Post a comment to %s', 'framework')); ?></h3>
+                <h3><i class="fa fa-share"></i> <?php comment_form_title(__('Trimite un mesaj', 'framework'), __('Post a comment to %s', 'framework')); ?></h3>
                 <div class="cancel-comment-reply">
 			<?php cancel_comment_reply_link(__('Cancel Reply','framework')); ?>
 		</div>
@@ -78,7 +78,7 @@ if (comments_open()) :
                         <div class="row">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    <input name="submit" type="submit" class="btn btn-primary btn-lg" id="submit" tabindex="5" value="<?php _e('Submit your comment', 'framework') ?>" />
+                                    <input name="submit" type="submit" class="btn btn-primary btn-lg" id="submit" tabindex="5" value="<?php _e('Trimite', 'framework') ?>" />
                                     <?php comment_id_fields(); ?>
                                     <?php do_action('comment_form', $post->ID); ?>
                                 </div>

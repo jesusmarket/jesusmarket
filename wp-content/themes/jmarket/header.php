@@ -84,6 +84,18 @@
     </head>
     <!--// CLOSE HEAD //-->
     <body <?php body_class($bodyClass); echo $style;  ?>>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-70700660-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
         <!--[if lt IE 7]>
                 <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]--> 
@@ -416,10 +428,10 @@
                                 $term = get_term_by('slug', get_query_var('term'), get_query_var('taxonomy'));
                                 if (!empty($term->term_id)) {
                                     echo '<div class="col-md-12">
-                                   <h1>' . __('All Sermons For ', 'framework') . $term->name . '</h1>
+                                   <h1>' . __(' ', 'framework') . $term->name . '</h1>
                                       </div>';
                                 } else {
-                                    $imic_post_custom_title = !empty($custom['imic_post_page_custom_title'][0]) ? $custom['imic_post_page_custom_title'][0] : __('Sermons','framework');
+                                    $imic_post_custom_title = !empty($custom['imic_post_page_custom_title'][0]) ? $custom['imic_post_page_custom_title'][0] : __('Prelegeri','framework');
                                     $sterm = get_the_terms(get_the_ID(), 'sermons-category');
                                     echo '<div class="col-md-10 col-sm-10 col-xs-8">
                                             <h1>' . $imic_post_custom_title . '</h1>
@@ -430,7 +442,7 @@
                                             if ($i == 1) {
                                            $term_link = get_term_link($terms, 'sermons-category');
                                            echo'<div class="col-md-2 col-sm-2 col-xs-4">
-                                                <a href="' . $term_link . '" class="pull-right btn btn-primary">' . __('All sermons', 'framework') . '</a>
+                                                <a href="' . $term_link . '" class="pull-right btn btn-primary">' . __('Toate', 'framework') . '</a>
                                                 </div>';
                                                 }
                                             $i++;
