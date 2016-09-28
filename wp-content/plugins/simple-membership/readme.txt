@@ -2,9 +2,9 @@
 Contributors: smp7, wp.insider, amijanina
 Donate link: https://simple-membership-plugin.com/
 Tags: member, members, members only, membership, memberships, register, WordPress membership plugin, content, content protection, paypal, restrict, restrict access, Restrict content, admin, access control, subscription, teaser, protection, profile, login, login page, bbpress, stripe
-Requires at least: 3.3
+Requires at least: 4.0
 Tested up to: 4.6
-Stable tag: 3.3.2
+Stable tag: 3.3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,25 @@ Please visit the memberhsip plugin page to view screenshots:
 https://simple-membership-plugin.com/
 
 == Changelog ==
+
+= 3.3.6 =
+- Added a new option so the admin notification email content can be customized from the email settings menu of the plugin.
+
+= 3.3.5 =
+- Added nonce check on the edit profile form.
+- Added an extra check for the membership level data on the registration form.
+- Minimum WordPress version requirement updated to v4.0.
+
+= 3.3.4 =
+- If you are editing the post protection settings of a post that belongs to a protected category, it will now show a message in the protection settings box to let you know.
+- Improved nonce check with the protection settings saving functionality.
+
+= 3.3.3 =
+- Improvements for a recurring payment received transaction. It will update the profile even if the membership level setting is using a duration type value.
+- Fixed CSRF vulnerabilies.
+- Added nonce verification check in various admin side actions.
+- Added is_admin() check for various admin side actions.
+- Added current_user_can() check for various admin side actions.
 
 = 3.3.2 =
 - You can now view a member's last accessed date and time value by editing the member's profile from the admin dashboard.

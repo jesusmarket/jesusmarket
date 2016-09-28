@@ -23,11 +23,6 @@ class SwpmInitTimeTasks {
         //Crete the custom post types
         $this->create_post_type();
 
-        if (current_user_can(SWPM_MANAGEMENT_PERMISSION)) { 
-            // Admin dashboard stuff
-            $this->admin_init();
-        }
-
         //Do frontend-only init time tasks
         if (!is_admin()) {
             SwpmAuth::get_instance();
@@ -43,6 +38,12 @@ class SwpmInitTimeTasks {
             $this->register_member();
             $this->edit_profile();
             SwpmCommentFormRelated::check_and_restrict_comment_posting_to_members();
+        } else {
+            //Do admin side init time tasks
+            if (current_user_can(SWPM_MANAGEMENT_PERMISSION)) { 
+                //Admin dashboard side stuff
+                $this->admin_init();
+            }
         }
 
         //IPN listener
@@ -52,21 +53,21 @@ class SwpmInitTimeTasks {
     public function admin_init() {
         $createswpmuser = filter_input(INPUT_POST, 'createswpmuser');
         if (!empty($createswpmuser)) {
-            SwpmAdminRegistration::get_instance()->register();
+            SwpmAdminRegistration::get_instance()->register_admin_end();
         }
         $editswpmuser = filter_input(INPUT_POST, 'editswpmuser');
         if (!empty($editswpmuser)) {
             $id = filter_input(INPUT_GET, 'member_id', FILTER_VALIDATE_INT);
-            SwpmAdminRegistration::get_instance()->edit($id);
+            SwpmAdminRegistration::get_instance()->edit_admin_end($id);
         }
         $createswpmlevel = filter_input(INPUT_POST, 'createswpmlevel');
         if (!empty($createswpmlevel)) {
-            SwpmMembershipLevel::get_instance()->create();
+            SwpmMembershipLevel::get_instance()->create_level();
         }
         $editswpmlevel = filter_input(INPUT_POST, 'editswpmlevel');
         if (!empty($editswpmlevel)) {
             $id = filter_input(INPUT_GET, 'id');
-            SwpmMembershipLevel::get_instance()->edit($id);
+            SwpmMembershipLevel::get_instance()->edit_level($id);
         }
         $update_category_list = filter_input(INPUT_POST, 'update_category_list');
         if (!empty($update_category_list)) {
@@ -131,14 +132,14 @@ class SwpmInitTimeTasks {
     private function register_member() {
         $registration = filter_input(INPUT_POST, 'swpm_registration_submit');
         if (!empty($registration)) {
-            SwpmFrontRegistration::get_instance()->register();
+            SwpmFrontRegistration::get_instance()->register_front_end();
         }
     }
 
     private function edit_profile() {
         $swpm_editprofile_submit = filter_input(INPUT_POST, 'swpm_editprofile_submit');
         if (!empty($swpm_editprofile_submit)) {
-            SwpmFrontRegistration::get_instance()->edit();
+            SwpmFrontRegistration::get_instance()->edit_profile_front_end();
             //TODO - do a redirect?
         }
     }

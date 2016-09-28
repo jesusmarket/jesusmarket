@@ -375,16 +375,18 @@ class SimpleWpMembership {
     public function inner_custom_box() {
         global $post, $wpdb;
         $id = $post->ID;
-        // Use nonce for verification
-        $is_protected = SwpmProtection::get_instance()->is_protected($id);
-        echo '<input type="hidden" name="swpm_noncename" id="swpm_noncename" value="' .
-        wp_create_nonce(plugin_basename(__FILE__)) . '" />';
+        $protection_obj = SwpmProtection::get_instance();
+        $is_protected = $protection_obj->is_protected($id);
+        
+        //Nonce input
+        echo '<input type="hidden" name="swpm_post_protection_box_nonce" value="' .wp_create_nonce('swpm_post_protection_box_nonce_action') . '" />';
+        
         // The actual fields for data entry
         echo '<h4>' . __("Do you want to protect this content?", 'swpm') . '</h4>';
-        echo '<input type="radio" ' . ((!$is_protected) ? 'checked' : "") .
-        '  name="swpm_protect_post" value="1" /> No, Do not protect this content. <br/>';
-        echo '<input type="radio" ' . (($is_protected) ? 'checked' : "") .
-        '  name="swpm_protect_post" value="2" /> Yes, Protect this content.<br/>';
+        echo '<input type="radio" ' . ((!$is_protected) ? 'checked' : "") . '  name="swpm_protect_post" value="1" /> No, Do not protect this content. <br/>';
+        echo '<input type="radio" ' . (($is_protected) ? 'checked' : "") . '  name="swpm_protect_post" value="2" /> Yes, Protect this content.<br/>';
+        echo $protection_obj->get_last_message();
+        
         echo '<h4>' . __("Select the membership level that can access this content:", 'swpm') . "</h4>";
         $query = "SELECT * FROM " . $wpdb->prefix . "swpm_membership_tbl WHERE  id !=1 ";
         $levels = $wpdb->get_results($query, ARRAY_A);
@@ -398,16 +400,21 @@ class SimpleWpMembership {
         global $wpdb;
         $post_type = filter_input(INPUT_POST, 'post_type');
         $swpm_protect_post = filter_input(INPUT_POST, 'swpm_protect_post');
-        $swpm_noncename = filter_input(INPUT_POST, 'swpm_noncename');
+        
         if (wp_is_post_revision($post_id)) {
             return;
-        }
-        if (!wp_verify_nonce($swpm_noncename, plugin_basename(__FILE__))) {
-            return $post_id;
         }
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return $post_id;
         }
+        
+        //Check nonce
+        $swpm_post_protection_box_nonce = filter_input(INPUT_POST, 'swpm_post_protection_box_nonce');
+        if (!wp_verify_nonce($swpm_post_protection_box_nonce, 'swpm_post_protection_box_nonce_action')) {
+            //Nonce check failed.
+            return $post_id;
+        }
+        
         if ('page' == $post_type) {
             if (!current_user_can('edit_page', $post_id)) {
                 return $post_id;
