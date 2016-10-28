@@ -10,6 +10,8 @@ echo "files"
 find wordpress wp-admin wpclone_backup wp-includes scripts wp-content -type f -not \( -path "*/\.git/*" \) -exec chmod 664 {} \;
 chmod 664 *.php
 chmod 640 wp-config.php
+chmod 400 readme.html
+chmod 400 license.txt
 echo "dirs"
 find wordpress wp-admin wpclone_backup wp-includes scripts wp-content -type d -not \( -path "*/\.git/*" \) -exec chmod 775 {} \;
 echo "scripts"
