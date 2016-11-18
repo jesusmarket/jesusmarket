@@ -120,7 +120,7 @@ imic_sidebar_position_module(); ?>
                             	<?php echo do_shortcode('[imic_causes cause_id="'.get_the_ID().'" description="'.get_the_title().'"]'); ?>
                             </div>
                             <div class="modal-footer">
-                            	<p class="small short"><?php echo (get_option('donation_form_info')!='')?get_option('donation_form_info'):'If you would prefer to call in your donation, please call 1800.785.876'; ?></p>
+                            	<p class="small short"><?php echo (get_option('donation_form_info')!='')?get_option('donation_form_info'):'If you would prefer to call in your donation, please call +40747 750 635'; ?></p>
                             </div>
                         </div>
                         </div>
