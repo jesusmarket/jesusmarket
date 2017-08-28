@@ -4,7 +4,7 @@ cd /var/www/html
 
 echo "chown"
 chown -R root *
-chgrp -R www *
+chgrp -R www-data *
 
 echo "files"
 find wordpress wp-admin wpclone_backup wp-includes scripts wp-content -type f -not \( -path "*/\.git/*" \) -exec chmod 664 {} \;
